@@ -1,63 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    AndroidManifest.xml — App-level manifest
-    ==========================================
-    This file declares everything the Android OS needs to know about the app:
-    - What hardware it needs (camera)
-    - What permissions it requires
-    - Which Activities exist and which is the launcher
-
-    ANDROID STUDIO IMPORT NOTES:
-    - The 'package' attribute is NOT here (it's now 'namespace' in app/build.gradle)
-    - applicationId is set in app/build.gradle as "tech.virtuglow.demoandroid"
-      This is what the OS uses to identify the app (Play Store, device install)
-    - namespace (internal Java package) is "ai.deepar.deepar_example" (in build.gradle)
-    - These two can differ — it's intentional in this project
-
-    NEW UI NOTE:
-    - Add any new Activities to this manifest or the OS won't know about them
-    - If you add audio recording to new UI, RECORD_AUDIO is already declared here
--->
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- ============================================================
-         HARDWARE FEATURE REQUIREMENTS
-         [ANDROID] Declares that this app requires a camera.
-         required="true" means the app won't install on devices without a camera.
-         Set required="false" if you want it to install on camera-less devices
-         (but then you must handle the no-camera case in code).
-         ============================================================ -->
+    <!-- Camera hardware required — app won't install on devices without a camera -->
     <uses-feature android:name="android.hardware.camera" android:required="true" />
 
-
-    <!-- ============================================================
-         PERMISSIONS
-         [ANDROID] All permissions must be declared here.
-         Dangerous permissions (CAMERA, RECORD_AUDIO, WRITE_EXTERNAL_STORAGE)
-         also require runtime requests on Android 6.0+ (API 23+).
-         ============================================================ -->
-
-    <!-- [ANDROID] Required to access camera hardware. Runtime permission (API 23+).
-         Requested in MainActivity.onStart(). -->
+    <!-- [ANDROID] Runtime permission — requested in MainActivity.onStart() -->
     <uses-permission android:name="android.permission.CAMERA" />
 
-    <!-- [ANDROID] Required for video recording with audio.
-         Must also be requested at runtime if you add audio recording UI.
-         Currently declared but NOT requested at runtime in this demo. -->
+    <!-- [DEEPAR] Required for video recording with audio -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
-    <!-- [ANDROID] Required to save files to external storage on Android ≤ 12 (API ≤ 32).
-         On Android 13+ (API 33+), use MediaStore API instead — no permission needed.
-         maxSdkVersion="32" means this permission is ignored on API 33+.
-         [DEEPAR] Needed to save screenshots and recorded videos to Pictures/Movies. -->
+    <!-- [ANDROID] Save screenshots/videos to external storage. Not needed on Android 13+ (API 33+) -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
 
-    <!-- [ANDROID] Required for DeepAR license validation and for any network features.
-         [DEEPAR] DeepAR contacts its servers to validate the license key on first launch. -->
+    <!-- [DEEPAR] DeepAR validates the license key over the network on first launch -->
     <uses-permission android:name="android.permission.INTERNET" />
-
 
     <application
         android:allowBackup="true"
@@ -67,46 +25,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!-- ============================================================
-             NATIVE LIBRARY DECLARATIONS
-             [DEEPAR] DeepAR can optionally use OpenCL for GPU-accelerated
-             face tracking and ML inference. These entries tell the system
-             that the app can use OpenCL if present, but it's not required.
-             The app works without OpenCL — it just falls back to CPU.
-             required="false" = don't reject the app if library is missing.
-             ============================================================ -->
-        <uses-native-library
-            android:name="libOpenCL.so"
-            android:required="false" />
+        <!-- [DEEPAR] Optional OpenCL acceleration for GPU-based face tracking.
+             required="false" = app works without it, just falls back to CPU. -->
+        <uses-native-library android:name="libOpenCL.so" android:required="false" />
+        <uses-native-library android:name="libOpenCL-pixel.so" android:required="false" />
 
-        <uses-native-library
-            android:name="libOpenCL-pixel.so"
-            android:required="false" />
-
-
-        <!-- ============================================================
-             ACTIVITIES
-             ============================================================ -->
-
-        <!-- [ANDROID] BasicActivity: secondary screen (lifecycle demo for DeepAR).
-             NoActionBar theme: hides the default ActionBar so the Toolbar widget
-             in the layout acts as the app bar instead (Material Design pattern).
-             NEW UI: Add more activities here if you create new screens. -->
-        <activity
-            android:name=".BasicActivity"
-            android:label="@string/title_activity_basic"
-            android:theme="@style/AppTheme.NoActionBar" />
-
-        <!-- [ANDROID] MainActivity: the primary AR camera screen.
-             android:exported="true" is REQUIRED on Android 12+ (API 31+) for any
-             activity with an intent-filter. Without this, the app crashes on launch.
-             The MAIN/LAUNCHER intent-filter makes this the entry point (home screen icon). -->
-        <activity android:name=".MainActivity"
-            android:exported="true">
+        <!-- [ANDROID] MainActivity is the only entry point.
+             android:exported="true" is required on Android 12+ for activities with intent-filters. -->
+        <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
-                <!-- MAIN = this is a top-level entry point (not a sub-action) -->
                 <action android:name="android.intent.action.MAIN" />
-                <!-- LAUNCHER = show this activity when the user taps the app icon -->
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

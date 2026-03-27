@@ -91,16 +91,6 @@ dependencies {
     // Used in activity_main.xml (the AR camera screen layout)
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
 
-    // Material Design: Google's Material UI components (Toolbar, FAB, Snackbar, etc.)
-    // Used in BasicActivity
-    implementation 'com.google.android.material:material:1.13.0'
-
-    // Navigation Component: manages Fragment back stack, arguments, and transitions
-    // Currently used by FirstFragment / SecondFragment (nav_graph.xml)
-    // NEW UI: If you build a Fragment-based UI, these are essential
-    implementation 'androidx.navigation:navigation-fragment:2.9.5'
-    implementation 'androidx.navigation:navigation-ui:2.9.5'
-
     // -------------------------------------------------------
     // [DEEPAR] DeepAR AR SDK
     // -------------------------------------------------------

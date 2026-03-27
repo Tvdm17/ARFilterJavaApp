@@ -66,8 +66,59 @@ import ai.deepar.ar.DeepAR;
  */
 public class ARSurfaceProvider implements Preview.SurfaceProvider {
 
+
+    // -------------------------------------------------------
+    // STATE FIELDS
+    // -------------------------------------------------------
+
+    /** [DEEPAR] Controls whether frames are forwarded to DeepAR. False during camera switch. */
+    private boolean isNotifyDeepar = true;
+
+    /** [GENERAL] Set by stop() — prevents frame delivery after cleanup. */
+    private boolean stop = false;
+
+    /**
+     * [DEEPAR] Mirror flag. True = horizontally flip output (for front camera).
+     * Default true = assume front camera at startup.
+     */
+    private boolean mirror = true;
+
+    /**
+     * [ANDROID + DEEPAR] Frame rotation in degrees (0/90/180/270).
+     * Updated by the transformation info listener when screen rotates.
+     * Passed to DeepAR so it can rotate the frame correctly before processing.
+     */
+    private int orientation = 0;
+
+    /**
+     * [ANDROID] SurfaceTexture backed by DeepAR's OpenGL texture.
+     * Camera frames are written here by CameraX and uploaded to GPU automatically.
+     */
+    private SurfaceTexture surfaceTexture;
+
+    /**
+     * [ANDROID] Surface wrapping the SurfaceTexture — given to CameraX as output target.
+     */
+    private Surface surface;
+
+    /**
+     * [DEEPAR] The OpenGL ES texture ID returned by deepAR.getExternalGlTexture().
+     * 0 = not yet allocated (initial state).
+     */
+    private int nativeGLTextureHandle = 0;
+
+    /** [DEEPAR] Reference to the DeepAR engine for GL texture request and frame delivery. */
+    private final DeepAR deepAR;
+
+    /** [ANDROID] Activity/app context used for getting the main executor. */
+    private final Context context;
+
     /** [ANDROID] Tag for Logcat output — shows class name in log messages. */
     private static final String tag = ARSurfaceProvider.class.getSimpleName();
+
+    // -------------------------------------------------------
+    // METHODS
+    // -------------------------------------------------------
 
     /**
      * [ANDROID] Constructor. Stores references to the context (for executor access)
@@ -267,49 +318,4 @@ public class ARSurfaceProvider implements Preview.SurfaceProvider {
         stop = true;
     }
 
-    // -------------------------------------------------------
-    // STATE FIELDS
-    // -------------------------------------------------------
-
-    /** [DEEPAR] Controls whether frames are forwarded to DeepAR. False during camera switch. */
-    private boolean isNotifyDeepar = true;
-
-    /** [GENERAL] Set by stop() — prevents frame delivery after cleanup. */
-    private boolean stop = false;
-
-    /**
-     * [DEEPAR] Mirror flag. True = horizontally flip output (for front camera).
-     * Default true = assume front camera at startup.
-     */
-    private boolean mirror = true;
-
-    /**
-     * [ANDROID + DEEPAR] Frame rotation in degrees (0/90/180/270).
-     * Updated by the transformation info listener when screen rotates.
-     * Passed to DeepAR so it can rotate the frame correctly before processing.
-     */
-    private int orientation = 0;
-
-    /**
-     * [ANDROID] SurfaceTexture backed by DeepAR's OpenGL texture.
-     * Camera frames are written here by CameraX and uploaded to GPU automatically.
-     */
-    private SurfaceTexture surfaceTexture;
-
-    /**
-     * [ANDROID] Surface wrapping the SurfaceTexture — given to CameraX as output target.
-     */
-    private Surface surface;
-
-    /**
-     * [DEEPAR] The OpenGL ES texture ID returned by deepAR.getExternalGlTexture().
-     * 0 = not yet allocated (initial state).
-     */
-    private int nativeGLTextureHandle = 0;
-
-    /** [DEEPAR] Reference to the DeepAR engine for GL texture request and frame delivery. */
-    private final DeepAR deepAR;
-
-    /** [ANDROID] Activity/app context used for getting the main executor. */
-    private final Context context;
 }

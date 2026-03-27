@@ -112,24 +112,6 @@
 
 
         <!--
-            [ANDROID] Top-right: Opens BasicActivity (demonstrates DeepAR lifecycle).
-            Uses the open_new_activity drawable (defined in drawable-anydpi/).
-            NEW UI: Replace or remove — in a real app this would be a Settings or Profile button.
-        -->
-        <ImageButton
-            android:id="@+id/openActivity"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_alignParentStart="false"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="15dp"
-            android:layout_marginEnd="5dp"
-            android:background="@null"
-            android:scaleType="centerInside"
-            android:src="@drawable/open_new_activity" />
-
-        <!--
             [DEEPAR] Bottom-left: "Previous" arrow — cycles to the previous AR effect.
             Click → gotoPrevious() → deepAR.switchEffect()
             NEW UI: Replace with a horizontal RecyclerView of effect thumbnails,
