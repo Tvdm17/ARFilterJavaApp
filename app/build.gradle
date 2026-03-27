@@ -1,45 +1,141 @@
+// ============================================================
+// app/build.gradle — App module build configuration
+// ============================================================
+// This file controls how the app is compiled, what its identity is,
+// and what libraries it depends on.
+//
+// ANDROID STUDIO IMPORT NOTES:
+//   - When opening in Android Studio, click "Sync Now" when prompted
+//   - The DeepAR dependency (ai.deepar.ar:DeepAR) requires the custom
+//     Maven repository defined in the ROOT build.gradle (not this file)
+//   - If sync fails, check: File > Project Structure > Repositories
+//   - minSdkVersion 23 = Android 6.0 Marshmallow minimum
+//   - compileSdk / targetSdkVersion 36 = compile against latest Android APIs
+// ============================================================
+
+// [ANDROID] Apply the Android Application plugin — makes this a deployable APK module
 apply plugin: 'com.android.application'
 
 android {
     defaultConfig {
+        // [ANDROID] applicationId is the unique identifier for this app on the device
+        // and on the Play Store. This MUST match the DeepAR license key domain.
+        // [DEEPAR] If you change this, you need a new license key from developer.deepar.ai
         applicationId "tech.virtuglow.demoandroid"
+
+        // [ANDROID] minSdkVersion: minimum Android version the app can run on.
+        // 23 = Android 6.0 Marshmallow. Required minimum for CameraX + runtime permissions.
         minSdkVersion 23
+
+        // [ANDROID] targetSdkVersion: which Android API version the app is designed for.
+        // Affects behavior flags (e.g. scoped storage, notification channels).
         targetSdkVersion 36
+
+        // [ANDROID] compileSdk: which SDK version to compile against (access to API 36 classes).
+        // Should match targetSdkVersion.
         compileSdk 36
+
+        // [ANDROID] Version code: integer that must increase with each Play Store release.
         versionCode 1
+
+        // [ANDROID] Version name: human-readable version string shown in Play Store.
         versionName "1.0"
+
+        // [ANDROID] Test runner for instrumented tests (runs on device/emulator).
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // [ANDROID] Use the debug signing config for all build types (including release here).
+        // For production: create a proper release signing config with a keystore file.
         signingConfig signingConfigs.debug
     }
+
     buildTypes {
         release {
+            // [ANDROID] minifyEnabled: enables R8/ProGuard code shrinking and obfuscation.
+            // Reduces APK size and makes reverse engineering harder.
+            // [DEEPAR] DeepAR SDK has its own ProGuard rules — if you see crashes in release
+            // builds, check that DeepAR classes aren't being stripped. Add keep rules if needed.
             minifyEnabled true
+
+            // [ANDROID] ProGuard rule files:
+            //   - proguard-android-optimize.txt: Google's default optimized rules
+            //   - proguard-rules.pro: project-specific rules (empty by default here)
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
+        // [ANDROID] Use Java 11 language features (e.g. lambdas, var, string methods).
+        // Required for CameraX lambda syntax used in MainActivity.
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
+
+    // [ANDROID] namespace: the Java package prefix for generated R.java and BuildConfig classes.
+    // NOTE: This differs from applicationId intentionally:
+    //   namespace (Java)   = ai.deepar.deepar_example  (internal code organization)
+    //   applicationId (OS) = tech.virtuglow.demoandroid (device/Play Store identity)
     namespace 'ai.deepar.deepar_example'
 }
 
 dependencies {
 
+    // -------------------------------------------------------
+    // [ANDROID] Core AndroidX libraries
+    // -------------------------------------------------------
+
+    // AppCompat: provides backward-compatible Activity, ActionBar, Toolbar, themes
     implementation 'androidx.appcompat:appcompat:1.7.1'
+
+    // ConstraintLayout: flexible layout system for complex UI without nesting
+    // Used in activity_main.xml (the AR camera screen layout)
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+
+    // Material Design: Google's Material UI components (Toolbar, FAB, Snackbar, etc.)
+    // Used in BasicActivity
     implementation 'com.google.android.material:material:1.13.0'
+
+    // Navigation Component: manages Fragment back stack, arguments, and transitions
+    // Currently used by FirstFragment / SecondFragment (nav_graph.xml)
+    // NEW UI: If you build a Fragment-based UI, these are essential
     implementation 'androidx.navigation:navigation-fragment:2.9.5'
     implementation 'androidx.navigation:navigation-ui:2.9.5'
 
-    testImplementation 'junit:junit:4.13.2'
+    // -------------------------------------------------------
+    // [DEEPAR] DeepAR AR SDK
+    // -------------------------------------------------------
+    // The main AR engine. Fetched from DeepAR's custom Maven repo
+    // defined in the root build.gradle:
+    //   url "https://sdk.developer.deepar.ai/maven-android-repository/releases/"
+    //
+    // Contains: face tracking, AR rendering, effect loading, screenshot/video capture
+    // Version 5.6.20 — check developer.deepar.ai for latest version
     implementation "ai.deepar.ar:DeepAR:5.6.20"
-    androidTestImplementation 'androidx.test.ext:junit:1.3.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
 
+    // -------------------------------------------------------
+    // [ANDROID] CameraX — Modern camera API
+    // -------------------------------------------------------
+    // CameraX abstracts the complex Camera2 API into a lifecycle-aware, use-case system.
+    // Used for: capturing frames, switching cameras, handling permissions
+    //
+    // camera-core: core use-case definitions (Preview, ImageAnalysis, ImageCapture)
+    // camera-camera2: Camera2 backend implementation (required)
+    // camera-lifecycle: binds camera use-cases to Activity/Fragment lifecycle
+    // camera-view: PreviewView widget (not used here — we use SurfaceView + DeepAR directly)
     def camerax_version = "1.5.0"
     implementation "androidx.camera:camera-core:$camerax_version"
     implementation "androidx.camera:camera-camera2:$camerax_version"
     implementation "androidx.camera:camera-lifecycle:$camerax_version"
     implementation "androidx.camera:camera-view:$camerax_version"
+
+    // -------------------------------------------------------
+    // [ANDROID] Testing dependencies
+    // -------------------------------------------------------
+
+    // JUnit: local unit tests (runs on your dev machine, no Android device needed)
+    testImplementation 'junit:junit:4.13.2'
+
+    // AndroidX JUnit + Espresso: instrumented tests (runs on device/emulator)
+    androidTestImplementation 'androidx.test.ext:junit:1.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
 }
