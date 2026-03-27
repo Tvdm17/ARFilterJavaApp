@@ -14,6 +14,14 @@ import static org.junit.Assert.*;
  * Instrumented test, which will execute on an Android device.
  *
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
+ *
+ *
+ * In a real project you'd replace it with actual tests like:
+ *   - "Does the camera permission dialog appear on first launch?"
+ *   - "Does switching filters actually change the effect?"
+ *   - "Does the screenshot button save a file?"
+ *
+ *   For now you can safely ignore or delete it.
  */
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {

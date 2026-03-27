@@ -855,8 +855,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         if (filterName.equals("none")) {
             return null; // [DEEPAR] Passing null to switchEffect() clears the current effect
         }
-        // BUG: should be "file:///android_asset/" + filterName
-        return "file:///android_asset/MakeupLook.deepar" + filterName;
+        return "file:///android_asset/" + filterName;
     }
 
     /**
