@@ -101,6 +101,8 @@ dependencies {
     // Contains: face tracking, AR rendering, effect loading, screenshot/video capture
     // Version 5.6.20 — check developer.deepar.ai for latest version
     implementation "ai.deepar.ar:DeepAR:5.6.20"
+    implementation 'com.google.android.material:material:1.10.0'
+    implementation 'androidx.activity:activity:1.8.0'
 
     // -------------------------------------------------------
     // [ANDROID] CameraX — Modern camera API

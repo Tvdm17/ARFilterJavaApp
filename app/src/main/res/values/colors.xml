@@ -1,6 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
+
+    <!-- ══════════════════════════════════════
+         PRIMARY BRAND COLORS
+         ══════════════════════════════════════ -->
+    <color name="colorPrimary">#C9A84C</color>          <!-- Gold — buttons, active elements -->
+    <color name="colorPrimaryDark">#A8832A</color>      <!-- Deep Gold — pressed states, shadows -->
+    <color name="colorPrimaryLight">#F0C040</color>     <!-- Light Gold — highlights, hover -->
+    <color name="colorAccent">#1A1A1A</color>           <!-- Near Black — accents, icons -->
+
+    <!-- ══════════════════════════════════════
+         BACKGROUNDS
+         ══════════════════════════════════════ -->
+    <color name="backgroundPrimary">#FFFFFF</color>     <!-- Pure White — main screen background -->
+    <color name="backgroundSecondary">#F7F5F0</color>  <!-- Warm Off-White — cards, input fields -->
+    <color name="backgroundDark">#1A1A1A</color>        <!-- Near Black — dark sections / headers -->
+
+    <!-- ══════════════════════════════════════
+         TEXT
+         ══════════════════════════════════════ -->
+    <color name="textPrimary">#1A1A1A</color>           <!-- Near Black — headings, body text -->
+    <color name="textSecondary">#666666</color>         <!-- Medium Grey — subtitles, hints -->
+    <color name="textMuted">#AAAAAA</color>             <!-- Light Grey — placeholders, disabled -->
+    <color name="textOnGold">#1A1A1A</color>            <!-- Near Black — text ON gold buttons -->
+    <color name="textOnDark">#F5F0E8</color>            <!-- Warm White — text ON dark backgrounds -->
+    <color name="textGold">#C9A84C</color>              <!-- Gold — links, labels, highlighted text -->
+
+    <!-- ══════════════════════════════════════
+         UI ELEMENTS
+         ══════════════════════════════════════ -->
+    <color name="divider">#C9A84C</color>               <!-- Gold — divider lines under inputs -->
+    <color name="dividerLight">#E0D9CC</color>          <!-- Soft Gold-Grey — subtle separators -->
+    <color name="inputBackground">#F7F5F0</color>       <!-- Warm Off-White — input field fills -->
+    <color name="iconTint">#888888</color>              <!-- Grey — inactive icons (e.g. eye) -->
+    <color name="iconTintActive">#C9A84C</color>        <!-- Gold — active/selected icons -->
+
+    <!-- ══════════════════════════════════════
+         STATE COLORS
+         ══════════════════════════════════════ -->
+    <color name="buttonPrimary">#C9A84C</color>         <!-- Gold — default button fill -->
+    <color name="buttonPressed">#A8832A</color>         <!-- Deep Gold — button pressed state -->
+    <color name="buttonDisabled">#D9CBA8</color>        <!-- Pale Gold — button disabled state -->
+    <color name="error">#C0392B</color>                 <!-- Red — error messages, validation -->
+    <color name="success">#27AE60</color>               <!-- Green — success confirmations -->
+
 </resources>
