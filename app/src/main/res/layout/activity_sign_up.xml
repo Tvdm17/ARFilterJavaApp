@@ -160,7 +160,7 @@
                 CheckBox — user must tick before continuing.
                 In your Activity:
                     cbTerms = findViewById(R.id.cbTerms)
-                    cbTerms.isChecked  ← read this before allowing Continue
+                    cbTerms.isChecked  ← read this before allowing To Continue
             -->
             <CheckBox
                 android:id="@+id/cbTerms"
