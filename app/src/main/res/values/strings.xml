@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">DeepAR_Example</string>
+    <string name="email">Email</string>
+    <string name="your_email_address">Your email address</string>
+    <string name="password">Password</string>
+    <string name="your_password">Your password</string>
+    <string name="i_agree_to_the">I agree to the</string>
+    <string name="terms_of_services">Terms of Services</string>
+    <string name="and">and</string>
+    <string name="privacy_policy">Privacy Policy.</string>
+    <string name="customer">Customer</string>
+    <string name="or">Or</string>
+    <string name="creator">Creator</string>
+    <string name="continuation">Continue</string>
+    <string name="have_an_account">Have an Account?</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
 </resources>
