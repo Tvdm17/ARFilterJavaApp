@@ -201,7 +201,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/eye_icon"
-            android:tint="@color/iconTint"
+            app:tint="@color/iconTint"
             android:clickable="true"
             android:focusable="true"
             android:scaleType="centerInside"
