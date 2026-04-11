@@ -13,6 +13,8 @@ This is an example app demonstrating DeepAR SDK.
 
 For more info on DeepAR for Android see: https://docs.deepar.ai/deepar-sdk/platforms/android/overview
 
+
+
 ## How to run
 
 1. Open the project in Android Studio. 
@@ -20,3 +22,7 @@ For more info on DeepAR for Android see: https://docs.deepar.ai/deepar-sdk/platf
 3. Create a project: https://developer.deepar.ai/projects. 
 4. Add a Android app to the project. Note that you need to specify the `applicationId` of your app. The `applicationId` is located in the `app/build.gradle` and in this case it is "ai.deepar.deepar_example".
 5. Copy the generated license key in the `MainActivity.java` instead of your_license_key_here.
+
+## Sources
+
+The following FBX file was used to create eyelashes for makeup effects https://www.cgtrader.com/3d-models/character/human-anatomy/eyelash-pack-01
