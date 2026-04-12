@@ -35,11 +35,13 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.text.format.DateFormat;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -91,6 +93,14 @@ public class MainActivity extends AppCompatActivity implements DeepARManager.Lis
 
     /** Output file for the current video recording. */
     private File videoFile;
+
+    //FOR RECORDING
+    private LinearLayout recDisplay;
+    private View recDot;
+    private TextView recTimer;
+    private Handler timerHandler;
+    private Runnable timerRunnable;
+    private long recordingStartTime;
 
     // ============================================================
     // LIFECYCLE
@@ -225,6 +235,13 @@ public class MainActivity extends AppCompatActivity implements DeepARManager.Lis
             return false;
         });
 
+        //Recording elements:
+        recDisplay = findViewById(R.id.recDisplay);
+        recDot = findViewById(R.id.recDot);
+        recTimer = findViewById(R.id.recTimer);
+        timerHandler = new Handler();
+
+
         // ---- Previous / Next filter arrows ----
         findViewById(R.id.previousMask).setOnClickListener(v -> deepARManager.gotoPrevious());
         findViewById(R.id.nextMask).setOnClickListener(v -> deepARManager.gotoNext());
@@ -336,7 +353,39 @@ public class MainActivity extends AppCompatActivity implements DeepARManager.Lis
      */
     @Override
     public void onVideoRecordingStarted() {
-        // TODO: show recording indicator
+        recordingStartTime = System.currentTimeMillis();
+        recDisplay.setVisibility(View.VISIBLE);
+
+        Runnable blinkRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (!recording) return;
+
+                if (recDot.getVisibility() == View.VISIBLE){
+                    recDot.setVisibility(View.INVISIBLE);
+                }
+                else{
+                    recDot.setVisibility(View.VISIBLE);
+                }
+                timerHandler.postDelayed(this, 500);
+            }
+        };
+
+        timerRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (!recording) return;
+                else{
+                    long elapsed = System.currentTimeMillis() - recordingStartTime;
+                    long seconds = (elapsed / 1000) % 60;
+                    long minutes = (elapsed / 1000) / 60;
+                    recTimer.setText(String.format("  %02d:%02d", minutes, seconds));
+                    timerHandler.postDelayed(this, 1000);
+                }
+                }
+        };
+        timerHandler.post(blinkRunnable);
+        timerHandler.post(timerRunnable);
     }
 
     /**
@@ -345,7 +394,11 @@ public class MainActivity extends AppCompatActivity implements DeepARManager.Lis
      */
     @Override
     public void onVideoRecordingFinished() {
-        // TODO: show save confirmation
+        recording = false;
+        recDisplay.setVisibility(View.GONE);
+        timerHandler.removeCallbacksAndMessages(null);
+        recTimer.setText("  00:00");
+        Toast.makeText(this, "Video saved.", Toast.LENGTH_SHORT).show();
     }
 
     /**
