@@ -79,6 +79,7 @@ android {
 }
 
 dependencies {
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
 
     // -------------------------------------------------------
     // [ANDROID] Core AndroidX libraries

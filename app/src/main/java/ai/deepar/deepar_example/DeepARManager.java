@@ -273,7 +273,9 @@ public class DeepARManager implements AREventListener, SurfaceHolder.Callback {
      * [DEEPAR] Stop an in-progress recording. File is fully written after videoRecordingFinished() fires.
      */
     public void stopVideoRecording() {
-        if (deepAR != null) deepAR.stopVideoRecording();
+        if (deepAR != null) {
+            if (deepAR != null) deepAR.stopVideoRecording();
+        }
     }
 
     // -------------------------------------------------------
@@ -392,6 +394,12 @@ public class DeepARManager implements AREventListener, SurfaceHolder.Callback {
     @Override
     public void error(ARErrorType type, String message) {
         if (listener != null) listener.onError(type, message);
+    }
+
+    public void switchEffect(String effectFileName) {
+        if (deepAR != null) {
+            deepAR.switchEffect("effect", getFilterPath(effectFileName));
+        }
     }
 
     @Override

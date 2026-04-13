@@ -417,7 +417,10 @@ public class MainActivity extends AppCompatActivity implements DeepARManager.Lis
      */
     @Override
     public void onInitialized() {
-        // DeepARManager already applied the current effect
+        String effectName = getIntent().getStringExtra("EFFECT_NAME");
+        if (effectName != null) {
+            deepARManager.switchEffect(effectName);
+        }
     }
 
     /**
