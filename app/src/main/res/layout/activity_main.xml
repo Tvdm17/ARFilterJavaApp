@@ -1,35 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    activity_main.xml — Layout for the main AR camera screen
-    ==========================================================
-    This layout has two layers stacked on top of each other:
+    activity_main.xml — Layout for the main AR camera screen (screenshots + filter navigation)
+    ===========================================================================================
+    Two layers stacked on top of each other:
       1. SurfaceView (full screen) — [DEEPAR] DeepAR renders the AR camera feed here
       2. RelativeLayout (full screen overlay) — [ANDROID] All UI controls sit on top
 
-    NEW UI PLAN:
-    ============
-    The SurfaceView (@+id/surface) is the ONLY element that must stay.
-    Everything else (buttons, mode toggles) can be replaced with your own design.
+    Video recording is handled by activity_preview.xml / PreviewActivity.
 
-    When redesigning:
-    - Keep the SurfaceView with id="@+id/surface" (MainActivity references it by this ID)
-    - You can replace the RelativeLayout overlay with a ConstraintLayout or any ViewGroup
-    - You can remove individual buttons as long as you remove their references in MainActivity.java too
-    - The record/screenshot button and mode toggle logic lives in initalizeViews() in MainActivity
-
-    ANDROID STUDIO IMPORT NOTE:
-    - The layout uses a mix of ConstraintLayout (outer) + RelativeLayout (overlay).
-      This works but is slightly redundant. When redesigning, consider using a single
-      ConstraintLayout with the SurfaceView as the background layer.
-    - "camera_white" drawable (used by switchCamera button) is referenced but may need
-      to be added to res/drawable/ — check if the file exists before building.
+    CRITICAL: The SurfaceView id="@+id/surface" must not be removed.
+    It is registered in MainActivity.setupViews() as the DeepAR render target.
 -->
 
-<!-- [ANDROID] Outer ConstraintLayout: full-screen container.
-     The SurfaceView fills this entirely. -->
+<!-- [ANDROID] Outer ConstraintLayout: full-screen container. -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -39,49 +24,27 @@
         [DEEPAR] SurfaceView — the AR rendering surface.
         DeepAR renders the camera feed + AR effects directly into this surface.
         It sits behind all other views (defined first = lower z-order).
-
-        CRITICAL: Do NOT remove or resize this view.
-        - Its id "surface" is referenced in MainActivity.initalizeViews()
-        - Its SurfaceHolder provides the Surface passed to deepAR.setRenderSurface()
-        - match_parent ensures the AR view fills the entire screen
-
-        [ANDROID] SurfaceView creates its own drawing layer outside the normal View hierarchy.
-        This means it can render at full frame rate without blocking the UI thread.
-        It also means overlaid views (like buttons) must be in a SEPARATE ViewGroup.
     -->
     <SurfaceView
+        android:id="@+id/surface"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/surface"/>
+        android:layout_height="match_parent" />
 
     <!--
         [ANDROID] RelativeLayout overlay: sits on top of the SurfaceView.
-        All UI controls live here. Because SurfaceView draws in its own window layer,
-        this ViewGroup's children must be positioned above it manually (z-order via declaration order).
-
-        NEW UI: Replace this entire RelativeLayout with your own UI overlay.
-        Just keep it as a full-screen overlay (match_parent x match_parent).
+        All UI controls live here.
     -->
     <RelativeLayout
         android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp">
+        android:layout_height="match_parent">
 
         <!--
-            [GENERAL] Center-bottom button: Screenshot or Record (toggled by mode buttons).
-            70x70dp with a custom drawable that changes appearance when pressed (record_selector.xml).
-            android:background="@null" = no default button background (transparent).
-
-            In MainActivity, this button's click listener is replaced dynamically
-            depending on whether the user selected Screenshot mode or Record mode.
-
-            NEW UI: Replace with a Floating Action Button (FAB), a custom styled button, etc.
-            Keep the id "recordButton" or update the reference in initalizeViews().
+            Center-bottom: Screenshot button.
+            Click → deepARManager.takeScreenshot()
         -->
         <ImageButton
-            android:id="@+id/recordButton"
+            android:id="@+id/screenshotButton"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_alignParentBottom="true"
@@ -89,14 +52,12 @@
             android:layout_marginBottom="40dp"
             android:background="@null"
             android:scaleType="centerInside"
-            android:src="@drawable/record_selector" />
-
+            android:src="@drawable/record_selector"
+            android:contentDescription="Take screenshot" />
 
         <!--
-            [ANDROID] Top-left: Switch camera (front ↔ back).
-            Uses "camera_white" drawable — ensure this file exists in res/drawable/.
-            Click listener in MainActivity toggles lensFacing and rebinds CameraX.
-            NEW UI: Replace with an icon from Material Icons or your own asset.
+            Top-left: Switch camera (front ↔ back).
+            Click → cameraManager.switchCamera()
         -->
         <ImageButton
             android:id="@+id/switchCamera"
@@ -108,53 +69,12 @@
             android:layout_marginTop="15dp"
             android:background="@null"
             android:scaleType="centerInside"
-            android:src="@drawable/camera_white" />
-
-        <LinearLayout
-            android:id="@+id/recDisplay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:visibility="gone"
-            android:gravity="center_vertical"
-            android:padding="8dp"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="15dp">
-
-            <View
-                android:id="@+id/recDot"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:background="@android:color/holo_red_dark"
-                android:layout_marginEnd="6dp"/>
-
-            <TextView
-                android:id="@+id/recLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="REC"
-                android:textColor="@android:color/holo_red_dark"
-                android:textStyle="bold"
-                android:textSize="14sp"/>
-
-            <TextView
-                android:id="@+id/recTimer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="  00:00"
-                android:textColor="@android:color/white"
-                android:textStyle="bold"
-                android:textSize="14sp"/>
-
-        </LinearLayout>
-
+            android:src="@drawable/camera_white"
+            android:contentDescription="Switch camera" />
 
         <!--
-            [DEEPAR] Bottom-left: "Previous" arrow — cycles to the previous AR effect.
-            Click → gotoPrevious() → deepAR.switchEffect()
-            NEW UI: Replace with a horizontal RecyclerView of effect thumbnails,
-            or a swipe gesture, or a bottom sheet filter picker.
+            Bottom-left: Previous filter arrow.
+            Click → deepARManager.gotoPrevious()
         -->
         <ImageButton
             android:id="@+id/previousMask"
@@ -166,13 +86,12 @@
             android:layout_marginBottom="20dp"
             android:background="@null"
             android:scaleType="centerInside"
-            android:src="@drawable/arrow_left" />
-
+            android:src="@drawable/arrow_left"
+            android:contentDescription="Previous filter" />
 
         <!--
-            [DEEPAR] Bottom-right: "Next" arrow — cycles to the next AR effect.
-            Click → gotoNext() → deepAR.switchEffect()
-            Same new UI suggestion as previousMask above.
+            Bottom-right: Next filter arrow.
+            Click → deepARManager.gotoNext()
         -->
         <ImageButton
             android:id="@+id/nextMask"
@@ -184,58 +103,9 @@
             android:layout_marginBottom="20dp"
             android:background="@null"
             android:scaleType="centerInside"
-            android:src="@drawable/arrow_right" />
-
-
-        <!--
-            [GENERAL] Mode toggle: "Screenshot" button (right side, above center button).
-            Clicking this switches the center button to take screenshots.
-            Active state = background alpha 0xA0 (semi-opaque white rounded rectangle).
-            Inactive state = background alpha 0x00 (invisible).
-            Background defined in res/drawable/rounded_corners.xml.
-
-            Uses TextView instead of Button for custom background + text styling.
-            android:layout_above="@id/recordButton" positions it just above the center button.
-
-            NEW UI: Replace both mode toggle buttons with a segmented control, toggle switch,
-            or a bottom navigation bar that explicitly shows the current mode.
-        -->
-        <TextView
-            android:id="@+id/screenshotModeButton"
-            android:layout_width="100dp"
-            android:layout_height="30dp"
-            android:layout_above="@id/recordButton"
-            android:layout_alignParentEnd="true"
-            android:layout_marginRight="25dp"
-            android:background="@drawable/rounded_corners"
-            android:clickable="true"
-            android:elegantTextHeight="true"
-            android:fadingEdgeLength="56dp"
-            android:requiresFadingEdge="vertical"
-            android:text="  Screenshot  "
-            android:textAlignment="center" />
-
-        <!--
-            [GENERAL] Mode toggle: "Record" button (left side, above center button).
-            Clicking this switches the center button to start/stop video recording.
-            Same visual behavior as screenshotModeButton (alpha toggle indicates active mode).
-
-            NEW UI: See screenshotModeButton above.
-        -->
-        <TextView
-            android:id="@+id/recordModeButton"
-            android:layout_width="100dp"
-            android:layout_height="30dp"
-            android:layout_above="@id/recordButton"
-            android:layout_alignParentStart="true"
-            android:layout_marginLeft="25dp"
-            android:background="@drawable/rounded_corners"
-            android:clickable="true"
-            android:elegantTextHeight="true"
-            android:fadingEdgeLength="32dp"
-            android:requiresFadingEdge="horizontal"
-            android:text="  Record  "
-            android:textAlignment="center" />
+            android:src="@drawable/arrow_right"
+            android:contentDescription="Next filter" />
 
     </RelativeLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

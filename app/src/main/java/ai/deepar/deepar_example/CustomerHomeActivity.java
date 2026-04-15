@@ -27,9 +27,11 @@ public class CustomerHomeActivity extends AppCompatActivity {
 
         // DUMMY LIST FOR TESTING, TO BE REPLACED WITH DATABASE
         List<Makeover> makeovers = new ArrayList<>();
-        makeovers.add(new Makeover("Makeup Look 1", "MakeupLook.deepar"));
-        makeovers.add(new Makeover("Makeup Look 2", "makeup_look_2.deepar"));
-        makeovers.add(new Makeover("Makeup Look 3", "makeup_look_3.deepar"));
+        makeovers.add(new Makeover("Makeup Look 1", "1GrayBlueEyeshadow.deepar"));
+        makeovers.add(new Makeover("Makeup Look 2", "2PurpleEyeliner.deepar"));
+        makeovers.add(new Makeover("Makeup Look 3", "3RedLips.deepar"));
+        makeovers.add(new Makeover("Makeup Look 4", "4ContourLipgloss.deepar"));
+        makeovers.add(new Makeover("Makeup Look 5", "5MPaleSymmetricalBlush.deepar"));
 
         RecyclerView rvItems = findViewById(R.id.rvItems);
         int columns = makeovers.size() > 5 ? 2 : 1;

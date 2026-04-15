@@ -39,9 +39,9 @@ public class MakeoverAdapter extends RecyclerView.Adapter<MakeoverAdapter.ViewHo
         // Set the name label
         holder.tvItemName.setText(makeover.makeoverName);
 
-        // When tapped, open MainActivity with this makeover's effect
-        holder.ivItemImage.setOnClickListener(v -> {
-            Intent intent = new Intent(context, MainActivity.class);
+        // When the makeover name is tapped, open PreviewActivity with this filter applied
+        holder.tvItemName.setOnClickListener(v -> {
+            Intent intent = new Intent(context, PreviewActivity.class);
             intent.putExtra("EFFECT_NAME", makeover.filterFileName);
             context.startActivity(intent);
         });
