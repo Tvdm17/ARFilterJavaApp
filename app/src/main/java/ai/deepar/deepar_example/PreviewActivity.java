@@ -232,8 +232,8 @@ public class PreviewActivity extends AppCompatActivity implements DeepARManager.
                     "video_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(new Date()) + ".mp4"
             );
             // & ~1 rounds down to the nearest even number — bc  Android video encoder (H.264) requires both dimensions to be even
-            int recordWidth  = (cameraManager.getWidth()  / 2) & ~1;
-            int recordHeight = (cameraManager.getHeight() / 2) & ~1;
+            int recordWidth  = (cameraManager.getWidth()  / 2) & ~16;
+            int recordHeight = (cameraManager.getHeight() / 2) & ~16;
             deepARManager.startVideoRecording(videoFile.toString(), recordWidth, recordHeight);
         }
         recording = !recording;

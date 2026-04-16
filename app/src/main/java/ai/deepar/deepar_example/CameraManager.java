@@ -40,6 +40,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 
 import ai.deepar.ar.CameraResolutionPreset;
 import ai.deepar.ar.DeepARImageFormat;
@@ -257,7 +258,10 @@ public class CameraManager {
                     .setTargetResolution(cameraResolution)
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                     .build();
-            imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(activity), imageAnalyzer);
+            // [ANDROID] Run frame analysis on a dedicated background thread, not the main thread.
+            // The main thread is for UI only — processing every camera frame there causes
+            // dropped frames and sluggish AR rendering.
+            imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(), imageAnalyzer);
             cameraProvider.unbindAll();
             cameraProvider.bindToLifecycle((LifecycleOwner) activity, cameraSelector, imageAnalysis);
         }
