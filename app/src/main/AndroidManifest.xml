@@ -17,8 +17,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true"> <!--  for allowing http, the api is http! -->
+        android:theme="@style/AppTheme">
         <activity
             android:name=".LoginActivity"
             android:exported="true">
@@ -31,11 +30,11 @@
 
         <activity android:name=".SignUpActivity" android:exported="false" />
         <activity android:name=".CustomerHomeActivity" android:exported="false" />
-
-        <!-- <activity android:name=".LoginActivity" android:exported="true" /> -->
         <activity android:name=".ShopActivity" android:exported="false" />
         <activity android:name=".MainActivity" android:exported="false" />
         <activity android:name=".PreviewActivity" android:exported="false" />
+        <activity android:name=".TermsActivity" android:exported="false" />
+        <activity android:name=".PrivacyPolicyActivity" android:exported="false" />
 
 
         <!--
