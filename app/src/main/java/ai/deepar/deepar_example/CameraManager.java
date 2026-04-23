@@ -37,6 +37,9 @@ import androidx.lifecycle.LifecycleOwner;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.ExecutionException;
@@ -98,6 +101,14 @@ public class CameraManager {
     /** [ANDROID + DEEPAR] Two ByteBuffers alternated each frame to avoid blocking. */
     private ByteBuffer[] buffers;
     private int currentBuffer = 0;
+
+    /**
+     * [DEEPAR] DeepAR requires every call (receiveFrame, switchEffect, etc.) to happen
+     * on the same thread where it was initialized and where setRenderSurface() was called
+     * (the main thread). CameraX's ImageAnalysis runs on a background executor, so we
+     * post receiveFrame() back to the main thread via this handler.
+     */
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     /**
      * [DEEPAR] Used when USE_EXTERNAL_CAMERA_TEXTURE = true.
@@ -272,13 +283,25 @@ public class CameraManager {
     // -------------------------------------------------------
 
     /**
-     * [ANDROID + DEEPAR] Called by CameraX for every camera frame.
+     * [ANDROID + DEEPAR] Called by CameraX for every camera frame on a background thread.
      *
      * Flow:
-     *   1. Extract the RGBA pixel data from ImageProxy into the current buffer
-     *   2. Hand the buffer to DeepARManager (which forwards to deepAR.receiveFrame())
-     *   3. Advance to the next buffer slot
+     *   1. Copy RGBA pixel data from ImageProxy into the current double-buffer slot (background thread)
+     *   2. Capture all frame metadata as locals (width, rotation, etc.)
+     *   3. Advance the buffer slot so the next frame writes to the other buffer
      *   4. Close the ImageProxy — CRITICAL: CameraX blocks until close() is called
+     *   5. Post receiveFrame() to the main thread via mainHandler
+     *
+     * WHY THE POST TO MAIN THREAD (crash fix):
+     *   DeepAR enforces that every method call — receiveFrame(), switchEffect(),
+     *   setRenderSurface() — must come from the same thread where DeepAR was first
+     *   initialized. DeepAR.initialize() is called from PreviewActivity.initialize(),
+     *   which runs on the main thread. CameraX runs this analyzer on a background
+     *   executor (pool-6-thread-1), so calling receiveFrame() here directly caused:
+     *   IllegalStateException: "Method called from the thread that DeepAR was not
+     *   initialized in."
+     *   Pixel data is safe to copy on the background thread — only the DeepAR call
+     *   itself must be on main.
      */
     private final ImageAnalysis.Analyzer imageAnalyzer = new ImageAnalysis.Analyzer() {
         @Override
@@ -287,24 +310,38 @@ public class CameraManager {
             ByteBuffer buffer = image.getPlanes()[0].getBuffer();
             buffer.rewind(); // Reset read position to 0
 
-            buffers[currentBuffer].put(buffer);       // Copy frame into our double-buffer slot
-            buffers[currentBuffer].position(0);        // Reset for DeepAR to read from start
+            buffers[currentBuffer].put(buffer);  // Copy frame pixels into our double-buffer slot
+            buffers[currentBuffer].position(0);  // Reset so DeepAR reads from the start
 
-            // [DEEPAR] Forward frame to DeepAR via DeepARManager
-            deepARManager.receiveFrame(
-                    buffers[currentBuffer],
-                    image.getWidth(),
-                    image.getHeight(),
-                    image.getImageInfo().getRotationDegrees(), // How much to rotate to match display
-                    lensFacing == CameraSelector.LENS_FACING_FRONT, // Mirror front camera
-                    DeepARImageFormat.RGBA_8888,
-                    image.getPlanes()[0].getPixelStride() // Bytes per pixel (usually 4 for RGBA)
-            );
+            // Capture everything needed for the main-thread call before closing the image
+            final int bufferIndex  = currentBuffer;
+            final int frameWidth   = image.getWidth();
+            final int frameHeight  = image.getHeight();
+            final int rotation     = image.getImageInfo().getRotationDegrees();
+            final boolean mirror   = lensFacing == CameraSelector.LENS_FACING_FRONT;
+            final int pixelStride  = image.getPlanes()[0].getPixelStride();
 
-            currentBuffer = (currentBuffer + 1) % NUMBER_OF_BUFFERS; // Advance buffer slot
+            // Advance buffer slot now so the next frame goes into the other buffer
+            currentBuffer = (currentBuffer + 1) % NUMBER_OF_BUFFERS;
 
-            // [ANDROID] MUST call close() — CameraX won't deliver the next frame until this returns
+            // [ANDROID] MUST call close() — CameraX won't deliver the next frame until this returns.
+            // Safe to close here because pixel data is already copied into buffers[bufferIndex].
             image.close();
+
+            // [DEEPAR] receiveFrame() must be called on the thread DeepAR was initialized on
+            // (the main thread, where setRenderSurface() was also called).
+            // Posting here moves the DeepAR call off the CameraX background executor.
+            mainHandler.post(() ->
+                deepARManager.receiveFrame(
+                        buffers[bufferIndex],
+                        frameWidth,
+                        frameHeight,
+                        rotation,    // How many degrees to rotate the frame to match the display
+                        mirror,      // Flip horizontally for front camera
+                        DeepARImageFormat.RGBA_8888,
+                        pixelStride  // Bytes per pixel — 4 for RGBA_8888
+                )
+            );
         }
     };
 

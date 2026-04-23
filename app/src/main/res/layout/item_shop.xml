@@ -1,44 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    item_shop.xml — Layout for a single item card in the Shop list
-    ===============================================================
-    Colors:  res/values/colors.xml
-             (C:\Users\Admin\StudioProjects\305\app\src\main\res\values\colors.xml)
-
+    item_shop.xml — single card in the Shop list
     Used by: RecyclerView (@+id/rvShopItems) in activity_shop.xml
-
-    VIEW IDs (reference these in your ShopAdapter):
-    - @+id/ivItemImage    — item image (200x200dp), read-only
-    - @+id/tvItemName     — item name label
-    - @+id/btnView        — "View" button, opens activity_item_card
-    - @+id/rbRating       — RatingBar (read-only, shows average rating)
-    - @+id/tvRatingValue  — numeric rating tooltip (hidden by default, shown on tap)
-
-    ADDING LOGIC LATER (in your ShopAdapter.onBindViewHolder):
-
-        // Set data
-        holder.tvItemName.setText(item.getName());
-        holder.rbRating.setRating((float) item.getAverageRating());
-        holder.tvRatingValue.setText(String.valueOf(item.getAverageRating()));
-
-        // Load image with Glide:
-        Glide.with(context).load(item.getImageUrl()).into(holder.ivItemImage);
-
-        // TODO: Navigate to activity_item_card
-        holder.btnView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, ItemCardActivity.class);
-            intent.putExtra("ITEM_ID", item.getId());
-            context.startActivity(intent);
-        });
-
-        // TODO: Show average rating tooltip
-        holder.rbRating.setOnClickListener(v -> {
-            holder.tvRatingValue.setVisibility(
-                holder.tvRatingValue.getVisibility() == View.VISIBLE
-                    ? View.GONE : View.VISIBLE);
-        });
+    Adapter: ShopAdapter.java
+    IDs: @+id/ivItemImage, @+id/tvItemName, @+id/btnView, @+id/rbRating, @+id/tvRatingValue
 -->
-
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -47,7 +13,6 @@
     android:paddingBottom="16dp"
     android:background="@color/backgroundPrimary">
 
-    <!-- Item image — 200x200dp square -->
     <ImageView
         android:id="@+id/ivItemImage"
         android:layout_width="200dp"
@@ -59,7 +24,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Item name -->
     <TextView
         android:id="@+id/tvItemName"
         android:layout_width="wrap_content"
@@ -72,10 +36,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!--
-        "View" button.
-        TODO: Navigate to activity_item_card (wire up in ShopAdapter — see header)
-    -->
     <Button
         android:id="@+id/btnView"
         android:layout_width="wrap_content"
@@ -89,11 +49,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!--
-        Star rating bar — read-only display of average rating.
-        TODO: Show average rating tooltip (wire up in ShopAdapter — see header)
-        Tapping shows/hides tvRatingValue below.
-    -->
     <RatingBar
         android:id="@+id/rbRating"
         style="?android:attr/ratingBarStyleSmall"
@@ -108,11 +63,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!--
-        Numeric rating tooltip — hidden by default.
-        Shown when user taps the RatingBar.
-        Displays the double average value e.g. "3.5"
-    -->
+    <!-- Numeric rating tooltip — hidden by default, shown when user taps the RatingBar -->
     <TextView
         android:id="@+id/tvRatingValue"
         android:layout_width="wrap_content"
