@@ -121,6 +121,12 @@ dependencies {
     implementation "androidx.camera:camera-lifecycle:$camerax_version"
     implementation "androidx.camera:camera-view:$camerax_version"
 
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    // htttp request and responses
+
+
+
+
     // -------------------------------------------------------
     // [ANDROID] Testing dependencies
     // -------------------------------------------------------
