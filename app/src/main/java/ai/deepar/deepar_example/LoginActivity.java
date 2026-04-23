@@ -1,24 +1,59 @@
 package ai.deepar.deepar_example;
 
+import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.activity.EdgeToEdge;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class LoginActivity extends AppCompatActivity {
+
+    private EditText etEmail, etPassword;
+    private Button btnSignIn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        // views from xml
+        etEmail = findViewById(R.id.etEmail);
+        etPassword = findViewById(R.id.etPassword);
+        btnSignIn = findViewById(R.id.btnSignIn);
+
+        // click listener sign in botton
+        btnSignIn.setOnClickListener(v -> {
+            String email = etEmail.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
+
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // disable button to prevent multiple logins
+            btnSignIn.setEnabled(false);
+
+            // call DatabaseManager
+            DatabaseManager.attemptLoginAsync(email, password, new DatabaseManager.LoginCallback() {
+                @Override
+                public void onSuccess(String email, int userId) {
+                    // Logic for successful login: Move to MainActivity
+                    Intent intent = new Intent(LoginActivity.this, CustomerHomeActivity.class);
+                    intent.putExtra("USER_EMAIL", email);
+                    intent.putExtra("USER_ID", userId);
+                    startActivity(intent);
+                    finish(); //  prevents going back to Login when hitting the back button
+                }
+
+                @Override
+                public void onFailure(String message) {
+                    // Logic for failed login
+                    btnSignIn.setEnabled(true);
+                    Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
+                }
+            });
         });
     }
 }

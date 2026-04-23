@@ -46,6 +46,13 @@ public class DatabaseManager {
         void onComplete(JSONArray result);
     }
 
+    public interface LoginCallback {
+        void onSuccess(String email, int userId);
+        void onFailure(String message);
+    }
+
+
+
 
     public static void getHRDataAsync(String date, ApiCallback callback) {
         executor.execute(() -> {
@@ -131,6 +138,33 @@ public class DatabaseManager {
             }
         }
         return null;
+    }
+
+    public static void attemptLoginAsync(String email, String password, LoginCallback callback) {
+        executor.execute(() -> {
+            try {
+                String hashedPassword = hashPassword(password);
+                // The endpoint must match your API's naming convention
+                JSONArray response = fetchFromAPI("get_user/" + email + "/" + hashedPassword);
+
+                if (response != null && response.length() > 0) {
+                    JSONObject userObj = response.optJSONObject(0);
+                    if (userObj != null) {
+                        String userEmail = userObj.optString("emailAddress", null);
+                        int userId = userObj.optInt("uersid", -1);
+
+                        // Success! Back to the UI thread
+                        mainHandler.post(() -> callback.onSuccess(userEmail, userId));
+                        return;
+                    }
+                }
+                // If we reach here, either response was empty or object was null
+                mainHandler.post(() -> callback.onFailure("Invalid email or password."));
+
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onFailure("Network error: " + e.getMessage()));
+            }
+        });
     }
 
     public static boolean registerUser(String username, String password) {

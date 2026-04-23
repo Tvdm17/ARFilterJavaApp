@@ -20,7 +20,7 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"> <!--  for allowing http, the api is http! -->
         <activity
-            android:name=".CustomerHomeActivity"
+            android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,7 +30,9 @@
         </activity>
 
         <activity android:name=".SignUpActivity" android:exported="false" />
-        <activity android:name=".LoginActivity" android:exported="false" />
+        <activity android:name=".CustomerHomeActivity" android:exported="false" />
+
+        <!-- <activity android:name=".LoginActivity" android:exported="true" /> -->
         <activity android:name=".ShopActivity" android:exported="false" />
         <activity android:name=".MainActivity" android:exported="false" />
         <activity android:name=".PreviewActivity" android:exported="false" />
