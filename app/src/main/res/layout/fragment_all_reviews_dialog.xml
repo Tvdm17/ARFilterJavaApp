@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    fragment_all_reviews_dialog.xml — All reviews popup for creators
+    ================================================================
+    Colors:  res/values/colors.xml
+             (C:\Users\Admin\StudioProjects\305\app\src\main\res\values\colors.xml)
+
+    Displayed as a DialogFragment on top of activity_creator_item_card.xml.
+    Shows ALL reviews for the mask (vs last 3 on customer side).
+    Reuses item_review.xml for each row.
+
+    VIEW IDs:
+    - @+id/tvAllReviewsTitle  — "Reviews" heading
+    - @+id/tvAverageRating    — average rating numeric display e.g. "Avg: 3.5 / 5"
+    - @+id/rbAverageRating    — read-only average star bar
+    - @+id/rvAllReviews       — RecyclerView showing all reviews
+    - @+id/btnCloseReviews    — closes the dialog
+
+    ADDING LOGIC LATER:
+    - Load all reviews : find "TODO: Fetch all reviews from DB"
+
+    JAVA DIALOG SETUP (create AllReviewsDialogFragment.java):
+        public class AllReviewsDialogFragment extends DialogFragment {
+            @Override
+            public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                     Bundle savedInstanceState) {
+                return inflater.inflate(R.layout.fragment_all_reviews_dialog, container, false);
+            }
+
+            @Override
+            public void onViewCreated(View view, Bundle savedInstanceState) {
+                super.onViewCreated(view, savedInstanceState);
+
+                RecyclerView rvAllReviews = view.findViewById(R.id.rvAllReviews);
+                rvAllReviews.setLayoutManager(new LinearLayoutManager(getContext()));
+
+                // TODO: Fetch all reviews from DB
+                // rvAllReviews.setAdapter(new ReviewAdapter(allReviews));
+
+                view.findViewById(R.id.btnCloseReviews).setOnClickListener(v -> dismiss());
+            }
+        }
+-->
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@color/backgroundPrimary">
+
+    <!-- Dialog title -->
+    <TextView
+        android:id="@+id/tvAllReviewsTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reviews"
+        android:textColor="@color/textPrimary"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Average rating row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <RatingBar
+            android:id="@+id/rbAverageRating"
+            style="?android:attr/ratingBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:stepSize="0.5"
+            android:isIndicator="true"
+            android:progressTint="@color/colorPrimary" />
+
+        <!--
+            TODO: Fetch all reviews from DB — compute and set average
+            tvAverageRating.setText(String.format("  %.1f / 5", avgRating));
+        -->
+        <TextView
+            android:id="@+id/tvAverageRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="  0.0 / 5"
+            android:textColor="@color/textSecondary"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+
+    <!--
+        Scrollable list of all reviews.
+        Reuses item_review.xml layout.
+        TODO: Fetch all reviews from DB
+    -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvAllReviews"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:nestedScrollingEnabled="true"
+        tools:listitem="@layout/item_review"
+        xmlns:tools="http://schemas.android.com/tools" />
+
+    <!-- Close button -->
+    <Button
+        android:id="@+id/btnCloseReviews"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Close"
+        android:textColor="@color/textOnGold"
+        android:backgroundTint="@color/buttonPrimary"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

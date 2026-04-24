@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    fragment_leave_review_dialog.xml — Leave a review popup dialog
+    ===============================================================
+    Colors:  res/values/colors.xml
+             (C:\Users\Admin\StudioProjects\305\app\src\main\res\values\colors.xml)
+
+    Displayed as a DialogFragment on top of activity_item_card.xml.
+    Only shown to users who own the mask.
+
+    VIEW IDs:
+    - @+id/tvDialogTitle     — "Leave a Review" heading
+    - @+id/rbUserRating      — interactive star rating (user picks 1–5)
+    - @+id/tvRatingHint      — helper label e.g. "Tap to rate"
+    - @+id/etReviewComment   — multi-line text input for the review comment
+    - @+id/btnSubmitReview   — submits the review to DB
+    - @+id/btnCancelReview   — dismisses the dialog without saving
+
+    ADDING LOGIC LATER:
+    - Submit review : find "TODO: Submit review to DB"
+    - Cancel        : find "TODO: Dismiss dialog"
+
+    JAVA DIALOG SETUP (create LeaveReviewDialogFragment.java):
+        public class LeaveReviewDialogFragment extends DialogFragment {
+            @Override
+            public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                     Bundle savedInstanceState) {
+                return inflater.inflate(R.layout.fragment_leave_review_dialog, container, false);
+            }
+
+            @Override
+            public void onViewCreated(View view, Bundle savedInstanceState) {
+                super.onViewCreated(view, savedInstanceState);
+
+                RatingBar rbUserRating   = view.findViewById(R.id.rbUserRating);
+                EditText etReviewComment = view.findViewById(R.id.etReviewComment);
+                Button btnSubmit         = view.findViewById(R.id.btnSubmitReview);
+                Button btnCancel         = view.findViewById(R.id.btnCancelReview);
+
+                // TODO: Dismiss dialog
+                btnCancel.setOnClickListener(v -> dismiss());
+
+                // TODO: Submit review to DB
+                btnSubmit.setOnClickListener(v -> {
+                    float rating = rbUserRating.getRating();
+                    String comment = etReviewComment.getText().toString().trim();
+                    // validate, then save to DB and dismiss
+                    dismiss();
+                });
+            }
+        }
+
+    OPEN FROM ItemCardActivity:
+        LeaveReviewDialogFragment dialog = new LeaveReviewDialogFragment();
+        dialog.show(getSupportFragmentManager(), "LeaveReviewDialog");
+-->
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@color/backgroundPrimary">
+
+    <!-- Dialog title -->
+    <TextView
+        android:id="@+id/tvDialogTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Leave a Review"
+        android:textColor="@color/textPrimary"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="4dp" />
+
+    <!-- Subtitle -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Share your experience with this mask"
+        android:textColor="@color/textSecondary"
+        android:textSize="13sp"
+        android:layout_marginBottom="20dp" />
+
+    <!-- Star rating input -->
+    <TextView
+        android:id="@+id/tvRatingHint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your rating"
+        android:textColor="@color/colorPrimary"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.08"
+        android:layout_marginBottom="6dp" />
+
+    <RatingBar
+        android:id="@+id/rbUserRating"
+        style="?android:attr/ratingBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:numStars="5"
+        android:stepSize="0.5"
+        android:rating="0"
+        android:progressTint="@color/colorPrimary"
+        android:layout_marginBottom="20dp" />
+
+    <!-- Review comment label -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your review"
+        android:textColor="@color/colorPrimary"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.08"
+        android:layout_marginBottom="6dp" />
+
+    <!--
+        Multi-line comment input.
+        Wrapped in a CardView for a clean bordered look.
+    -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="@color/backgroundSecondary"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_marginBottom="24dp">
+
+        <EditText
+            android:id="@+id/etReviewComment"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:hint="Write your review here..."
+            android:textColorHint="@color/textMuted"
+            android:textColor="@color/textPrimary"
+            android:textSize="14sp"
+            android:background="@null"
+            android:padding="12dp"
+            android:gravity="top|start"
+            android:inputType="textMultiLine"
+            android:lines="4"
+            android:maxLines="6"
+            android:scrollbars="vertical" />
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Cancel + Submit buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Cancel — dismisses without saving -->
+        <Button
+            android:id="@+id/btnCancelReview"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="Cancel"
+            android:textColor="@color/textPrimary"
+            android:backgroundTint="@color/buttonDisabled"
+            android:layout_marginEnd="8dp" />
+
+        <!-- Submit — saves review to DB -->
+        <Button
+            android:id="@+id/btnSubmitReview"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="Submit"
+            android:textColor="@color/textOnGold"
+            android:backgroundTint="@color/buttonPrimary"
+            android:layout_marginStart="8dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,678 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    activity_edit_mask.xml — Mask creation / editing screen for creators
+    =====================================================================
+    Colors:  res/values/colors.xml
+             (C:\Users\Admin\StudioProjects\305\app\src\main\res\values\colors.xml)
+
+    Used for BOTH creating a new mask (launched from btnAddMask in CreatorHomeActivity)
+    and editing an existing one (launched from btnEdit in CreatorItemCardActivity).
+    When editing, pre-fill all fields using the MASK_ID extra passed via Intent.
+
+    STRUCTURE:
+    - Top bar         : hamburger menu (left) + username (center)
+    - Name card       : editable mask name
+    - Photos card     : 5 rows (Main + First–Fourth), each with thumbnail + label + pick button
+                        Each slot supports both image and video via ActivityResultLauncher
+    - Tags card       : chip group showing added tags + text input to add new ones
+    - Save button     : saves new or updated mask to DB
+
+    ADDING LOGIC LATER:
+    - Hamburger menu      : find "TODO: Open navigation drawer / menu"
+    - Username from DB    : find "TODO: Load username from DB"
+    - Pre-fill for edit   : find "TODO: Pre-fill fields if editing existing mask"
+    - Media picker rows   : find "TODO: Open media picker for slot X"
+    - Add tag             : find "TODO: Add new tag chip"
+    - Save button         : find "TODO: Save mask to DB"
+
+    MEDIA PICKER SETUP (paste into EditMaskActivity — works for both image and video):
+    ───────────────────────────────────────────────────────────────────────────────────
+        // Declare one launcher per slot, or use a single launcher + track active slot
+        private int activeSlot = 0;
+
+        private final ActivityResultLauncher<Intent> mediaPickerLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    Uri mediaUri = result.getData().getData();
+                    String mimeType = getContentResolver().getType(mediaUri);
+                    // check if video or image and update the correct slot thumbnail
+                    updateSlotPreview(activeSlot, mediaUri, mimeType);
+                }
+            });
+
+        private void openMediaPicker(int slot) {
+            activeSlot = slot;
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("*/*");
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*"});
+            mediaPickerLauncher.launch(intent);
+        }
+
+        private void updateSlotPreview(int slot, Uri uri, String mimeType) {
+            ImageView thumb = getThumbForSlot(slot);
+            if (mimeType != null && mimeType.startsWith("video/")) {
+                // Show a video thumbnail using MediaMetadataRetriever or a play icon overlay
+                thumb.setImageResource(R.drawable.video_placeholder_icon);
+            } else {
+                Glide.with(this).load(uri).into(thumb);
+            }
+            // Store uri for DB save later
+        }
+
+    TAG INPUT SETUP (paste into EditMaskActivity):
+    ───────────────────────────────────────────────
+        // TODO: Add new tag chip
+        private void addTag(String tagText) {
+            if (tagText.isEmpty()) return;
+            Chip chip = new Chip(this);
+            chip.setText(tagText);
+            chip.setCloseIconVisible(true);
+            chip.setChipBackgroundColorResource(R.color.backgroundSecondary);
+            chip.setChipStrokeColorResource(R.color.colorPrimary);
+            chip.setChipStrokeWidth(1f);
+            chip.setTextColor(ContextCompat.getColor(this, R.color.textPrimary));
+            chip.setOnCloseIconClickListener(v -> chipGroupTags.removeView(chip));
+            chipGroupTags.addView(chip);
+            etNewTag.setText("");
+        }
+
+    VIEW IDs:
+    - @+id/btnMenu          — hamburger
+    - @+id/tvUsername       — username
+    - @+id/etMaskName       — mask name EditText
+    - @+id/ivThumbMain      — main picture thumbnail
+    - @+id/btnPickMain      — pick button for main slot
+    - @+id/ivThumb1..4      — thumbnails for slots 1–4
+    - @+id/btnPick1..4      — pick buttons for slots 1–4
+    - @+id/chipGroupTags    — ChipGroup holding added tags
+    - @+id/etNewTag         — EditText to type a new tag
+    - @+id/btnAddTag        — "+" button to confirm adding tag
+    - @+id/btnSave          — Save button
+-->
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundPrimary"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="32dp"
+        tools:context=".EditMaskActivity">
+
+        <!-- ══════════════════════════════════════
+             TOP BAR
+             ══════════════════════════════════════ -->
+
+        <!--
+            TODO: Open navigation drawer / menu
+        -->
+        <ImageButton
+            android:id="@+id/btnMenu"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="20dp"
+            android:background="@null"
+            android:src="@drawable/menu_icon"
+            app:tint="@color/textPrimary"
+            android:scaleType="centerInside"
+            android:contentDescription="Menu"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/tvUsername" />
+
+        <!--
+            TODO: Load username from DB
+            tvUsername.setText(currentUser.getDisplayName());
+        -->
+        <TextView
+            android:id="@+id/tvUsername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Username"
+            android:textColor="@color/textPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:text="Johanna Doe"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Gold underline -->
+        <View
+            android:id="@+id/dividerTop"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/divider"
+            app:layout_constraintTop_toBottomOf="@id/tvUsername"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- ══════════════════════════════════════
+             NAME CARD
+             ══════════════════════════════════════ -->
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/backgroundPrimary"
+            app:layout_constraintTop_toBottomOf="@id/dividerTop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="14dp">
+
+                <!-- Label row -->
+                <TextView
+                    android:id="@+id/tvNameLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Name of the mask"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="13sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/btnEditName" />
+
+                <!--
+                    Edit icon next to label.
+                    Tapping focuses etMaskName.
+                -->
+                <ImageView
+                    android:id="@+id/btnEditName"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/edit_icon"
+                    app:tint="@color/textSecondary"
+                    android:scaleType="centerInside"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:contentDescription="Edit name"
+                    app:layout_constraintTop_toTopOf="@id/tvNameLabel"
+                    app:layout_constraintBottom_toBottomOf="@id/tvNameLabel"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <!-- Divider -->
+                <View
+                    android:id="@+id/dividerName"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:background="@color/dividerLight"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintTop_toBottomOf="@id/tvNameLabel"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <!--
+                    Mask name input.
+                    TODO: Pre-fill fields if editing existing mask
+                    etMaskName.setText(mask.getName());
+                -->
+                <EditText
+                    android:id="@+id/etMaskName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter mask name"
+                    android:textColorHint="@color/textMuted"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:gravity="end"
+                    android:background="@null"
+                    android:paddingTop="10dp"
+                    android:inputType="text"
+                    app:layout_constraintTop_toBottomOf="@id/dividerName"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- ══════════════════════════════════════
+             PHOTOS / VIDEOS CARD
+             ══════════════════════════════════════ -->
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardPhotos"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/backgroundPrimary"
+            app:layout_constraintTop_toBottomOf="@id/cardName"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <!-- Card title -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Photos / Videos"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="10dp" />
+
+                <!-- Divider under title -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/dividerLight"
+                    android:layout_marginBottom="8dp" />
+
+                <!--
+                    ── MAIN PICTURE / VIDEO ──
+                    TODO: Open media picker for slot 0 (Main)
+                    btnPickMain.setOnClickListener(v -> openMediaPicker(0));
+                    TODO: Pre-fill fields if editing existing mask
+                    Glide.with(this).load(mask.getMainMediaUrl()).into(ivThumbMain);
+                -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp">
+
+                    <ImageView
+                        android:id="@+id/ivThumbMain"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:scaleType="centerCrop"
+                        android:background="@color/backgroundSecondary"
+                        android:contentDescription="Main picture preview" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Main picture"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="14sp"
+                        android:layout_marginStart="12dp" />
+
+                    <ImageView
+                        android:id="@+id/btnPickMain"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/edit_icon"
+                        app:tint="@color/textSecondary"
+                        android:scaleType="centerInside"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="Pick main media" />
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:background="@color/dividerLight" />
+
+                <!--
+                    ── FIRST PICTURE / VIDEO ──
+                    TODO: Open media picker for slot 1 (First)
+                    btnPick1.setOnClickListener(v -> openMediaPicker(1));
+                    TODO: Pre-fill fields if editing existing mask
+                -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp">
+
+                    <ImageView
+                        android:id="@+id/ivThumb1"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:scaleType="centerCrop"
+                        android:background="@color/backgroundSecondary"
+                        android:contentDescription="First picture preview" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="First picture"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="14sp"
+                        android:layout_marginStart="12dp" />
+
+                    <ImageView
+                        android:id="@+id/btnPick1"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/edit_icon"
+                        app:tint="@color/textSecondary"
+                        android:scaleType="centerInside"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="Pick first media" />
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:background="@color/dividerLight" />
+
+                <!--
+                    ── SECOND PICTURE / VIDEO ──
+                    TODO: Open media picker for slot 2 (Second)
+                    btnPick2.setOnClickListener(v -> openMediaPicker(2));
+                    TODO: Pre-fill fields if editing existing mask
+                -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp">
+
+                    <ImageView
+                        android:id="@+id/ivThumb2"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:scaleType="centerCrop"
+                        android:background="@color/backgroundSecondary"
+                        android:contentDescription="Second picture preview" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Second picture"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="14sp"
+                        android:layout_marginStart="12dp" />
+
+                    <ImageView
+                        android:id="@+id/btnPick2"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/edit_icon"
+                        app:tint="@color/textSecondary"
+                        android:scaleType="centerInside"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="Pick second media" />
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:background="@color/dividerLight" />
+
+                <!--
+                    ── THIRD PICTURE / VIDEO ──
+                    TODO: Open media picker for slot 3 (Third)
+                    btnPick3.setOnClickListener(v -> openMediaPicker(3));
+                    TODO: Pre-fill fields if editing existing mask
+                -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp">
+
+                    <ImageView
+                        android:id="@+id/ivThumb3"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:scaleType="centerCrop"
+                        android:background="@color/backgroundSecondary"
+                        android:contentDescription="Third picture preview" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Third picture"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="14sp"
+                        android:layout_marginStart="12dp" />
+
+                    <ImageView
+                        android:id="@+id/btnPick3"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/edit_icon"
+                        app:tint="@color/textSecondary"
+                        android:scaleType="centerInside"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="Pick third media" />
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:background="@color/dividerLight" />
+
+                <!--
+                    ── FOURTH PICTURE / VIDEO ──
+                    TODO: Open media picker for slot 4 (Fourth)
+                    btnPick4.setOnClickListener(v -> openMediaPicker(4));
+                    TODO: Pre-fill fields if editing existing mask
+                -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp">
+
+                    <ImageView
+                        android:id="@+id/ivThumb4"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:scaleType="centerCrop"
+                        android:background="@color/backgroundSecondary"
+                        android:contentDescription="Fourth picture preview" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Fourth picture"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="14sp"
+                        android:layout_marginStart="12dp" />
+
+                    <ImageView
+                        android:id="@+id/btnPick4"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/edit_icon"
+                        app:tint="@color/textSecondary"
+                        android:scaleType="centerInside"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="Pick fourth media" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- ══════════════════════════════════════
+             TAGS CARD
+             ══════════════════════════════════════ -->
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardTags"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/backgroundPrimary"
+            app:layout_constraintTop_toBottomOf="@id/cardPhotos"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <!-- Card title -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tags"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="10dp" />
+
+                <!-- Divider under title -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/dividerLight"
+                    android:layout_marginBottom="10dp" />
+
+                <!--
+                    Existing tags shown as chips.
+                    TODO: Pre-fill fields if editing existing mask
+                    Load existing tags from mask and call addTag() for each.
+                    New tags added via etNewTag + btnAddTag.
+                    See TAG INPUT SETUP in header for full Java snippet.
+                -->
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroupTags"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:singleSelection="false" />
+
+                <!-- New tag input row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="@color/backgroundSecondary"
+                        android:layout_marginEnd="8dp">
+
+                        <!--
+                            Tag text input.
+                            TODO: Add new tag chip
+                            etNewTag.setOnEditorActionListener((v, actionId, event) -> {
+                                addTag(etNewTag.getText().toString().trim());
+                                return true;
+                            });
+                        -->
+                        <EditText
+                            android:id="@+id/etNewTag"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:hint="New tag..."
+                            android:textColorHint="@color/textMuted"
+                            android:textColor="@color/textPrimary"
+                            android:textSize="14sp"
+                            android:background="@null"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:inputType="text"
+                            android:imeOptions="actionDone"
+                            android:singleLine="true" />
+
+                    </androidx.cardview.widget.CardView>
+
+                    <!--
+                        "+" button to confirm adding the tag.
+                        TODO: Add new tag chip
+                        btnAddTag.setOnClickListener(v ->
+                            addTag(etNewTag.getText().toString().trim()));
+                    -->
+                    <Button
+                        android:id="@+id/btnAddTag"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:text="+"
+                        android:textColor="@color/textOnGold"
+                        android:textSize="20sp"
+                        android:backgroundTint="@color/buttonPrimary"
+                        android:padding="0dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- ══════════════════════════════════════
+             SAVE BUTTON
+             ══════════════════════════════════════ -->
+
+        <!--
+            TODO: Save mask to DB
+            In your Activity:
+                btnSave.setOnClickListener(v -> {
+                    String name = etMaskName.getText().toString().trim();
+                    // collect media URIs from each slot
+                    // collect tags from chipGroupTags
+                    // validate, then save to DB:
+                    //   if MASK_ID extra present → update existing mask
+                    //   else → create new mask
+                    // on success → finish() to return to previous screen
+                });
+        -->
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:text="Save"
+            android:textColor="@color/textOnGold"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:backgroundTint="@color/buttonPrimary"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="24dp"
+            app:layout_constraintTop_toBottomOf="@id/cardTags"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
