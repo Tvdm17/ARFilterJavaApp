@@ -1,68 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    fragment_filter_dialog.xml — Filter popup dialog for the Shop screen
-    =====================================================================
-    Colors:  res/values/colors.xml
-             (C:\Users\Admin\StudioProjects\305\app\src\main\res\values\colors.xml)
-
-    Displayed as a DialogFragment on top of activity_shop.xml.
-    Opened when user taps the filter icon (@+id/ivFilter) in the Shop screen.
-
-    VIEW IDs:
-    - @+id/tvFilterTitle      — "Filter" heading
-    - @+id/chipGroupFilters   — ChipGroup holding filter tags (checkable, multi-select)
-    - @+id/btnClearFilter     — clears all selected chips
-    - @+id/btnApplyFilter     — applies selected filters and dismisses dialog
-
-    ADDING LOGIC LATER:
-    - Replace placeholder Chip items with real tags fetched from DB
-    - On Apply: pass selected chip labels back to ShopActivity via interface callback
-                to re-fetch filtered items
-
-    JAVA DIALOG SETUP (create FilterDialogFragment.java):
-        public class FilterDialogFragment extends DialogFragment {
-            @Override
-            public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                     Bundle savedInstanceState) {
-                return inflater.inflate(R.layout.fragment_filter_dialog, container, false);
-            }
-
-            @Override
-            public void onViewCreated(View view, Bundle savedInstanceState) {
-                super.onViewCreated(view, savedInstanceState);
-
-                Button btnApply = view.findViewById(R.id.btnApplyFilter);
-                Button btnClear = view.findViewById(R.id.btnClearFilter);
-                ChipGroup chipGroup = view.findViewById(R.id.chipGroupFilters);
-
-                // TODO: Replace chips with tags from DB
-
-                btnClear.setOnClickListener(v -> chipGroup.clearCheck());
-
-                btnApply.setOnClickListener(v -> {
-                    // TODO: read chipGroup.getCheckedChipIds() and pass back to ShopActivity
-                    dismiss();
-                });
-            }
-        }
-
-    OPEN FROM ShopActivity:
-        FilterDialogFragment dialog = new FilterDialogFragment();
-        dialog.show(getSupportFragmentManager(), "FilterDialog");
--->
-
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="24dp"
-    android:background="@color/backgroundPrimary"
-    tools:ignore="HardcodedText" >
+    android:background="@color/backgroundPrimary">
 
-    <!-- Dialog title -->
     <TextView
         android:id="@+id/tvFilterTitle"
         android:layout_width="wrap_content"
@@ -73,11 +18,6 @@
         android:textStyle="bold"
         android:layout_marginBottom="16dp" />
 
-    <!--
-        Filter tag chips — multi-select.
-        TODO: Replace these placeholder Chips with real tags from DB.
-        Each Chip is checkable; user can select multiple tags.
-    -->
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/chipGroupFilters"
         android:layout_width="match_parent"
@@ -85,9 +25,10 @@
         app:singleSelection="false">
 
         <com.google.android.material.chip.Chip
+            android:id="@+id/chipAverageLook"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tag 1"
+            android:text="averagelook"
             android:checkable="true"
             app:chipBackgroundColor="@color/backgroundSecondary"
             app:checkedIconTint="@color/colorPrimary"
@@ -95,9 +36,10 @@
             app:chipStrokeWidth="1dp" />
 
         <com.google.android.material.chip.Chip
+            android:id="@+id/chipNatural"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tag 2"
+            android:text="natural"
             android:checkable="true"
             app:chipBackgroundColor="@color/backgroundSecondary"
             app:checkedIconTint="@color/colorPrimary"
@@ -105,9 +47,10 @@
             app:chipStrokeWidth="1dp" />
 
         <com.google.android.material.chip.Chip
+            android:id="@+id/chipMedium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tag 3"
+            android:text="medium"
             android:checkable="true"
             app:chipBackgroundColor="@color/backgroundSecondary"
             app:checkedIconTint="@color/colorPrimary"
@@ -115,9 +58,10 @@
             app:chipStrokeWidth="1dp" />
 
         <com.google.android.material.chip.Chip
+            android:id="@+id/chipBright"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tag 4"
+            android:text="bright"
             android:checkable="true"
             app:chipBackgroundColor="@color/backgroundSecondary"
             app:checkedIconTint="@color/colorPrimary"
@@ -126,7 +70,6 @@
 
     </com.google.android.material.chip.ChipGroup>
 
-    <!-- Clear + Apply buttons -->
     <LinearLayout
         style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
@@ -134,7 +77,6 @@
         android:orientation="horizontal"
         android:layout_marginTop="24dp">
 
-        <!-- Clear — resets all chip selections -->
         <Button
             android:id="@+id/btnClearFilter"
             style="?android:attr/buttonBarButtonStyle"
@@ -146,7 +88,6 @@
             android:backgroundTint="@color/buttonDisabled"
             android:layout_marginEnd="8dp" />
 
-        <!-- Apply — reads selected chips and closes dialog -->
         <Button
             android:id="@+id/btnApplyFilter"
             style="?android:attr/buttonBarButtonStyle"

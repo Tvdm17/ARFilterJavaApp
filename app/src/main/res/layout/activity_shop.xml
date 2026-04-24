@@ -13,12 +13,12 @@
 
     ADDING LOGIC LATER:
     - Hamburger menu      : find "TODO: Open navigation drawer / menu"
-    - Username from DB    : find "TODO: Load username from DB" - need DB
-    - Search logic        : find "TODO: Implement search logic" - need shop items list and adapter to exist fists
-    - Filter dialog open  : find "TODO: Open filter dialog" - need FilterDialogFragment to be created as a class first
-    - Load items from DB  : find "TODO: Fetch market items from DB" - need DB
-    - View button click   : find "TODO: Navigate to activity_item_card" (in Adapter) - need activity_item_card and Activity class
-    - Star rating tap     : find "TODO: Show average rating tooltip" (in Adapter) - need real rating from DB
+    - Username from DB    : find "TODO: Load username from DB"
+    - Search logic        : find "TODO: Implement search logic"
+    - Filter dialog open  : find "TODO: Open filter dialog"
+    - Load items from DB  : find "TODO: Fetch market items from DB"
+    - View button click   : find "TODO: Navigate to activity_item_card" (in Adapter)
+    - Star rating tap     : find "TODO: Show average rating tooltip" (in Adapter)
 
     VIEW IDs:
     - @+id/btnMenu       — hamburger ImageButton (top-left)

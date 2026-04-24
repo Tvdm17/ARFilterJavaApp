@@ -1,48 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    item_owned.xml — Layout for a single item card in the Customer Home grid
-    =========================================================================
-    Colors:  res/values/colors.xml
-             (C:\Users\Admin\StudioProjects\305\app\src\main\res\values\colors.xml)
-
+    item_owned.xml — single card in the Customer Home grid
     Used by: RecyclerView (@+id/rvItems) in activity_customer_home.xml
-
-    VIEW IDs (reference these in your RecyclerView Adapter):
-    - @+id/ivItemImage   — item image (square, 150x150dp), clickable
-    - @+id/tvItemName    — item name label below the image
-
-    ADDING LOGIC LATER:
-    - Image click → find "TODO: Navigate to item detail screen" in your Adapter
-
-    ADAPTER HINT (in your onBindViewHolder):
-    ─────────────────────────────────────────
-        holder.tvItemName.text = item.name
-
-        // Load image with Glide or Picasso:
-        Glide.with(context).load(item.imageUrl).into(holder.ivItemImage)
-
-        // TODO: Navigate to item detail screen
-        holder.ivItemImage.setOnClickListener {
-            val intent = Intent(context, ItemDetailActivity::class.java)
-            intent.putExtra("ITEM_ID", item.id)
-            context.startActivity(intent)
-        }
+    Adapter: MakeoverAdapter.java
+    IDs: @+id/ivItemImage, @+id/tvItemName
 -->
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:padding="6dp"
-    android:gravity="center_horizontal"
-    tools:ignore="HardcodedText">
+    android:gravity="center_horizontal">
 
-    <!--
-        Item image — fixed 150x150dp square.
-        Clickable to open item detail screen.
-        TODO: Navigate to item detail screen (wire up in your Adapter, see header comment)
-    -->
     <ImageView
         android:id="@+id/ivItemImage"
         android:layout_width="150dp"
@@ -53,7 +22,6 @@
         android:focusable="true"
         android:contentDescription="Item image" />
 
-    <!-- Item name label -->
     <TextView
         android:id="@+id/tvItemName"
         android:layout_width="150dp"
