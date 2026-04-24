@@ -64,7 +64,7 @@ public class DatabaseManager {
         });
     }
 
-    private static String hashPassword(String password) {
+    public static String hashPassword(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] encodedhash = digest.digest(password.getBytes(java.nio.charset.StandardCharsets.UTF_8));
@@ -164,6 +164,32 @@ public class DatabaseManager {
 
             } catch (Exception e) {
                 mainHandler.post(() -> callback.onFailure("Network error: " + e.getMessage()));
+            }
+        });
+    }
+
+    public interface SimpleCallback {
+        void onSuccess();
+        void onFailure(String message);
+    }
+
+    public static void postToAPI(String endpoint, SimpleCallback callback, String... args) {
+        executor.execute(() -> {
+            try {
+                // This builds the parameters part: /val1/val2/val3
+                StringBuilder params = new StringBuilder();
+                for (String arg : args) {
+                    // handle special characters like @, encode them
+                    params.append("/").append(java.net.URLEncoder.encode(arg, "UTF-8"));
+                }
+
+                String fullPath = endpoint + params.toString();
+                JSONArray response = fetchFromAPI(fullPath);
+
+                // Studev returns [] for successful INSERTs
+                mainHandler.post(callback::onSuccess);
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onFailure("API Error: " + e.getMessage()));
             }
         });
     }

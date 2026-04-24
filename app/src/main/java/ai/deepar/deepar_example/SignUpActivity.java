@@ -4,7 +4,10 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +20,11 @@ public class SignUpActivity extends AppCompatActivity {
 
     private Button btnCustomer;
     private Button btnCreator;
+
+    private EditText etEmail;
+    private EditText etPassword;
+    private CheckBox cbTerms;
+    private boolean isCustomerSelected = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +47,70 @@ public class SignUpActivity extends AppCompatActivity {
             startActivity(new Intent(this, PrivacyPolicyActivity.class));
         });
 
-        Button btnContinue = findViewById(R.id.btnContinue);
+        // intialise views
+        etEmail = findViewById(R.id.etEmail);
+        etPassword = findViewById(R.id.etPassword);
+        cbTerms = findViewById(R.id.cbTerms);
+
+        Button btnContinue = findViewById(R.id.btnContinue); // keep
+
         btnContinue.setOnClickListener(v -> {
-            startActivity(new Intent(this, CustomerHomeActivity.class));
+
+            String email = etEmail.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
+
+            if(email.isEmpty() || password.isEmpty()){
+                Toast.makeText(this,"Fill in all fields", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if(!cbTerms.isChecked()){
+                Toast.makeText(this, "Agree to the terms of service to continue", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String hashedPassword = DatabaseManager.hashPassword(password);
+            btnContinue.setEnabled(false);
+
+            DatabaseManager.postToAPI("create_user", new DatabaseManager.SimpleCallback() {
+                @Override
+                public void onSuccess() {
+                    String roleEndpoint = "";
+                    if(isCustomerSelected){
+                        roleEndpoint = "create_client";
+                    }
+                    else{
+                        roleEndpoint = "create_mua";
+                    }
+                    // you need to do DatabaseManager.SimpleCallback, DatebaseManager is a class, but we need the interface
+                    //  contains the onSucces and onFailure methods, which are overwritten to do what you want to do
+                    DatabaseManager.postToAPI(roleEndpoint, new DatabaseManager.SimpleCallback() {
+                        @Override
+                        public void onSuccess() {
+                            Toast.makeText(SignUpActivity.this, "Sign up successful!", Toast.LENGTH_LONG).show();
+                            // go to login page
+                            startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
+                            finish();
+                        }
+
+                        @Override
+                        public void onFailure(String msg) {
+                            btnContinue.setEnabled(true);
+                            Toast.makeText(SignUpActivity.this, "Error linking role in signup: " + msg, Toast.LENGTH_SHORT).show();
+                        }
+                    }, email);
+                }
+
+                @Override
+                public void onFailure(String msg) {
+                    btnContinue.setEnabled(true);
+                    Toast.makeText(SignUpActivity.this, "User creation failed (Email might be taken)", Toast.LENGTH_LONG).show();
+                }
+            }, email, hashedPassword);
+
+
+
+
+
+
         });
 
         btnCustomer = findViewById(R.id.btnCustomer);
@@ -61,6 +130,7 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void setCustomerSelected(boolean customerActive) {
+        this.isCustomerSelected = customerActive;
         applyButtonState(btnCustomer, customerActive);
         applyButtonState(btnCreator, !customerActive);
     }
