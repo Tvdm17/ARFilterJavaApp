@@ -1,11 +1,5 @@
 package ai.deepar.deepar_example;
 
-
-// CLASS USED TO ADAPT MAKEOVER FILTERS TO BE USED BY
-// RECYCLEVIEW - into card views that RecycleView
-// can display
-
-
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -16,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
+
 public class MakeoverAdapter extends RecyclerView.Adapter<MakeoverAdapter.ViewHolder> {
     private final Context context;
     private final List<Makeover> makeovers;
@@ -36,15 +31,19 @@ public class MakeoverAdapter extends RecyclerView.Adapter<MakeoverAdapter.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Makeover makeover = makeovers.get(position);
 
-        // Set the name label
         holder.tvItemName.setText(makeover.makeoverName);
 
-        // When the makeover name is tapped, open PreviewActivity with this filter applied
-        holder.tvItemName.setOnClickListener(v -> {
-            Intent intent = new Intent(context, PreviewActivity.class);
-            intent.putExtra("EFFECT_NAME", makeover.filterFileName);
-            context.startActivity(intent);
-        });
+        // Load image — add Glide to build.gradle, then:
+        // Glide.with(context).load(makeover.imagePreview).into(holder.ivItemImage);
+
+        holder.ivItemImage.setOnClickListener(v -> openPreview(makeover));
+        holder.tvItemName.setOnClickListener(v -> openPreview(makeover));
+    }
+
+    private void openPreview(Makeover makeover) {
+        Intent intent = new Intent(context, PreviewActivity.class);
+        intent.putExtra("EFFECT_NAME", makeover.filterFileName);
+        context.startActivity(intent);
     }
 
     @Override

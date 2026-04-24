@@ -144,14 +144,15 @@ public class DatabaseManager {
         executor.execute(() -> {
             try {
                 String hashedPassword = hashPassword(password);
+                System.out.println("DEBUG HASH: " + hashedPassword);
                 // The endpoint must match your API's naming convention
-                JSONArray response = fetchFromAPI("get_user/" + email + "/" + hashedPassword);
+                JSONArray response = fetchFromAPI("check_user/" + email + "/" + hashedPassword);
 
                 if (response != null && response.length() > 0) {
                     JSONObject userObj = response.optJSONObject(0);
                     if (userObj != null) {
                         String userEmail = userObj.optString("emailAddress", null);
-                        int userId = userObj.optInt("uersid", -1);
+                        int userId = userObj.optInt("userid", -1);
 
                         // Success! Back to the UI thread
                         mainHandler.post(() -> callback.onSuccess(userEmail, userId));

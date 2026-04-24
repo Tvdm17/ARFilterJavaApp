@@ -1,0 +1,91 @@
+package ai.deepar.deepar_example;
+
+import android.content.Context;
+import android.content.Intent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RatingBar;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+import java.util.List;
+
+/**
+ * RecyclerView adapter for the Shop screen.
+ * Binds a List<ShopItem> to item_shop.xml cards.
+ *
+ * Each card shows:
+ *   - item image (placeholder until Glide is added)
+ *   - item name
+ *   - "View" button — opens PreviewActivity with the makeover's DeepAR filter
+ *   - star RatingBar showing average rating
+ *   - numeric rating tooltip (hidden by default, toggled by tapping the stars)
+ */
+public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ViewHolder> {
+
+    private final Context context;
+    private final List<ShopItem> items;
+
+    public ShopAdapter(Context context, List<ShopItem> items) {
+        this.context = context;
+        this.items = items;
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.item_shop, parent, false);
+        return new ViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        ShopItem item = items.get(position);
+
+        holder.tvItemName.setText(item.name);
+        holder.rbRating.setRating((float) item.averageRating);
+        holder.tvRatingValue.setText(String.valueOf(item.averageRating));
+
+        // Image loading — add Glide to build.gradle, then replace this with:
+        // Glide.with(context).load(item.imagePreview).into(holder.ivItemImage);
+
+        // "View" opens PreviewActivity, applying the makeover's DeepAR filter on the camera feed
+        holder.btnView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, PreviewActivity.class);
+            intent.putExtra("EFFECT_NAME", item.deeparFile);
+            context.startActivity(intent);
+        });
+
+        // Tapping the stars toggles the numeric rating label
+        holder.rbRating.setOnClickListener(v ->
+            holder.tvRatingValue.setVisibility(
+                holder.tvRatingValue.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE
+            )
+        );
+    }
+
+    @Override
+    public int getItemCount() {
+        return items.size();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        ImageView ivItemImage;
+        TextView tvItemName;
+        Button btnView;
+        RatingBar rbRating;
+        TextView tvRatingValue;
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            ivItemImage = itemView.findViewById(R.id.ivItemImage);
+            tvItemName = itemView.findViewById(R.id.tvItemName);
+            btnView = itemView.findViewById(R.id.btnView);
+            rbRating = itemView.findViewById(R.id.rbRating);
+            tvRatingValue = itemView.findViewById(R.id.tvRatingValue);
+        }
+    }
+}
