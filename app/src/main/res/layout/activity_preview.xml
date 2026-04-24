@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    activity_preview.xml — Layout for the Preview screen
-    =====================================================
+    activity_preview.xml — Layout for PreviewActivity
+    ==================================================
     Two layers stacked on top of each other:
-      1. SurfaceView (full screen) — [DEEPAR] DeepAR renders the camera + filter here
-      2. RelativeLayout (full screen overlay) — UI controls on top
+      1. SurfaceView  (full screen, behind)  — DeepAR renders the camera + filter here.
+      2. RelativeLayout (full screen, front) — all UI controls overlaid on top.
 
-    CRITICAL: The SurfaceView id="@+id/surface" must not be removed.
+    Controls:
+      backButton   — top-left,  returns to the previous screen
+      switchCamera — top-right, toggles front/back camera
+      recDisplay   — top-center, REC indicator (hidden when not recording)
+      recordButton — bottom-center, tap = screenshot / hold = record video
+
+    CRITICAL: The SurfaceView id="@+id/surface" must not be removed or renamed.
     It is registered in PreviewActivity.setupViews() as the DeepAR render target.
 -->
 
@@ -35,18 +41,14 @@
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp">
 
-        <!--
-            Top-left: Back button — returns to the previous screen (finish()).
-        -->
+        <!-- Top-left: back arrow — calls finish() -->
+
+        <!-- Top-right: flip camera icon — calls cameraManager.switchCamera() -->
 
         <!--
-            Top-right: Switch camera (front ↔ back).
-            Click → cameraManager.switchCamera()
-        -->
-
-        <!--
-            Top-center: REC indicator — hidden by default, shown while recording.
-            Contains a blinking red dot, "REC" label, and mm:ss timer.
+            Top-center: REC indicator — GONE by default, VISIBLE while recording.
+            Contains a blinking red dot, "REC" label, and a mm:ss elapsed timer.
+            Shown/hidden by PreviewActivity.onVideoRecordingStarted/Finished().
         -->
 
         <ImageButton
@@ -115,8 +117,10 @@
         </LinearLayout>
 
         <!--
-            Center-bottom: Record button — tap to start/stop video recording.
-            Click → toggleRecording() in PreviewActivity
+            Bottom-center: Capture button.
+            Tap  → screenshot saved to Pictures/
+            Hold → video recording starts; release stops it and saves to Movies/
+            Touch logic lives in PreviewActivity.setupViews().
         -->
         <ImageButton
             android:id="@+id/recordButton"
@@ -126,7 +130,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="40dp"
             android:background="@null"
-            android:contentDescription="Record video"
+            android:contentDescription="Tap to screenshot, hold to record"
             android:scaleType="centerInside"
             android:src="@drawable/record_selector" />
 
