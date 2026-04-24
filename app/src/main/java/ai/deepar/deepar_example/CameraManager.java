@@ -19,7 +19,6 @@ package ai.deepar.deepar_example;
 //   4. Call release() in onStop
 // ============================================================
 
-import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.util.DisplayMetrics;
 import android.util.Size;
@@ -30,7 +29,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
-import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
@@ -61,18 +59,6 @@ public class CameraManager {
      */
     private static final int NUMBER_OF_BUFFERS = 2;
 
-    /**
-     * [DEEPAR] Toggle the camera-to-DeepAR integration mode.
-     *
-     *   false (default): ByteBuffer path
-     *     Camera → ImageAnalysis → ByteBuffer → deepARManager.receiveFrame()
-     *     CPU copies pixel data each frame. Simple, reliable.
-     *
-     *   true: GL texture path
-     *     Camera → Preview → ARSurfaceProvider → deepAR.receiveFrameExternalTexture()
-     *     Frame stays on GPU. More efficient at high resolution.
-     */
-    private static final boolean USE_EXTERNAL_CAMERA_TEXTURE = false;
 
     // -------------------------------------------------------
     // FIELDS
@@ -111,15 +97,8 @@ public class CameraManager {
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     /**
-     * [DEEPAR] Used when USE_EXTERNAL_CAMERA_TEXTURE = true.
-     * Wraps DeepAR's GL texture in a CameraX-compatible surface.
-     */
-    private ARSurfaceProvider surfaceProvider;
-
-    /**
-     * [ANDROID] Screen dimensions in pixels, set by getScreenOrientation().
-     * Exposed via getWidth()/getHeight() so MainActivity can pass them to
-     * deepARManager.startVideoRecording() for the recording resolution.
+     * [ANDROID] Screen dimensions in pixels — set once by getScreenOrientation() during bindImageAnalysis().
+     * Exposed via getWidth()/getHeight() so PreviewActivity can halve them for the video recording resolution.
      */
     private int width = 0;
     private int height = 0;
@@ -173,8 +152,8 @@ public class CameraManager {
     }
 
     /**
-     * [ANDROID] Release the camera and surface provider.
-     * Call this in MainActivity.onStop() before DeepARManager.release().
+     * [ANDROID] Unbind all CameraX use-cases and free the camera hardware.
+     * Call this in onStop() before DeepARManager.release() so the GPU is freed while off-screen.
      */
     public void release() {
         try {
@@ -183,22 +162,14 @@ public class CameraManager {
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
-        if (surfaceProvider != null) {
-            surfaceProvider.stop();
-            surfaceProvider = null;
-        }
     }
 
-    /** [ANDROID] Screen width in pixels — used by MainActivity for video recording resolution. */
+    /** [ANDROID] Screen width in pixels — used by PreviewActivity to set video recording resolution. */
     public int getWidth() { return width; }
 
-    /** [ANDROID] Screen height in pixels — used by MainActivity for video recording resolution. */
+    /** [ANDROID] Screen height in pixels — used by PreviewActivity to set video recording resolution. */
     public int getHeight() { return height; }
 
-    /** [ANDROID] True if the active camera is the front (selfie) camera. */
-    public boolean isFrontCamera() {
-        return lensFacing == CameraSelector.LENS_FACING_FRONT;
-    }
 
     // -------------------------------------------------------
     // PRIVATE — CAMERA BINDING
@@ -207,14 +178,9 @@ public class CameraManager {
     /**
      * [ANDROID + DEEPAR] Configure and bind the camera use-case.
      *
-     * Resolution logic:
-     *   [DEEPAR] CameraResolutionPreset.P1920x1080 = 1080p (DeepAR constant).
-     *   Camera sensor is physically landscape (width > height), so in portrait
-     *   mode we swap width and height to match what the display expects.
-     *
-     * Two paths depending on USE_EXTERNAL_CAMERA_TEXTURE:
-     *   false → ImageAnalysis (ByteBuffer per frame)
-     *   true  → Preview + ARSurfaceProvider (GL texture)
+     * [DEEPAR] CameraResolutionPreset.P1920x1080 = 1080p (DeepAR constant).
+     * Camera sensor is physically landscape (width > height), so in portrait
+     * mode we swap width and height to match what the display expects.
      */
     private void bindImageAnalysis(@NonNull ProcessCameraProvider cameraProvider) {
         CameraResolutionPreset preset = CameraResolutionPreset.P1920x1080;
@@ -236,46 +202,28 @@ public class CameraManager {
                 .requireLensFacing(lensFacing)
                 .build();
 
-        if (USE_EXTERNAL_CAMERA_TEXTURE) {
-            // ---- GL texture path (not active by default) ----
-            // [DEEPAR] Camera writes directly into DeepAR's OpenGL texture.
-            // No CPU pixel copy — more efficient for high resolutions.
-            Preview preview = new Preview.Builder()
-                    .setTargetResolution(cameraResolution)
-                    .build();
-            cameraProvider.unbindAll();
-            cameraProvider.bindToLifecycle((LifecycleOwner) activity, cameraSelector, preview);
-            if (surfaceProvider == null) {
-                surfaceProvider = new ARSurfaceProvider(activity, deepARManager.getDeepAR());
-            }
-            preview.setSurfaceProvider(surfaceProvider);
-            surfaceProvider.setMirror(lensFacing == CameraSelector.LENS_FACING_FRONT);
-
-        } else {
-            // ---- ByteBuffer path (default) ----
-            // [ANDROID] Allocate two RGBA_8888 frame buffers: width * height * 4 bytes each.
-            buffers = new ByteBuffer[NUMBER_OF_BUFFERS];
-            for (int i = 0; i < NUMBER_OF_BUFFERS; i++) {
-                buffers[i] = ByteBuffer.allocateDirect(frameWidth * frameHeight * 4);
-                buffers[i].order(ByteOrder.nativeOrder()); // Match CPU endianness
-                buffers[i].position(0);
-            }
-
-            // [ANDROID] ImageAnalysis: CameraX delivers each frame as an ImageProxy.
-            // STRATEGY_KEEP_ONLY_LATEST: drop queued frames if the analyzer is busy — prevents lag buildup.
-            // OUTPUT_IMAGE_FORMAT_RGBA_8888: request pre-converted RGBA (no manual YUV conversion needed).
-            ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
-                    .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
-                    .setTargetResolution(cameraResolution)
-                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                    .build();
-            // [ANDROID] Run frame analysis on a dedicated background thread, not the main thread.
-            // The main thread is for UI only — processing every camera frame there causes
-            // dropped frames and sluggish AR rendering.
-            imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(), imageAnalyzer);
-            cameraProvider.unbindAll();
-            cameraProvider.bindToLifecycle((LifecycleOwner) activity, cameraSelector, imageAnalysis);
+        // [ANDROID] Allocate two RGBA_8888 frame buffers: width * height * 4 bytes each.
+        buffers = new ByteBuffer[NUMBER_OF_BUFFERS];
+        for (int i = 0; i < NUMBER_OF_BUFFERS; i++) {
+            buffers[i] = ByteBuffer.allocateDirect(frameWidth * frameHeight * 4);
+            buffers[i].order(ByteOrder.nativeOrder()); // Match CPU endianness
+            buffers[i].position(0);
         }
+
+        // [ANDROID] ImageAnalysis: CameraX delivers each frame as an ImageProxy.
+        // STRATEGY_KEEP_ONLY_LATEST: drop queued frames if the analyzer is busy — prevents lag buildup.
+        // OUTPUT_IMAGE_FORMAT_RGBA_8888: request pre-converted RGBA (no manual YUV conversion needed).
+        ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
+                .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
+                .setTargetResolution(cameraResolution)
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .build();
+        // [ANDROID] Run frame analysis on a dedicated background thread, not the main thread.
+        // The main thread is for UI only — processing every camera frame there causes
+        // dropped frames and sluggish AR rendering.
+        imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(), imageAnalyzer);
+        cameraProvider.unbindAll();
+        cameraProvider.bindToLifecycle((LifecycleOwner) activity, cameraSelector, imageAnalysis);
     }
 
     // -------------------------------------------------------

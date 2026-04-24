@@ -32,7 +32,6 @@
         <activity android:name=".SignUpActivity" android:exported="false" />
         <activity android:name=".CustomerHomeActivity" android:exported="false" />
         <activity android:name=".ShopActivity" android:exported="false" />
-        <activity android:name=".MainActivity" android:exported="false" />
         <activity android:name=".PreviewActivity" android:exported="false" />
         <activity android:name=".TermsActivity" android:exported="false" />
         <activity android:name=".PrivacyPolicyActivity" android:exported="false" />

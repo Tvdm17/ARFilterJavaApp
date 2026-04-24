@@ -1,14 +1,14 @@
 package ai.deepar.deepar_example;
 
 // ============================================================
-// PreviewActivity — camera preview with a fixed filter + video recording
+// PreviewActivity — full-screen camera preview with a fixed DeepAR filter
 // ============================================================
 // Responsibilities:
-//   - Show the camera feed with a DeepAR filter applied (passed via Intent "EFFECT_NAME")
-//   - Let the user record a video (single record button, no screenshot mode)
+//   - Show the camera feed with a DeepAR filter (passed via Intent extra "EFFECT_NAME")
+//   - Capture button: tap = screenshot, hold = record video, release = stop recording
 //   - Switch between front and back camera
 //
-// How the filter is set:
+// Starting this activity:
 //   Intent intent = new Intent(context, PreviewActivity.class);
 //   intent.putExtra("EFFECT_NAME", "MakeupLook.deepar");
 //   startActivity(intent);
@@ -31,6 +31,7 @@ import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,6 +41,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -48,11 +51,15 @@ import ai.deepar.ar.ARTouchInfo;
 import ai.deepar.ar.ARTouchType;
 
 /**
- * Camera preview screen with a DeepAR filter and video recording.
+ * Full-screen camera preview with a single DeepAR filter and capture controls.
  *
- * Implements DeepARManager.Listener to receive AR events (recording started/finished,
- * errors) and update the UI accordingly.
- * No direct DeepAR SDK calls happen here.
+ * Capture button behaviour:
+ *   - Tap  → screenshot saved to Pictures/
+ *   - Hold → video recording starts; release stops it and saves to Movies/
+ *
+ * Implements DeepARManager.Listener to receive AR callbacks (screenshot ready,
+ * recording started/finished, errors) and update the UI accordingly.
+ * No direct DeepAR SDK calls happen here — everything goes through DeepARManager.
  */
 public class PreviewActivity extends AppCompatActivity implements DeepARManager.Listener {
 
@@ -76,13 +83,20 @@ public class PreviewActivity extends AppCompatActivity implements DeepARManager.
     /** Output file for the current video recording. */
     private File videoFile;
 
-    // REC indicator views
-    private LinearLayout recDisplay;
-    private View recDot;
-    private TextView recTimer;
-    private Handler timerHandler;
-    private Runnable timerRunnable;
-    private long recordingStartTime;
+    // REC indicator shown while recording
+    private LinearLayout recDisplay;   // container — hidden when not recording
+    private View recDot;               // blinking red dot
+    private TextView recTimer;         // mm:ss elapsed counter
+    private Handler timerHandler;      // drives both the blink and the timer tick
+    private Runnable timerRunnable;    // ticks every second to update recTimer text
+    private long recordingStartTime;   // System.currentTimeMillis() when recording began
+
+    // Long-press detection: ACTION_DOWN starts a delayed runnable;
+    // if finger lifts before it fires it's a short press (screenshot),
+    // if it fires it starts recording and ACTION_UP then stops it.
+    private static final long LONG_PRESS_THRESHOLD = 500; // ms before hold triggers recording
+    private final Handler captureHandler = new Handler();
+    private Runnable longPressRunnable;
 
     // ============================================================
     // LIFECYCLE
@@ -208,35 +222,58 @@ public class PreviewActivity extends AppCompatActivity implements DeepARManager.
         // Switch camera (front ↔ back)
         findViewById(R.id.switchCamera).setOnClickListener(v -> cameraManager.switchCamera());
 
-        // Record button — toggles recording on/off
-        findViewById(R.id.recordButton).setOnClickListener(v -> toggleRecording());
+        // Capture button: short press = screenshot, hold = record video, release = stop
+        ImageButton captureButton = findViewById(R.id.recordButton);
+        captureButton.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    v.setPressed(true);
+                    longPressRunnable = () -> startRecording();
+                    captureHandler.postDelayed(longPressRunnable, LONG_PRESS_THRESHOLD);
+                    return true;
+                case MotionEvent.ACTION_UP:
+                    v.setPressed(false);
+                    captureHandler.removeCallbacks(longPressRunnable);
+                    if (recording) {
+                        stopRecording();
+                    } else {
+                        deepARManager.takeScreenshot();
+                    }
+                    return true;
+                case MotionEvent.ACTION_CANCEL:
+                    v.setPressed(false);
+                    captureHandler.removeCallbacks(longPressRunnable);
+                    if (recording) stopRecording();
+                    return true;
+            }
+            return false;
+        });
+    }
+
+    /** Creates the output file and tells DeepAR to start encoding. Sets recording = true. */
+    private void startRecording() {
+        videoFile = new File(
+                getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES),
+                "video_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(new Date()) + ".mp4"
+        );
+        // Half the screen resolution keeps file size reasonable.
+        // & ~16 rounds down to the nearest multiple of 16 — required by the H.264 encoder.
+        int recordWidth  = (cameraManager.getWidth()  / 2) & ~16;
+        int recordHeight = (cameraManager.getHeight() / 2) & ~16;
+        deepARManager.startVideoRecording(videoFile.toString(), recordWidth, recordHeight);
+        recording = true;
     }
 
     /**
-     * Starts or stops video recording depending on current state.
-     * File saved to Movies directory with a timestamped filename.
-     * Recording resolution = half screen size to balance quality and file size.
+     * Tells DeepAR to finish encoding and broadcasts a media-scanner intent so the
+     * saved video appears in the Gallery immediately without a reboot.
+     * recording = false is set later in onVideoRecordingFinished() once the file is fully written.
      */
-    private void toggleRecording() {
-        if (recording) {
-            // ---- Stop recording ----
-            deepARManager.stopVideoRecording();
-            // [ANDROID] Notify media scanner so video appears in Gallery immediately
-            Intent scanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-            scanIntent.setData(Uri.fromFile(videoFile));
-            sendBroadcast(scanIntent);
-        } else {
-            // ---- Start recording ----
-            videoFile = new File(
-                    getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES),
-                    "video_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(new Date()) + ".mp4"
-            );
-            // & ~1 rounds down to the nearest even number — bc  Android video encoder (H.264) requires both dimensions to be even
-            int recordWidth  = (cameraManager.getWidth()  / 2) & ~16;
-            int recordHeight = (cameraManager.getHeight() / 2) & ~16;
-            deepARManager.startVideoRecording(videoFile.toString(), recordWidth, recordHeight);
-        }
-        recording = !recording;
+    private void stopRecording() {
+        deepARManager.stopVideoRecording();
+        Intent scanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        scanIntent.setData(Uri.fromFile(videoFile));
+        sendBroadcast(scanIntent);
     }
 
     // ============================================================
@@ -303,9 +340,22 @@ public class PreviewActivity extends AppCompatActivity implements DeepARManager.
         Toast.makeText(this, "Recording failed.", Toast.LENGTH_SHORT).show();
     }
 
-    /** Not used — PreviewActivity has no screenshot functionality. */
+    /** [DEEPAR via listener] Screenshot bitmap is ready — compress and save to Pictures/. */
     @Override
-    public void onScreenshotTaken(Bitmap bitmap) {}
+    public void onScreenshotTaken(Bitmap bitmap) {
+        File picturesDir = getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        File screenshotFile = new File(picturesDir,
+                "screenshot_" + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(new Date()) + ".jpg");
+        try (FileOutputStream out = new FileOutputStream(screenshotFile)) {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 95, out);
+            Intent scanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+            scanIntent.setData(Uri.fromFile(screenshotFile));
+            sendBroadcast(scanIntent);
+            runOnUiThread(() -> Toast.makeText(this, "Screenshot saved.", Toast.LENGTH_SHORT).show());
+        } catch (IOException e) {
+            runOnUiThread(() -> Toast.makeText(this, "Screenshot failed.", Toast.LENGTH_SHORT).show());
+        }
+    }
 
     /** [DEEPAR via listener] A DeepAR error occurred. */
     @Override

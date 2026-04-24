@@ -1,0 +1,48 @@
+Privacy Policy: VirtuGlow.tech
+Last Updated: April 2026
+
+At VirtuGlow, we take your facial privacy seriously. This policy explains how we handle your media and the data used to power our AI.
+
+────────────────────────────────────────────
+1. Data Controller
+────────────────────────────────────────────
+VirtuGlow [Insert Legal Entity Name] is the controller of your data. For inquiries, contact: privacy@virtuglow.tech.
+
+────────────────────────────────────────────
+2. Collection of User Media & Processing
+────────────────────────────────────────────
+To provide our "Virtual Makeover" service, we process the photos, selfies, and videos you upload.
+
+Service Provision: Media is processed to detect facial features and apply digital overlays. This is necessary for the performance of our contract with you.
+
+Storage: We retain original media for [Insert Duration, e.g., 30 days] to allow you to re-edit or download your results.
+
+────────────────────────────────────────────
+3. AI Training & Machine Learning
+────────────────────────────────────────────
+Under the EU AI Act (2026), we inform you that VirtuGlow uses AI models.
+
+Anonymized Usage: We use submitted media to improve our proprietary ML models. Before training, images are anonymized: facial features are converted into mathematical vectors, and all identifying metadata is stripped.
+
+Legal Basis: We rely on your Explicit Consent for this training. You may opt-in/out at the time of upload without losing access to the core service.
+
+────────────────────────────────────────────
+4. Your Rights under Belgian Law
+────────────────────────────────────────────
+In accordance with the APD-GBA (Belgian Data Protection Authority) guidelines, you have the right to:
+
+Access & Export: Request a copy of your stored media and data.
+
+Erasure ("Right to be Forgotten"): Request the immediate deletion of your photos and account.
+
+Object to Training: Withdraw consent for your data to be used in ML training at any time.
+
+────────────────────────────────────────────
+5. Minors
+────────────────────────────────────────────
+In line with Belgian law, our services are strictly for users aged 13 and older. We do not knowingly process data from children under this age.
+
+────────────────────────────────────────────
+6. Data Security & Transfers
+────────────────────────────────────────────
+All data is encrypted in transit and at rest. We prioritize processing within the European Economic Area (EEA). Any transfers outside the EEA are protected by Standard Contractual Clauses.

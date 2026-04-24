@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    activity_creator_home.xml — Layout for the Creator Home screen
+    ===============================================================
+    Colors:  res/values/colors.xml
+             (C:\Users\Admin\StudioProjects\305\app\src\main\res\values\colors.xml)
+
+    STRUCTURE:
+    - Top bar     : hamburger menu (left) + username (center) + add button (right)
+    - Search bar  : below top bar
+    - RecyclerView: scrollable grid of creator's masks
+                    1 column if items <= COLUMN_THRESHOLD, 2 columns if items > COLUMN_THRESHOLD
+
+    COLUMN THRESHOLD (change this in your Activity):
+        private static final int COLUMN_THRESHOLD = 5;
+
+    ADDING LOGIC LATER:
+    - Hamburger menu      : find "TODO: Open navigation drawer / menu"
+    - Username from DB    : find "TODO: Load username from DB"
+    - Search logic        : find "TODO: Implement search logic"
+    - Add mask button     : find "TODO: Navigate to AddMaskActivity"
+    - Load masks from DB  : find "TODO: Load creator masks from DB and call updateGrid()"
+    - Image tap           : find "TODO: Navigate to item detail screen" (in Adapter)
+
+    HOW THE DYNAMIC GRID WORKS (paste into CreatorHomeActivity):
+    ─────────────────────────────────────────────────────────────
+        private static final int COLUMN_THRESHOLD = 5;
+
+        private RecyclerView recyclerView;
+        private GridLayoutManager gridLayoutManager;
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_creator_home);
+
+            recyclerView = findViewById(R.id.rvMasks);
+            gridLayoutManager = new GridLayoutManager(this, 1);
+            recyclerView.setLayoutManager(gridLayoutManager);
+
+            // TODO: Load creator masks from DB and call updateGrid()
+            // updateGrid(maskList);
+        }
+
+        private void updateGrid(List<YourMaskModel> masks) {
+            int columns = masks.size() > COLUMN_THRESHOLD ? 2 : 1;
+            gridLayoutManager.setSpanCount(columns);
+            recyclerView.setAdapter(new CreatorMaskAdapter(masks, columns));
+        }
+
+    VIEW IDs:
+    - @+id/btnMenu       — hamburger ImageButton (top-left)
+    - @+id/tvUsername    — username TextView (top-center)
+    - @+id/btnAddMask    — "+" ImageButton (top-right)
+    - @+id/etSearch      — search EditText
+    - @+id/ivSearch      — search icon
+    - @+id/rvMasks       — RecyclerView (scrollable mask grid)
+
+    RELATED FILES:
+    - res/layout/item_creator_mask.xml — single mask card layout (see bottom comment)
+-->
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundPrimary"
+    tools:context=".CreatorHomeActivity">
+
+    <!-- ══════════════════════════════════════
+         TOP BAR
+         ══════════════════════════════════════ -->
+
+    <!--
+        Hamburger menu button — top-left.
+        TODO: Open navigation drawer / menu
+        In your Activity:
+            ImageButton btnMenu = findViewById(R.id.btnMenu);
+            btnMenu.setOnClickListener(v -> {
+                // open your DrawerLayout or menu
+            });
+    -->
+    <ImageButton
+        android:id="@+id/btnMenu"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:background="@null"
+        android:src="@drawable/menu_icon"
+        android:scaleType="centerInside"
+        android:contentDescription="Menu"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/tvUsername"
+        app:tint="@color/textPrimary" />
+
+    <!--
+        Username — pulled from DB.
+        TODO: Load username from DB
+        In your Activity:
+            TextView tvUsername = findViewById(R.id.tvUsername);
+            tvUsername.setText(currentUser.getDisplayName());
+    -->
+    <TextView
+        android:id="@+id/tvUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Username"
+        android:textColor="@color/textPrimary"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        tools:text="Johanna Doe"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!--
+        "+" Add mask button — top-right.
+        TODO: Navigate to AddMaskActivity
+        In your Activity:
+            ImageButton btnAddMask = findViewById(R.id.btnAddMask);
+            btnAddMask.setOnClickListener(v -> {
+                Intent intent = new Intent(this, AddMaskActivity.class);
+                startActivity(intent);
+            });
+    -->
+    <ImageButton
+        android:id="@+id/btnAddMask"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="20dp"
+        android:background="@null"
+        android:src="@drawable/addition_icon"
+        android:scaleType="centerInside"
+        android:contentDescription="Add mask"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/tvUsername"
+        app:tint="@color/textPrimary" />
+
+    <!-- ══════════════════════════════════════
+         SEARCH BAR
+         ══════════════════════════════════════ -->
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardSearch"
+        android:layout_width="0dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="2dp"
+        app:cardBackgroundColor="@color/backgroundSecondary"
+        app:layout_constraintTop_toBottomOf="@id/tvUsername"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <!--
+                Search input.
+                TODO: Implement search logic
+                In your Activity:
+                    EditText etSearch = findViewById(R.id.etSearch);
+                    etSearch.addTextChangedListener(new TextWatcher() {
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            // filter mask list and notify adapter
+                        }
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                        public void afterTextChanged(Editable s) {}
+                    });
+            -->
+            <EditText
+                android:id="@+id/etSearch"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:hint="Search"
+                android:textColorHint="@color/textMuted"
+                android:textColor="@color/textPrimary"
+                android:textSize="14sp"
+                android:background="@null"
+                android:paddingStart="14dp"
+                android:paddingEnd="8dp"
+                android:inputType="text"
+                android:imeOptions="actionSearch"
+                android:singleLine="true"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/ivSearch"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+            <!-- Search icon -->
+            <ImageView
+                android:id="@+id/ivSearch"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="14dp"
+                android:src="@drawable/search_icon"
+                android:scaleType="centerInside"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:tint="@color/iconTint" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Gold accent line below search bar -->
+    <View
+        android:id="@+id/dividerSearch"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/divider"
+        app:layout_constraintTop_toBottomOf="@id/cardSearch"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- ══════════════════════════════════════
+         MASKS GRID (RecyclerView)
+         ══════════════════════════════════════
+         GridLayoutManager column count is set programmatically in Activity.
+         See "HOW THE DYNAMIC GRID WORKS" comment at the top of this file.
+         Each card is rendered by item_creator_mask.xml.
+
+         TODO: Load creator masks from DB and call updateGrid()
+    -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvMasks"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="12dp"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp"
+        app:layout_constraintTop_toBottomOf="@id/dividerSearch"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <!--        tools:listitem="@layout/item_creator_mask"-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

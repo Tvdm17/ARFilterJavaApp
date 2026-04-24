@@ -77,8 +77,7 @@ public class DeepARManager implements AREventListener, SurfaceHolder.Callback {
 
     /**
      * [GENERAL] Callback interface for the UI layer.
-     * Implement this in MainActivity (or any other UI class) to react to DeepAR events.
-     * No DeepAR imports needed on the UI side.
+     * Implement this in any activity to react to DeepAR events without importing DeepAR SDK classes.
      */
     public interface Listener {
         /** Called when a screenshot bitmap is ready to be saved or displayed. */
@@ -115,9 +114,9 @@ public class DeepARManager implements AREventListener, SurfaceHolder.Callback {
 
     /**
      * [DEEPAR] Initialize the DeepAR engine.
-     * Call this after camera permission is granted (from MainActivity.onStart).
-     * DeepAR fires the initialized() callback when it's ready — we apply
-     * the current effect there.
+     * Call this after camera permission is granted, before setupCamera().
+     * DeepAR fires initialized() when ready — that is the earliest safe point
+     * to call switchEffect().
      */
     public void initialize() {
         buildEffectList();
@@ -129,8 +128,8 @@ public class DeepARManager implements AREventListener, SurfaceHolder.Callback {
 
     /**
      * [DEEPAR] Release all DeepAR resources (GPU textures, threads, ML models).
-     * Call this in MainActivity.onStop so the GPU is freed while off-screen.
-     * DeepAR will be re-initialized in the next initialize() call.
+     * Call this in onStop() so the GPU is freed while the activity is off-screen.
+     * DeepAR is re-initialized on the next initialize() call.
      */
     public void release() {
         if (deepAR != null) {
@@ -138,14 +137,6 @@ public class DeepARManager implements AREventListener, SurfaceHolder.Callback {
             deepAR.release();
             deepAR = null;
         }
-    }
-
-    /**
-     * [DEEPAR] Exposes the raw DeepAR object — needed by ARSurfaceProvider
-     * (the external GL texture camera path). Avoid using this in UI code.
-     */
-    public DeepAR getDeepAR() {
-        return deepAR;
     }
 
     // -------------------------------------------------------
@@ -270,12 +261,11 @@ public class DeepARManager implements AREventListener, SurfaceHolder.Callback {
     }
 
     /**
-     * [DEEPAR] Stop an in-progress recording. File is fully written after videoRecordingFinished() fires.
+     * [DEEPAR] Stop an in-progress recording.
+     * The file is fully written only after videoRecordingFinished() fires.
      */
     public void stopVideoRecording() {
-        if (deepAR != null) {
-            if (deepAR != null) deepAR.stopVideoRecording();
-        }
+        if (deepAR != null) deepAR.stopVideoRecording();
     }
 
     // -------------------------------------------------------
@@ -283,11 +273,11 @@ public class DeepARManager implements AREventListener, SurfaceHolder.Callback {
     // -------------------------------------------------------
 
     /**
-     * [ANDROID + DEEPAR] Returns this object as a SurfaceHolder.Callback so MainActivity
+     * [ANDROID + DEEPAR] Returns this object as a SurfaceHolder.Callback so an activity
      * can register it with the SurfaceView's holder:
      *   arView.getHolder().addCallback(deepARManager.getSurfaceCallback())
      *
-     * Keeping SurfaceHolder.Callback here means MainActivity never needs to
+     * Keeping SurfaceHolder.Callback here means activities never need to
      * call deepAR.setRenderSurface() directly.
      */
     public SurfaceHolder.Callback getSurfaceCallback() {
@@ -363,28 +353,30 @@ public class DeepARManager implements AREventListener, SurfaceHolder.Callback {
 
     @Override
     public void videoRecordingPrepared() {
-        // Encoder ready but not yet recording — not needed for basic usage
+        // Encoder is ready but recording has not started yet.
+        // Could be used to enable the record button only once the encoder is ready.
     }
 
     @Override
     public void shutdownFinished() {
-        // deepAR.release() has fully completed — GPU resources are freed
+        // deepAR.release() has fully completed — GPU resources are freed.
+        // Useful if you need to do work (e.g. re-init) guaranteed after teardown.
     }
 
     @Override
     public void faceVisibilityChanged(boolean visible) {
-        // visible=true: face detected, false: no face in frame
-        // UI could show a "point camera at your face" hint when false
+        // true = face detected, false = no face in frame.
+        // Could show a "point camera at your face" hint when false.
     }
 
     @Override
     public void imageVisibilityChanged(String targetName, boolean visible) {
-        // Marker-based AR — not used in this project
+        // Marker-based (image-tracking) AR — not used in this project.
     }
 
     @Override
     public void frameAvailable(Image image) {
-        // Offscreen rendering mode — not used here (we render to SurfaceView directly)
+        // Fired in offscreen rendering mode — not used here because we render to a SurfaceView.
     }
 
     /**
@@ -396,6 +388,7 @@ public class DeepARManager implements AREventListener, SurfaceHolder.Callback {
         if (listener != null) listener.onError(type, message);
     }
 
+    /** [DEEPAR] Apply a specific effect by filename (e.g. "MakeupLook.deepar"). */
     public void switchEffect(String effectFileName) {
         if (deepAR != null) {
             deepAR.switchEffect("effect", getFilterPath(effectFileName));
@@ -404,6 +397,7 @@ public class DeepARManager implements AREventListener, SurfaceHolder.Callback {
 
     @Override
     public void effectSwitched(String slot) {
-        // Called after switchEffect() completes — useful for hiding a loading spinner
+        // Called after switchEffect() completes.
+        // Could be used to hide a loading spinner shown while the effect was loading.
     }
 }
