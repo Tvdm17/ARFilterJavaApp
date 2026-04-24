@@ -58,168 +58,185 @@
     (see comment at the bottom of this file)
     ─────────────────────────────────────────────────────────────
 -->
-
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<androidx.drawerlayout.widget.DrawerLayout android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/backgroundPrimary"
-    tools:context=".CustomerHomeActivity"
-    tools:ignore="HardcodedText">
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- ══════════════════════════════════════
-         TOP BAR
-         ══════════════════════════════════════ -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/backgroundPrimary"
+        tools:context=".CustomerHomeActivity"
+        tools:ignore="HardcodedText">
 
-    <!--
-        Hamburger menu button — top-left.
-        TODO: Open navigation drawer / menu
-        In your Activity:
-            btnMenu = findViewById(R.id.btnMenu)
-            btnMenu.setOnClickListener {
-                // open your DrawerLayout or bottom sheet menu
-            }
-    -->
-    <ImageButton
-        android:id="@+id/btnMenu"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="20dp"
-        android:background="@null"
-        android:src="@drawable/menu_icon"
-        android:scaleType="centerInside"
-        android:contentDescription="Menu"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/tvUsername"
-        app:tint="@color/textPrimary" />
+        <!-- ══════════════════════════════════════
+             TOP BAR
+             ══════════════════════════════════════ -->
 
-    <!--
-        Username — pulled from DB.
-        TODO: Load username from DB
-        In your Activity:
-            tvUsername = findViewById(R.id.tvUsername)
-            tvUsername.text = currentUser.displayName  // replace with your DB call
-    -->
-    <TextView
-        android:id="@+id/tvUsername"
+        <!--
+            Hamburger menu button — top-left.
+            TODO: Open navigation drawer / menu
+            In your Activity:
+                btnMenu = findViewById(R.id.btnMenu)
+                btnMenu.setOnClickListener {
+                    // open your DrawerLayout or bottom sheet menu
+                }
+        -->
+
+        <ImageButton
+            android:id="@+id/btnMenu"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="20dp"
+            android:background="@null"
+            android:src="@drawable/menu_icon"
+            android:scaleType="centerInside"
+            android:contentDescription="Menu"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/tvUsername"
+            app:tint="@color/textPrimary" />
+
+        <!--
+            Username — pulled from DB.
+            TODO: Load username from DB
+            In your Activity:
+                tvUsername = findViewById(R.id.tvUsername)
+                tvUsername.text = currentUser.displayName  // replace with your DB call
+        -->
+        <TextView
+            android:id="@+id/tvUsername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Username"
+            android:textColor="@color/textPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:text="Johanna Doe"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- ══════════════════════════════════════
+             SEARCH BAR
+             ══════════════════════════════════════ -->
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardSearch"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/backgroundSecondary"
+            app:layout_constraintTop_toBottomOf="@id/tvUsername"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <!--
+                    Search input.
+                    TODO: Implement search logic
+                    In your Activity:
+                        etSearch = findViewById(R.id.etSearch)
+                        etSearch.addTextChangedListener { query ->
+                            // filter your item list and call updateGrid(filteredList)
+                        }
+                -->
+                <EditText
+                    android:id="@+id/etSearch"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:hint="Search"
+                    android:textColorHint="@color/textMuted"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="14sp"
+                    android:background="@null"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="8dp"
+                    android:inputType="text"
+                    android:imeOptions="actionSearch"
+                    android:singleLine="true"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/ivSearch"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+                <!-- Search icon -->
+                <ImageView
+                    android:id="@+id/ivSearch"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="14dp"
+                    android:src="@drawable/search_icon"
+                    app:tint="@color/iconTint"
+                    android:scaleType="centerInside"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Gold accent line below search bar -->
+        <View
+            android:id="@+id/dividerSearch"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/divider"
+            app:layout_constraintTop_toBottomOf="@id/cardSearch"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- ══════════════════════════════════════
+             ITEMS GRID (RecyclerView)
+             ══════════════════════════════════════
+             GridLayoutManager column count is set programmatically in Activity.
+             See "HOW THE DYNAMIC GRID WORKS" comment at the top of this file.
+
+             Each item is rendered by res/layout/item_owned.xml (see bottom comment).
+        -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvItems"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="12dp"
+            android:clipToPadding="false"
+            android:paddingBottom="16dp"
+            tools:listitem="@layout/item_owned"
+            app:layout_constraintTop_toBottomOf="@id/dividerSearch"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigationView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Username"
-        android:textColor="@color/textPrimary"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        tools:text="Johanna Doe"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:menu="@menu/menu"/>
 
-    <!-- ══════════════════════════════════════
-         SEARCH BAR
-         ══════════════════════════════════════ -->
+</androidx.drawerlayout.widget.DrawerLayout>
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardSearch"
-        android:layout_width="0dp"
-        android:layout_height="44dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        app:cardCornerRadius="10dp"
-        app:cardElevation="2dp"
-        app:cardBackgroundColor="@color/backgroundSecondary"
-        app:layout_constraintTop_toBottomOf="@id/tvUsername"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <!--
-                Search input.
-                TODO: Implement search logic
-                In your Activity:
-                    etSearch = findViewById(R.id.etSearch)
-                    etSearch.addTextChangedListener { query ->
-                        // filter your item list and call updateGrid(filteredList)
-                    }
-            -->
-            <EditText
-                android:id="@+id/etSearch"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:hint="Search"
-                android:textColorHint="@color/textMuted"
-                android:textColor="@color/textPrimary"
-                android:textSize="14sp"
-                android:background="@null"
-                android:paddingStart="14dp"
-                android:paddingEnd="8dp"
-                android:inputType="text"
-                android:imeOptions="actionSearch"
-                android:singleLine="true"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/ivSearch"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
-
-            <!-- Search icon -->
-            <ImageView
-                android:id="@+id/ivSearch"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginEnd="14dp"
-                android:src="@drawable/search_icon"
-                app:tint="@color/iconTint"
-                android:scaleType="centerInside"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
-
-    <!-- Gold accent line below search bar -->
-    <View
-        android:id="@+id/dividerSearch"
-        android:layout_width="0dp"
-        android:layout_height="2dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="8dp"
-        android:background="@color/divider"
-        app:layout_constraintTop_toBottomOf="@id/cardSearch"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- ══════════════════════════════════════
-         ITEMS GRID (RecyclerView)
-         ══════════════════════════════════════
-         GridLayoutManager column count is set programmatically in Activity.
-         See "HOW THE DYNAMIC GRID WORKS" comment at the top of this file.
-
-         Each item is rendered by res/layout/item_owned.xml (see bottom comment).
-    -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvItems"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:layout_marginBottom="12dp"
-        android:clipToPadding="false"
-        android:paddingBottom="16dp"
-        tools:listitem="@layout/item_owned"
-        app:layout_constraintTop_toBottomOf="@id/dividerSearch"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>

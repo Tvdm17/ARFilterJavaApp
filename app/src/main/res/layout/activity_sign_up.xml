@@ -5,13 +5,6 @@
         Colors:  res/values/colors.xml
                  (C:\Users\Admin\StudioProjects\305\app\src\main\res\values\colors.xml)
 
-        ADDING ACTIVITIES / LOGIC LATER:
-        - Back / already have account : find "TODO: Navigate to SignInActivity"
-        - Terms of Services link      : find "TODO: Navigate to TermsActivity"
-        - Privacy Policy link         : find "TODO: Navigate to PrivacyPolicyActivity"
-        - Continue button             : find "TODO: Navigate to next onboarding screen"
-        - Customer/Creator toggle     : find "TODO: Handle Customer/Creator toggle" in your Activity
-
         VIEW IDs (reference these in your Activity/Fragment):
         - @+id/tvSignUpTitle      — "Sign Up" heading
         - @+id/etEmail            — email EditText
@@ -218,15 +211,6 @@
                     android:textColor="@color/textSecondary"
                     android:textSize="11sp" />
 
-                <!--
-                    "Privacy Policy."
-                    TODO: Navigate to PrivacyPolicyActivity
-                    In your Activity:
-                        tvPrivacyLink = findViewById(R.id.tvPrivacyLink)
-                        tvPrivacyLink.setOnClickListener {
-                            // startActivity(Intent(this, PrivacyPolicyActivity::class.java))
-                        }
-                -->
                 <TextView
                     android:id="@+id/tvPrivacyLink"
                     android:layout_width="wrap_content"
@@ -243,32 +227,8 @@
             <!-- ══════════════════════════════════════
                  CUSTOMER / CREATOR TOGGLE BUTTONS
                  ══════════════════════════════════════
-                 TODO: Handle Customer/Creator toggle
-                 In your Activity:
-                     btnCustomer = findViewById(R.id.btnCustomer)
-                     btnCreator  = findViewById(R.id.btnCreator)
 
-                     // Default state: Customer selected
-                     setCustomerSelected(true)
-
-                     fun setCustomerSelected(customerActive: Boolean) {
-                         btnCustomer.backgroundTintList = ColorStateList.valueOf(
-                             ContextCompat.getColor(this,
-                                 if (customerActive) R.color.buttonPrimary else R.color.buttonDisabled))
-                         btnCustomer.setTextColor(ContextCompat.getColor(this,
-                                 if (customerActive) R.color.textOnGold  else R.color.textSecondary))
-                         btnCreator.backgroundTintList = ColorStateList.valueOf(
-                             ContextCompat.getColor(this,
-                                 if (customerActive) R.color.buttonDisabled else R.color.buttonPrimary))
-                         btnCreator.setTextColor(ContextCompat.getColor(this,
-                                 if (customerActive) R.color.textSecondary  else R.color.textOnGold))
-                     }
-
-                     btnCustomer.setOnClickListener { setCustomerSelected(true)  }
-                     btnCreator .setOnClickListener { setCustomerSelected(false) }
-            -->
-
-            <!-- Customer button — gold by default (selected state) -->
+            <!- Customer button — gold by default (selected state) -->
             <Button
                 android:id="@+id/btnCustomer"
                 android:layout_width="0dp"
@@ -315,15 +275,6 @@
                  CONTINUE BUTTON
                  ══════════════════════════════════════ -->
 
-            <!--
-                TODO: Navigate to next onboarding screen
-                In your Activity:
-                    btnContinue = findViewById(R.id.btnContinue)
-                    btnContinue.setOnClickListener {
-                        // validate fields + cbTerms.isChecked, then:
-                        // startActivity(Intent(this, OnboardingActivity::class.java))
-                    }
-            -->
             <Button
                 android:id="@+id/btnContinue"
                 android:layout_width="0dp"
@@ -356,14 +307,7 @@
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintHorizontal_bias="0.5" />
 
-            <!--
-                TODO: Navigate to SignInActivity
-                In your Activity:
-                    tvSignIn = findViewById(R.id.tvSignIn)
-                    tvSignIn.setOnClickListener {
-                        // startActivity(Intent(this, SignInActivity::class.java))
-                    }
-            -->
+
             <TextView
                 android:id="@+id/tvSignIn"
                 android:layout_width="wrap_content"
