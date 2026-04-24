@@ -198,15 +198,6 @@
                     android:textColor="@color/textSecondary"
                     android:textSize="11sp" />
 
-                <!--
-                    "Terms of Services"
-                    TODO: Navigate to TermsActivity
-                    In your Activity:
-                        tvTermsLink = findViewById(R.id.tvTermsLink)
-                        tvTermsLink.setOnClickListener {
-                            // startActivity(Intent(this, TermsActivity::class.java))
-                        }
-                -->
                 <TextView
                     android:id="@+id/tvTermsLink"
                     android:layout_width="wrap_content"

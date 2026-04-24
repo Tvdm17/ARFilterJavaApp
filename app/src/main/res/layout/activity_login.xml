@@ -7,10 +7,6 @@
     Logo:    @drawable/logo        (logo.jpg)
     Eye icon:@drawable/eye_icon
 
-    ADDING ACTIVITIES LATER:
-    - Sign In button : find "TODO: Navigate to MainActivity"   in your Activity
-    - Sign Up link   : find "TODO: Navigate to SignUpActivity" in your Activity
-    - Password toggle: find "TODO: Toggle password visibility" in your Activity
 
     VIEW IDs (reference these in your Activity/Fragment):
     - @+id/ivLogo             — company logo ImageView
@@ -189,15 +185,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!--
-            Eye icon — toggle password visibility.
-            TODO: Toggle password visibility
-            In your Activity:
-                ivPasswordToggle = findViewById(R.id.ivPasswordToggle)
-                ivPasswordToggle.setOnClickListener {
-                    // toggle etPassword inputType between textPassword and textVisiblePassword
-                }
-        -->
         <ImageView
             android:id="@+id/ivPasswordToggle"
             android:layout_width="24dp"
@@ -225,16 +212,6 @@
              SIGN IN BUTTON
              ══════════════════════════════════════ -->
 
-        <!--
-            Primary action button.
-            TODO: Navigate to MainActivity
-            In your Activity:
-                btnSignIn = findViewById(R.id.btnSignIn)
-                btnSignIn.setOnClickListener {
-                    // validate fields, then:
-                    // startActivity(Intent(this, MainActivity::class.java))
-                }
-        -->
         <Button
             android:id="@+id/btnSignIn"
             android:layout_width="0dp"
@@ -268,15 +245,6 @@
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintHorizontal_bias="0.5" />
 
-        <!--
-            "Sign Up" tappable link.
-            TODO: Navigate to SignUpActivity
-            In your Activity:
-                tvSignUp = findViewById(R.id.tvSignUp)
-                tvSignUp.setOnClickListener {
-                    // startActivity(Intent(this, SignUpActivity::class.java))
-                }
-        -->
         <TextView
             android:id="@+id/tvSignUp"
             android:layout_width="wrap_content"

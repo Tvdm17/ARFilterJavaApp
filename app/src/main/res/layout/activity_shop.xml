@@ -1,9 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    activity_shop.xml — Shop screen
-    IDs: @+id/btnMenu, @+id/tvUsername, @+id/etSearch, @+id/ivSearch, @+id/ivFilter, @+id/rvShopItems
-    Related: item_shop.xml, fragment_filter_dialog.xml
+    activity_shop.xml — Layout for the Shop screen
+    ================================================
+    Colors:  res/values/colors.xml
+             (C:\Users\Admin\StudioProjects\305\app\src\main\res\values\colors.xml)
+
+    STRUCTURE:
+    - Top bar     : hamburger menu (left) + username (center)
+    - Search bar  : with search icon + filter icon (right)
+    - RecyclerView: scrollable list of market items (1 column)
+    - Filter popup: dialog fragment (separate file — fragment_filter_dialog.xml)
+
+    ADDING LOGIC LATER:
+    - Hamburger menu      : find "TODO: Open navigation drawer / menu"
+    - Username from DB    : find "TODO: Load username from DB"
+    - Search logic        : find "TODO: Implement search logic"
+    - Filter dialog open  : find "TODO: Open filter dialog"
+    - Load items from DB  : find "TODO: Fetch market items from DB"
+    - View button click   : find "TODO: Navigate to activity_item_card" (in Adapter)
+    - Star rating tap     : find "TODO: Show average rating tooltip" (in Adapter)
+
+    VIEW IDs:
+    - @+id/btnMenu       — hamburger ImageButton (top-left)
+    - @+id/tvUsername    — username TextView (top-center)
+    - @+id/etSearch      — search EditText
+    - @+id/ivSearch      — search icon
+    - @+id/ivFilter      — filter icon (top-right, opens filter dialog)
+    - @+id/rvShopItems   — RecyclerView (scrollable item list)
+
+    RELATED FILES:
+    - res/layout/item_shop.xml           — single item card layout (see bottom comment)
+    - res/layout/fragment_filter_dialog.xml — filter popup layout (see bottom comment)
 -->
+
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -15,6 +44,19 @@
     tools:context=".ShopActivity"
     tools:ignore="HardcodedText">
 
+    <!-- ══════════════════════════════════════
+         TOP BAR
+         ══════════════════════════════════════ -->
+
+    <!--
+        Hamburger menu button.
+        TODO: Open navigation drawer / menu
+        In your Activity:
+            ImageButton btnMenu = findViewById(R.id.btnMenu);
+            btnMenu.setOnClickListener(v -> {
+                // open your DrawerLayout or menu
+            });
+    -->
     <ImageButton
         android:id="@+id/btnMenu"
         android:layout_width="36dp"
@@ -30,6 +72,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/tvUsername" />
 
+    <!--
+        Username — pulled from DB.
+        TODO: Load username from DB
+        In your Activity:
+            TextView tvUsername = findViewById(R.id.tvUsername);
+            tvUsername.setText(currentUser.getDisplayName()); // replace with your DB call
+    -->
     <TextView
         android:id="@+id/tvUsername"
         android:layout_width="wrap_content"
@@ -43,6 +92,10 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- ══════════════════════════════════════
+         SEARCH BAR + FILTER ICON
+         ══════════════════════════════════════ -->
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardSearch"
@@ -62,6 +115,19 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <!--
+                Search input.
+                TODO: Implement search logic
+                In your Activity:
+                    EditText etSearch = findViewById(R.id.etSearch);
+                    etSearch.addTextChangedListener(new TextWatcher() {
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            // filter your item list and notify adapter
+                        }
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                        public void afterTextChanged(Editable s) {}
+                    });
+            -->
             <EditText
                 android:id="@+id/etSearch"
                 android:layout_width="0dp"
@@ -97,6 +163,16 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
+    <!--
+        Filter icon — opens the filter dialog.
+        TODO: Open filter dialog
+        In your Activity:
+            ImageView ivFilter = findViewById(R.id.ivFilter);
+            ivFilter.setOnClickListener(v -> {
+                FilterDialogFragment dialog = new FilterDialogFragment();
+                dialog.show(getSupportFragmentManager(), "FilterDialog");
+            });
+    -->
     <ImageView
         android:id="@+id/ivFilter"
         android:layout_width="24dp"
@@ -112,6 +188,7 @@
         app:layout_constraintBottom_toBottomOf="@id/cardSearch"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Gold accent line below search bar -->
     <View
         android:id="@+id/dividerSearch"
         android:layout_width="0dp"
@@ -124,6 +201,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- ══════════════════════════════════════
+         SHOP ITEMS LIST (RecyclerView)
+         ══════════════════════════════════════
+         Single-column list. Each card is rendered by item_shop.xml.
+         TODO: Fetch market items from DB
+         In your Activity:
+             RecyclerView rvShopItems = findViewById(R.id.rvShopItems);
+             rvShopItems.setLayoutManager(new LinearLayoutManager(this));
+             // fetch items from DB, then:
+             rvShopItems.setAdapter(new ShopAdapter(itemList));
+    -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvShopItems"
         android:layout_width="0dp"
