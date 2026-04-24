@@ -1,62 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    activity_customer_home.xml — Layout for the Customer Home screen
-    =================================================================
+    activity_creator_home.xml — Layout for the Creator Home screen
+    ===============================================================
     Colors:  res/values/colors.xml
              (C:\Users\Admin\StudioProjects\305\app\src\main\res\values\colors.xml)
 
     STRUCTURE:
-    - Top bar  : hamburger menu (left) + username (center)
-    - Search bar below top bar
-    - RecyclerView fills the rest — dynamically switches between
-      1 column (items <= COLUMN_THRESHOLD) and 2 columns (items > COLUMN_THRESHOLD)
+    - Top bar     : hamburger menu (left) + username (center) + add button (right)
+    - Search bar  : below top bar
+    - RecyclerView: scrollable grid of creator's masks
+                    1 column if items <= COLUMN_THRESHOLD, 2 columns if items > COLUMN_THRESHOLD
 
     COLUMN THRESHOLD (change this in your Activity):
-        private val COLUMN_THRESHOLD = 5
+        private static final int COLUMN_THRESHOLD = 5;
 
     ADDING LOGIC LATER:
-    - Hamburger menu  : find "TODO: Open navigation drawer / menu"
-    - Username from DB: find "TODO: Load username from DB"
-    - Search logic    : find "TODO: Implement search logic"
-    - Item click      : find "TODO: Navigate to item detail screen" (in your RecyclerView Adapter)
-    - Load items      : find "TODO: Load items from DB and call updateGrid()"
+    - Hamburger menu      : find "TODO: Open navigation drawer / menu"
+    - Username from DB    : find "TODO: Load username from DB"
+    - Search logic        : find "TODO: Implement search logic"
+    - Add mask button     : find "TODO: Navigate to AddMaskActivity"
+    - Load masks from DB  : find "TODO: Load creator masks from DB and call updateGrid()"
+    - Image tap           : find "TODO: Navigate to item detail screen" (in Adapter)
 
-    HOW THE DYNAMIC GRID WORKS (paste into CustomerHomeActivity):
+    HOW THE DYNAMIC GRID WORKS (paste into CreatorHomeActivity):
     ─────────────────────────────────────────────────────────────
-        private val COLUMN_THRESHOLD = 5   // ← change this value to adjust breakpoint
+        private static final int COLUMN_THRESHOLD = 5;
 
-        private lateinit var recyclerView: RecyclerView
-        private lateinit var gridLayoutManager: GridLayoutManager
+        private RecyclerView recyclerView;
+        private GridLayoutManager gridLayoutManager;
 
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-            setContentView(R.layout.activity_customer_home)
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_creator_home);
 
-            recyclerView = findViewById(R.id.rvItems)
-            gridLayoutManager = GridLayoutManager(this, 1)
-            recyclerView.layoutManager = gridLayoutManager
+            recyclerView = findViewById(R.id.rvMasks);
+            gridLayoutManager = new GridLayoutManager(this, 1);
+            recyclerView.setLayoutManager(gridLayoutManager);
 
-            // TODO: Load items from DB and call updateGrid()
-            // updateGrid(itemList)
+            // TODO: Load creator masks from DB and call updateGrid()
+            // updateGrid(maskList);
         }
 
-        fun updateGrid(items: List<YourItemModel>) {
-            val columns = if (items.size > COLUMN_THRESHOLD) 2 else 1
-            gridLayoutManager.spanCount = columns
-            recyclerView.adapter = YourAdapter(items, columns) // pass columns so adapter can size images
+        private void updateGrid(List<YourMaskModel> masks) {
+            int columns = masks.size() > COLUMN_THRESHOLD ? 2 : 1;
+            gridLayoutManager.setSpanCount(columns);
+            recyclerView.setAdapter(new CreatorMaskAdapter(masks, columns));
         }
 
     VIEW IDs:
     - @+id/btnMenu       — hamburger ImageButton (top-left)
     - @+id/tvUsername    — username TextView (top-center)
+    - @+id/btnAddMask    — "+" ImageButton (top-right)
     - @+id/etSearch      — search EditText
-    - @+id/ivSearch      — search icon ImageView
-    - @+id/rvItems       — RecyclerView (the scrollable item grid)
+    - @+id/ivSearch      — search icon
+    - @+id/rvMasks       — RecyclerView (scrollable mask grid)
 
-    ─────────────────────────────────────────────────────────────
-    RECYCLER ITEM LAYOUT: create res/layout/item_owned.xml
-    (see comment at the bottom of this file).
-    ─────────────────────────────────────────────────────────────
+    RELATED FILES:
+    - res/layout/item_creator_mask.xml — single mask card layout (see bottom comment)
 -->
 
 <androidx.constraintlayout.widget.ConstraintLayout
@@ -67,8 +68,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/backgroundPrimary"
-    tools:context=".CustomerHomeActivity"
-    tools:ignore="HardcodedText">
+    tools:context=".CreatorHomeActivity">
 
     <!-- ══════════════════════════════════════
          TOP BAR
@@ -78,10 +78,10 @@
         Hamburger menu button — top-left.
         TODO: Open navigation drawer / menu
         In your Activity:
-            btnMenu = findViewById(R.id.btnMenu)
-            btnMenu.setOnClickListener {
-                // open your DrawerLayout or bottom sheet menu
-            }
+            ImageButton btnMenu = findViewById(R.id.btnMenu);
+            btnMenu.setOnClickListener(v -> {
+                // open your DrawerLayout or menu
+            });
     -->
     <ImageButton
         android:id="@+id/btnMenu"
@@ -102,8 +102,8 @@
         Username — pulled from DB.
         TODO: Load username from DB
         In your Activity:
-            tvUsername = findViewById(R.id.tvUsername)
-            tvUsername.text = currentUser.displayName  // replace with your DB call
+            TextView tvUsername = findViewById(R.id.tvUsername);
+            tvUsername.setText(currentUser.getDisplayName());
     -->
     <TextView
         android:id="@+id/tvUsername"
@@ -118,6 +118,31 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <!--
+        "+" Add mask button — top-right.
+        TODO: Navigate to AddMaskActivity
+        In your Activity:
+            ImageButton btnAddMask = findViewById(R.id.btnAddMask);
+            btnAddMask.setOnClickListener(v -> {
+                Intent intent = new Intent(this, AddMaskActivity.class);
+                startActivity(intent);
+            });
+    -->
+    <ImageButton
+        android:id="@+id/btnAddMask"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="20dp"
+        android:background="@null"
+        android:src="@drawable/addition_icon"
+        android:scaleType="centerInside"
+        android:contentDescription="Add mask"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/tvUsername"
+        app:tint="@color/textPrimary" />
 
     <!-- ══════════════════════════════════════
          SEARCH BAR
@@ -145,10 +170,14 @@
                 Search input.
                 TODO: Implement search logic
                 In your Activity:
-                    etSearch = findViewById(R.id.etSearch)
-                    etSearch.addTextChangedListener { query ->
-                        // filter your item list and call updateGrid(filteredList)
-                    }
+                    EditText etSearch = findViewById(R.id.etSearch);
+                    etSearch.addTextChangedListener(new TextWatcher() {
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            // filter mask list and notify adapter
+                        }
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                        public void afterTextChanged(Editable s) {}
+                    });
             -->
             <EditText
                 android:id="@+id/etSearch"
@@ -176,11 +205,11 @@
                 android:layout_height="20dp"
                 android:layout_marginEnd="14dp"
                 android:src="@drawable/search_icon"
-                app:tint="@color/iconTint"
                 android:scaleType="centerInside"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:tint="@color/iconTint" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
@@ -199,15 +228,16 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- ══════════════════════════════════════
-         ITEMS GRID (RecyclerView)
+         MASKS GRID (RecyclerView)
          ══════════════════════════════════════
          GridLayoutManager column count is set programmatically in Activity.
          See "HOW THE DYNAMIC GRID WORKS" comment at the top of this file.
+         Each card is rendered by item_creator_mask.xml.
 
-         Each item is rendered by res/layout/item_owned.xml (see bottom comment).
+         TODO: Load creator masks from DB and call updateGrid()
     -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvItems"
+        android:id="@+id/rvMasks"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="12dp"
@@ -216,10 +246,10 @@
         android:layout_marginBottom="12dp"
         android:clipToPadding="false"
         android:paddingBottom="16dp"
-        tools:listitem="@layout/item_owned"
         app:layout_constraintTop_toBottomOf="@id/dividerSearch"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <!--        tools:listitem="@layout/item_creator_mask"-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
