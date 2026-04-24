@@ -1,38 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-
+<!--
+    activity_privacy_policy.xml — Privacy Policy screen
+    =====================================================
+    Structure:
+      ScrollView (root)             — makes long text scrollable
+        LinearLayout (vertical)     — stacks back button, title, and body
+          ImageButton (backButton)  — calls finish()
+          TextView   (tvTitle)      — "Privacy Policy" heading
+          TextView   (tvBody)       — full text loaded from res/raw/privacy_policy.txt
+-->
 
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".TermsActivity">
+    android:fillViewport="true">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="28dp"
-        android:paddingEnd="28dp"
-        android:paddingTop="56dp"
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
         android:paddingBottom="40dp">
 
-        <!-- ══════════════════════════════════════
-             HEADING
-             ══════════════════════════════════════ -->
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="48dp"
+            android:layout_marginBottom="8dp"
+            android:background="@null"
+            android:src="@drawable/arrow_left"
+            android:scaleType="centerInside"
+            android:contentDescription="Back" />
 
         <TextView
-            android:id="@+id/tvPrivacyTitle"
+            android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="24dp"
             android:text="@string/privacy_policy"
             android:textColor="@color/textPrimary"
-            android:textSize="30sp"
-            android:textStyle="bold"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:textSize="28sp"
+            android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/tvBody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lineSpacingMultiplier="1.4"
+            android:textColor="@color/textPrimary"
+            android:textSize="14sp" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
 </ScrollView>

@@ -1,0 +1,38 @@
+Terms of Service: VirtuGlow.tech
+Last Updated: April 2026
+
+────────────────────────────────────────────
+1. Acceptance & Scope
+────────────────────────────────────────────
+By accessing VirtuGlow.tech, you agree to these Terms. These are governed by Belgian law. We provide an AI-driven virtual makeup service intended for users aged 13+.
+
+────────────────────────────────────────────
+2. Use of Service & AI Disclosure
+────────────────────────────────────────────
+VirtuGlow is an "AI System" under the EU AI Act. Our filters use machine learning to overlay digital effects on your video/image. You are granted a limited, non-exclusive license for personal or professional use during video conferencing.
+
+────────────────────────────────────────────
+3. User Media & ML Training
+────────────────────────────────────────────
+To provide our "makeover" service, you must upload photos or videos ("User Media").
+
+Service Processing: We process User Media solely to apply filters.
+
+Machine Learning (ML): With your explicit opt-in, we may use anonymized versions of your images to train our proprietary ML models. "Anonymized" means the data is stripped of all identifiers and converted into mathematical facial landmarks.
+
+Ownership: You retain ownership of your original media. You grant VirtuGlow a license to use the anonymized data for the technical improvement of our AI.
+
+────────────────────────────────────────────
+4. Intellectual Property
+────────────────────────────────────────────
+The software, filters, and AI models are the exclusive property of VirtuGlow. You may not reverse-engineer the code or attempt to extract our training datasets.
+
+────────────────────────────────────────────
+5. Liability & Warranty
+────────────────────────────────────────────
+The service is provided "as is." Under Belgian consumer law, we ensure the digital content is conformant at the time of delivery, but we are not liable for third-party platform changes (e.g., Zoom updates) that may affect performance.
+
+────────────────────────────────────────────
+6. Governing Law
+────────────────────────────────────────────
+Any dispute regarding these terms shall be subject to the exclusive jurisdiction of the courts of Brussels, Belgium.
