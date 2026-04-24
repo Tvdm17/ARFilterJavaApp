@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class CustomerHomeActivity extends AppCompatActivity {
+    public MakeoverAdapter myAdapter;
+    public List<Makeover> makeovers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +28,7 @@ public class CustomerHomeActivity extends AppCompatActivity {
         });
 
         // DUMMY LIST FOR TESTING, TO BE REPLACED WITH DATABASE
-        List<Makeover> makeovers = new ArrayList<>();
+        //List<Makeover> makeovers = new ArrayList<>();
         makeovers.add(new Makeover("Makeup Look 1", "1GrayBlueEyeshadow.deepar"));
         makeovers.add(new Makeover("Makeup Look 2", "2PurpleEyeliner.deepar"));
         makeovers.add(new Makeover("Makeup Look 3", "3RedLips.deepar"));
@@ -37,5 +39,10 @@ public class CustomerHomeActivity extends AppCompatActivity {
         int columns = makeovers.size() > 5 ? 2 : 1;
         rvItems.setLayoutManager(new GridLayoutManager(this, columns));
         rvItems.setAdapter(new MakeoverAdapter(this, makeovers));
+
+        myAdapter.notifyDataSetChanged();
     }
+
+
+
 }
