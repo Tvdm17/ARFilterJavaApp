@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    activity_item_card.xml — Mask/Item detail screen for customers
+    ==============================================================
+    Colors:  res/values/colors.xml
+             (C:\Users\Admin\StudioProjects\305\app\src\main\res\values\colors.xml)
+
+    STRUCTURE:
+    - Top bar          : hamburger menu (left) + username (center)
+    - Mask name        : bold heading
+    - Main image       : large square, swaps when thumbnail tapped
+    - 4 Thumbnails     : vertical strip on the right of main image
+    - Add / Delete btn : gold "Add" if not owned, red "Delete" if owned
+    - Average rating   : star bar + numeric value
+    - Recent reviews   : last 3 reviews fetched from DB (each has avatar, name, stars, collapsed text)
+    - Leave review btn : opens fragment_leave_review_dialog.xml (owners only)
+
+    ADDING LOGIC LATER:
+    - Hamburger menu        : find "TODO: Open navigation drawer / menu"
+    - Username from DB      : find "TODO: Load username from DB"
+    - Load mask data        : find "TODO: Load mask data from DB"
+    - Thumbnail swap        : find "TODO: Swap main image with tapped thumbnail" (in Activity)
+    - Add button            : find "TODO: Add mask to owned list in DB"
+    - Delete button         : find "TODO: Remove mask from owned list in DB"
+    - Owned state toggle    : find "TODO: Check if mask is owned and toggle Add/Delete button"
+    - Load reviews from DB  : find "TODO: Fetch last 3 reviews from DB"
+    - Leave review button   : find "TODO: Open leave review dialog (owners only)"
+    - Expand review text    : find "TODO: Expand/collapse review text" (in Adapter)
+
+    VIEW IDs:
+    - @+id/btnMenu           — hamburger ImageButton
+    - @+id/tvUsername        — username
+    - @+id/tvMaskName        — mask name heading
+    - @+id/ivMainImage       — large main image
+    - @+id/ivThumb1..4       — four thumbnail ImageViews
+    - @+id/btnAddDelete      — "Add" (gold) or "Delete" (red) button
+    - @+id/rbAverageRating   — average rating RatingBar
+    - @+id/tvAverageValue    — numeric average e.g. "3.5"
+    - @+id/rvReviews         — RecyclerView with last 3 reviews
+    - @+id/btnLeaveReview    — "Leave a Review" button (visible to owners only)
+
+    RELATED FILES:
+    - res/layout/item_review.xml               — single review row (see bottom comment)
+    - res/layout/fragment_leave_review_dialog.xml — leave review popup (see bottom comment)
+
+    THUMBNAIL SWAP LOGIC (paste into ItemCardActivity):
+    ────────────────────────────────────────────────────
+        private void swapMainImage(ImageView tappedThumb) {
+            // Swap drawables between main image and tapped thumbnail
+            Drawable mainDrawable = ivMainImage.getDrawable();
+            Drawable thumbDrawable = tappedThumb.getDrawable();
+            ivMainImage.setImageDrawable(thumbDrawable);
+            tappedThumb.setImageDrawable(mainDrawable);
+            // If using Glide: store URLs in tags and reload accordingly
+        }
+
+        ivThumb1.setOnClickListener(v -> swapMainImage(ivThumb1));
+        ivThumb2.setOnClickListener(v -> swapMainImage(ivThumb2));
+        ivThumb3.setOnClickListener(v -> swapMainImage(ivThumb3));
+        ivThumb4.setOnClickListener(v -> swapMainImage(ivThumb4));
+
+    OWNED STATE TOGGLE (paste into ItemCardActivity):
+    ──────────────────────────────────────────────────
+        // TODO: Check if mask is owned and toggle Add/Delete button
+        private void setOwnedState(boolean isOwned) {
+            if (isOwned) {
+                btnAddDelete.setText("Delete");
+                btnAddDelete.setBackgroundTintList(
+                    ColorStateList.valueOf(ContextCompat.getColor(this, R.color.error)));
+                btnAddDelete.setTextColor(
+                    ContextCompat.getColor(this, R.color.textOnDark));
+                btnLeaveReview.setVisibility(View.VISIBLE);
+                // TODO: Remove mask from owned list in DB
+                btnAddDelete.setOnClickListener(v -> { });
+            } else {
+                btnAddDelete.setText("Add");
+                btnAddDelete.setBackgroundTintList(
+                    ColorStateList.valueOf(ContextCompat.getColor(this, R.color.buttonPrimary)));
+                btnAddDelete.setTextColor(
+                    ContextCompat.getColor(this, R.color.textOnGold));
+                btnLeaveReview.setVisibility(View.GONE);
+                // TODO: Add mask to owned list in DB
+                btnAddDelete.setOnClickListener(v -> { });
+            }
+        }
+-->
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundPrimary"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="32dp"
+        tools:context=".ItemCardActivity">
+
+        <!-- ══════════════════════════════════════
+             TOP BAR
+             ══════════════════════════════════════ -->
+
+        <!--
+            TODO: Open navigation drawer / menu
+            ImageButton btnMenu = findViewById(R.id.btnMenu);
+            btnMenu.setOnClickListener(v -> { ... });
+        -->
+        <ImageButton
+            android:id="@+id/btnMenu"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="20dp"
+            android:background="@null"
+            android:src="@drawable/menu_icon"
+            android:scaleType="centerInside"
+            android:contentDescription="Menu"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/tvUsername"
+            app:tint="@color/textPrimary" />
+
+        <!--
+            TODO: Load username from DB
+            tvUsername.setText(currentUser.getDisplayName());
+        -->
+        <TextView
+            android:id="@+id/tvUsername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Username"
+            android:textColor="@color/textPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:text="Johanna Doe"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Gold underline below top bar -->
+        <View
+            android:id="@+id/dividerTop"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/divider"
+            app:layout_constraintTop_toBottomOf="@id/tvUsername"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- ══════════════════════════════════════
+             MASK NAME
+             ══════════════════════════════════════ -->
+
+        <!--
+            TODO: Load mask data from DB
+            tvMaskName.setText(mask.getName());
+        -->
+        <TextView
+            android:id="@+id/tvMaskName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mask Name"
+            android:textColor="@color/textPrimary"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            tools:text="Mask 1"
+            app:layout_constraintTop_toBottomOf="@id/dividerTop"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- ══════════════════════════════════════
+             MAIN IMAGE + 4 THUMBNAILS
+             ══════════════════════════════════════ -->
+
+        <!--
+            Large main image.
+            TODO: Load mask data from DB — set main image via Glide:
+            Glide.with(this).load(mask.getMainImageUrl()).into(ivMainImage);
+        -->
+        <ImageView
+            android:id="@+id/ivMainImage"
+            android:layout_width="0dp"
+            android:layout_height="240dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="8dp"
+            android:scaleType="centerCrop"
+            android:background="@color/backgroundSecondary"
+            android:contentDescription="Main mask image"
+            app:layout_constraintTop_toBottomOf="@id/tvMaskName"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/llThumbnails" />
+
+        <!--
+            Vertical strip of 4 thumbnails.
+            TODO: Swap main image with tapped thumbnail — see THUMBNAIL SWAP LOGIC in header.
+            Glide.with(this).load(mask.getImageUrl(i)).into(ivThumb_i);
+        -->
+        <LinearLayout
+            android:id="@+id/llThumbnails"
+            android:layout_width="64dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="12dp"
+            app:layout_constraintTop_toBottomOf="@id/tvMaskName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/ivMainImage">
+
+            <ImageView
+                android:id="@+id/ivThumb1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginBottom="4dp"
+                android:scaleType="centerCrop"
+                android:background="@color/backgroundSecondary"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Thumbnail 1" />
+
+            <ImageView
+                android:id="@+id/ivThumb2"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginBottom="4dp"
+                android:scaleType="centerCrop"
+                android:background="@color/backgroundSecondary"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Thumbnail 2" />
+
+            <ImageView
+                android:id="@+id/ivThumb3"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginBottom="4dp"
+                android:scaleType="centerCrop"
+                android:background="@color/backgroundSecondary"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Thumbnail 3" />
+
+            <ImageView
+                android:id="@+id/ivThumb4"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:scaleType="centerCrop"
+                android:background="@color/backgroundSecondary"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Thumbnail 4" />
+
+        </LinearLayout>
+
+        <!-- ══════════════════════════════════════
+             ADD / DELETE BUTTON
+             ══════════════════════════════════════ -->
+
+        <!--
+            Starts as gold "Add". Switches to red "Delete" if mask is owned.
+            TODO: Check if mask is owned and toggle Add/Delete button
+            See OWNED STATE TOGGLE in header comment for full Java snippet.
+        -->
+        <Button
+            android:id="@+id/btnAddDelete"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:text="Add"
+            android:textColor="@color/textOnGold"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:backgroundTint="@color/buttonPrimary"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/ivMainImage"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- ══════════════════════════════════════
+             AVERAGE RATING
+             ══════════════════════════════════════ -->
+
+        <RatingBar
+            android:id="@+id/rbAverageRating"
+            style="?android:attr/ratingBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:stepSize="0.5"
+            android:isIndicator="true"
+            android:progressTint="@color/colorPrimary"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="14dp"
+            app:layout_constraintTop_toBottomOf="@id/btnAddDelete"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!--
+            Numeric average value next to stars e.g. "3.5 / 5"
+            TODO: Load mask data from DB
+            tvAverageValue.setText(String.format("%.1f / 5", mask.getAverageRating()));
+        -->
+        <TextView
+            android:id="@+id/tvAverageValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0.0 / 5"
+            android:textColor="@color/textSecondary"
+            android:textSize="13sp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintTop_toTopOf="@id/rbAverageRating"
+            app:layout_constraintBottom_toBottomOf="@id/rbAverageRating"
+            app:layout_constraintStart_toEndOf="@id/rbAverageRating" />
+
+        <!-- ══════════════════════════════════════
+             RECENT REVIEWS SECTION
+             ══════════════════════════════════════ -->
+
+        <TextView
+            android:id="@+id/tvReviewsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Recent reviews"
+            android:textColor="@color/textPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintTop_toBottomOf="@id/rbAverageRating"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!--
+            RecyclerView — shows last 3 reviews.
+            Disable nested scrolling so the outer ScrollView handles all scrolling.
+            TODO: Fetch last 3 reviews from DB
+            In your Activity:
+                rvReviews.setLayoutManager(new LinearLayoutManager(this));
+                rvReviews.setNestedScrollingEnabled(false);
+                rvReviews.setAdapter(new ReviewAdapter(last3Reviews));
+        -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvReviews"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
+            android:nestedScrollingEnabled="false"
+            tools:listitem="@layout/item_review"
+            app:layout_constraintTop_toBottomOf="@id/tvReviewsTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- ══════════════════════════════════════
+             LEAVE A REVIEW BUTTON (owners only)
+             ══════════════════════════════════════ -->
+
+        <!--
+            Hidden by default. Shown only when mask is owned.
+            TODO: Open leave review dialog (owners only)
+            In your Activity:
+                btnLeaveReview.setOnClickListener(v -> {
+                    LeaveReviewDialogFragment dialog = new LeaveReviewDialogFragment();
+                    dialog.show(getSupportFragmentManager(), "LeaveReviewDialog");
+                });
+        -->
+        <Button
+            android:id="@+id/btnLeaveReview"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:text="Leave a Review"
+            android:textColor="@color/textOnGold"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:backgroundTint="@color/buttonPrimary"
+            android:visibility="gone"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/rvReviews"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

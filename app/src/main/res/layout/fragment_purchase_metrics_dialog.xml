@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    fragment_purchase_metrics_dialog.xml — Purchase metrics popup for creators
+    ===========================================================================
+    Colors:  res/values/colors.xml
+             (C:\Users\Admin\StudioProjects\305\app\src\main\res\values\colors.xml)
+
+    Displayed as a DialogFragment on top of activity_creator_item_card.xml.
+    Shows three graphs (Adds, Removes, Reviews over time) + average rating number.
+
+    GRAPHS: Uses MPAndroidChart library (com.github.PhilJay:MPAndroidChart).
+    Add to build.gradle (app level):
+        dependencies {
+            implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+        }
+    Add to settings.gradle (or build.gradle project level):
+        repositories {
+            maven { url 'https://jitpack.io' }
+        }
+
+    VIEW IDs:
+    - @+id/tvMetricsTitle     — "Purchase Metrics" heading
+    - @+id/tvAvgRatingLabel   — "Average Rating" label
+    - @+id/tvAvgRatingValue   — numeric average e.g. "3.5 / 5"
+    - @+id/tvAddsLabel        — "Adds over time" label
+    - @+id/chartAdds          — LineChart for adds
+    - @+id/tvRemovesLabel     — "Removes over time" label
+    - @+id/chartRemoves       — LineChart for removes
+    - @+id/tvReviewsLabel     — "Reviews over time" label
+    - @+id/chartReviews       — LineChart for reviews count
+    - @+id/btnCloseMetrics    — closes the dialog
+
+    ADDING LOGIC LATER:
+    - Load metrics data : find "TODO: Fetch metrics data from DB and populate charts"
+
+    JAVA CHART SETUP EXAMPLE (paste into PurchaseMetricsDialogFragment.java):
+        // TODO: Fetch metrics data from DB and populate charts
+        private void setupChart(LineChart chart, List<Entry> entries, String label) {
+            LineDataSet dataSet = new LineDataSet(entries, label);
+            dataSet.setColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+            dataSet.setValueTextColor(ContextCompat.getColor(getContext(), R.color.textPrimary));
+            dataSet.setCircleColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+            dataSet.setLineWidth(2f);
+            dataSet.setCircleRadius(4f);
+            dataSet.setDrawValues(false);
+            chart.setData(new LineData(dataSet));
+            chart.getDescription().setEnabled(false);
+            chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+            chart.getAxisRight().setEnabled(false);
+            chart.invalidate();
+        }
+
+    JAVA DIALOG SETUP (create PurchaseMetricsDialogFragment.java):
+        public class PurchaseMetricsDialogFragment extends DialogFragment {
+            @Override
+            public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                     Bundle savedInstanceState) {
+                return inflater.inflate(R.layout.fragment_purchase_metrics_dialog, container, false);
+            }
+
+            @Override
+            public void onViewCreated(View view, Bundle savedInstanceState) {
+                super.onViewCreated(view, savedInstanceState);
+
+                LineChart chartAdds    = view.findViewById(R.id.chartAdds);
+                LineChart chartRemoves = view.findViewById(R.id.chartRemoves);
+                LineChart chartReviews = view.findViewById(R.id.chartReviews);
+                TextView tvAvgValue    = view.findViewById(R.id.tvAvgRatingValue);
+
+                // TODO: Fetch metrics data from DB and populate charts
+                // setupChart(chartAdds,    addsEntries,    "Adds");
+                // setupChart(chartRemoves, removesEntries, "Removes");
+                // setupChart(chartReviews, reviewsEntries, "Reviews");
+                // tvAvgValue.setText(String.format("%.1f / 5", avgRating));
+
+                view.findViewById(R.id.btnCloseMetrics).setOnClickListener(v -> dismiss());
+            }
+        }
+-->
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/backgroundPrimary">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Dialog title -->
+        <TextView
+            android:id="@+id/tvMetricsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Purchase Metrics"
+            android:textColor="@color/textPrimary"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="20dp" />
+
+        <!-- ── Average Rating (number only) ── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp"
+            android:background="@color/backgroundSecondary"
+            android:padding="14dp">
+
+            <TextView
+                android:id="@+id/tvAvgRatingLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Average Rating"
+                android:textColor="@color/textPrimary"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <!--
+                TODO: Fetch metrics data from DB and populate charts
+                tvAvgRatingValue.setText(String.format("%.1f / 5", avgRating));
+            -->
+            <TextView
+                android:id="@+id/tvAvgRatingValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.0 / 5"
+                android:textColor="@color/textGold"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- ── Adds over time ── -->
+        <TextView
+            android:id="@+id/tvAddsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Adds over time"
+            android:textColor="@color/textPrimary"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <!--
+            LineChart for adds.
+            TODO: Fetch metrics data from DB and populate charts
+            See setupChart() in JAVA CHART SETUP EXAMPLE above.
+        -->
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chartAdds"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_marginBottom="24dp" />
+
+        <!-- ── Removes over time ── -->
+        <TextView
+            android:id="@+id/tvRemovesLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Removes over time"
+            android:textColor="@color/textPrimary"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <!--
+            LineChart for removes.
+            TODO: Fetch metrics data from DB and populate charts
+        -->
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chartRemoves"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_marginBottom="24dp" />
+
+        <!-- ── Reviews over time ── -->
+        <TextView
+            android:id="@+id/tvReviewsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reviews over time"
+            android:textColor="@color/textPrimary"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <!--
+            LineChart for review count over time.
+            TODO: Fetch metrics data from DB and populate charts
+        -->
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chartReviews"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Close button -->
+        <Button
+            android:id="@+id/btnCloseMetrics"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Close"
+            android:textColor="@color/textOnGold"
+            android:backgroundTint="@color/buttonPrimary" />
+
+    </LinearLayout>
+</ScrollView>

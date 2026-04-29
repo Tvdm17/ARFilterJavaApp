@@ -1,28 +1,67 @@
-# quickstart-android-java
+# VirtuGlow
 
-## Overview
+## Sources and AI usage statement
 
-This is an example app demonstrating DeepAR SDK.
+This project builds upon an example app demonstrating DeepAR SDK usage for Android development. The following functionality was taken:
 
-- Preview of fun face filters, effects and background replacement.
-- Carousel with filter thumbnails.
+- Preview of fun face filters.
 - Take screenshot.
 - Record video.
 - Front and back camera.
-- Source code demonstrates how to integrate DeepAR for Android in your app.
+- Source code demonstrates how to integrate DeepAR for Android.
 
 For more info on DeepAR for Android see: https://docs.deepar.ai/deepar-sdk/platforms/android/overview
 
+Claude Code, Claude, and Gemini were used throughout development to assist mainly with:
+
+- understanding DeepAR sample code
+- cleaning up not used sample project code
+- suggestions to improve DeepAR performance
+- creating repetitive UI elements
+- debugging when the issue persisted
+- writing detailed comments
+- explaining documentation
+- recommending best practices for app structure
 
 
-## How to run
 
-1. Open the project in Android Studio. 
-2. Create a DeepAR developer account: https://developer.deepar.ai/signup. 
-3. Create a project: https://developer.deepar.ai/projects. 
-4. Add a Android app to the project. Note that you need to specify the `applicationId` of your app. The `applicationId` is located in the `app/build.gradle` and in this case it is "ai.deepar.deepar_example".
-5. Copy the generated license key in the `MainActivity.java` instead of your_license_key_here.
 
-## Sources
+## Requirements
 
-The following FBX file was used to create eyelashes for makeup effects https://www.cgtrader.com/3d-models/character/human-anatomy/eyelash-pack-01
+1. essential
+
+- client user account creation
+- client user log in
+- storing client personal and makeover information in a database
+- encrypted strings for password - hashed and salted
+- successful integration of DeepAR SDK
+- permissions for the phone’s camera and microphone usage
+- client being able to see makeup on face
+- recording video with the makeover
+- taking picture with makeover
+
+2. main
+
+- agreement Terms of Use and Privacy Policy
+- shop for users
+- image preview of the available makeovers in the shop
+- video preview of the available makeovers in the shop
+- satisfaction scores and average satisfaction scores 
+- reviews for MUA for common free makeovers
+- tags for filtering + search function (by tag)
+- ranking of makeovers
+- MUA personal look catalogue
+- window for uploading a new makeover
+
+3. optional
+
+- modify user info once account is created 
+- profile pictures and changing them
+- forgot password
+- reviews for MUA for custom filters
+- delete account and personal information
+- window for requesting a new makeover
+- window for MUA to modify makeovers 
+- encrypt deepAR files
+
+
