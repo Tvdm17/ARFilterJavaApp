@@ -15,7 +15,7 @@
         private val COLUMN_THRESHOLD = 5
 
     ADDING LOGIC LATER:
-    - Hamburger menu  : find "TODO: Open navigation drawer / menu"
+    - Hamburger menu  : find "TODO: Open navigation drawer / menu" DONE!!!!
     - Username from DB: find "TODO: Load username from DB"
     - Search logic    : find "TODO: Implement search logic"
     - Item click      : find "TODO: Navigate to item detail screen" (in your RecyclerView Adapter)
@@ -77,16 +77,6 @@
         <!-- ══════════════════════════════════════
              TOP BAR
              ══════════════════════════════════════ -->
-
-        <!--
-            Hamburger menu button — top-left.
-            TODO: Open navigation drawer / menu
-            In your Activity:
-                btnMenu = findViewById(R.id.btnMenu)
-                btnMenu.setOnClickListener {
-                    // open your DrawerLayout or bottom sheet menu
-                }
-        -->
 
         <ImageButton
             android:id="@+id/btnMenu"
@@ -210,6 +200,14 @@
              See "HOW THE DYNAMIC GRID WORKS" comment at the top of this file.
 
              Each item is rendered by res/layout/item_owned.xml (see bottom comment).
+             Single-column list. Each card is rendered by item_shop.xml.
+             TODO: Fetch market items from DB
+             In your Activity:
+                 RecyclerView rvShopItems = findViewById(R.id.rvShopItems);
+                 rvShopItems.setLayoutManager(new LinearLayoutManager(this));
+                 // fetch items from DB, then:
+                 rvShopItems.setAdapter(new ShopAdapter(itemList));
+
         -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvItems"

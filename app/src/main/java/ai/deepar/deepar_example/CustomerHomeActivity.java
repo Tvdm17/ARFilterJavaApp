@@ -20,7 +20,7 @@ import com.google.android.material.navigation.NavigationView;
 
 public class CustomerHomeActivity extends AppCompatActivity {
     public MakeoverAdapter myAdapter;
-    public List<Makeover> makeoverList = new ArrayList<>();
+    public List<CustomerMakeover> makeoverList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +58,11 @@ public class CustomerHomeActivity extends AppCompatActivity {
 
         // DUMMY LIST FOR TESTING, TO BE REPLACED WITH DATABASE
         //List<Makeover> makeovers = new ArrayList<>();
-        makeoverList.add(new Makeover("Makeup Look 1", "1GrayBlueEyeshadow.deepar"));
-        makeoverList.add(new Makeover("Makeup Look 2", "2PurpleEyeliner.deepar"));
-        makeoverList.add(new Makeover("Makeup Look 3", "3RedLips.deepar"));
-        makeoverList.add(new Makeover("Makeup Look 4", "4ContourLipgloss.deepar"));
-        makeoverList.add(new Makeover("Makeup Look 5", "5MPaleSymmetricalBlush.deepar"));
+        makeoverList.add(new CustomerMakeover("Makeup Look 1", "1GrayBlueEyeshadow.deepar"));
+        makeoverList.add(new CustomerMakeover("Makeup Look 2", "2PurpleEyeliner.deepar"));
+        makeoverList.add(new CustomerMakeover("Makeup Look 3", "3RedLips.deepar"));
+        makeoverList.add(new CustomerMakeover("Makeup Look 4", "4ContourLipgloss.deepar"));
+        makeoverList.add(new CustomerMakeover("Makeup Look 5", "5MPaleSymmetricalBlush.deepar"));
 
         RecyclerView rvItems = findViewById(R.id.rvItems);
         int columns = makeoverList.size() > 5 ? 2 : 1;

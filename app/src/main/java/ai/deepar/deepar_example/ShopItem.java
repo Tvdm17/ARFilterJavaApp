@@ -16,7 +16,7 @@ public class ShopItem {
     public String imagePreview; // makeover.imagePreview — URL/path for the thumbnail
     public String deeparFile;   // makeover.deeparFile — filename passed to PreviewActivity
     public double averageRating;// AVG(review.score) for this makeover
-    public double price;        // makeover.price
+    public double price;// makeover.price
 
     public ShopItem(int makeoverID, String name, String imagePreview, String deeparFile, double averageRating, double price) {
         this.makeoverID = makeoverID;

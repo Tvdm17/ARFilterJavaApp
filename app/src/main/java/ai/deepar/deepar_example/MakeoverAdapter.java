@@ -13,9 +13,9 @@ import java.util.List;
 
 public class MakeoverAdapter extends RecyclerView.Adapter<MakeoverAdapter.ViewHolder> {
     private final Context context;
-    private final List<Makeover> makeovers;
+    private final List<CustomerMakeover> makeovers;
 
-    public MakeoverAdapter(Context context, List<Makeover> makeovers) {
+    public MakeoverAdapter(Context context, List<CustomerMakeover> makeovers) {
         this.context = context;
         this.makeovers = makeovers;
     }
@@ -29,7 +29,7 @@ public class MakeoverAdapter extends RecyclerView.Adapter<MakeoverAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Makeover makeover = makeovers.get(position);
+        CustomerMakeover makeover = makeovers.get(position);
 
         holder.tvItemName.setText(makeover.makeoverName);
 
@@ -40,7 +40,7 @@ public class MakeoverAdapter extends RecyclerView.Adapter<MakeoverAdapter.ViewHo
         holder.tvItemName.setOnClickListener(v -> openPreview(makeover));
     }
 
-    private void openPreview(Makeover makeover) {
+    private void openPreview(CustomerMakeover makeover) {
         Intent intent = new Intent(context, PreviewActivity.class);
         intent.putExtra("EFFECT_NAME", makeover.filterFileName);
         context.startActivity(intent);
