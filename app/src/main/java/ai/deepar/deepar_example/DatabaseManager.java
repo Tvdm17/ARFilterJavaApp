@@ -6,14 +6,23 @@ import org.json.JSONObject;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
+import java.io.File;
+import java.io.InputStream;
 import java.net.URI;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+
+import android.content.Context;
 
 import android.os.Bundle;
 
@@ -42,9 +51,7 @@ public class DatabaseManager {
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    public interface ApiCallback {
-        void onComplete(JSONArray result);
-    }
+
 
     public interface LoginCallback {
         void onSuccess(String email, int userId);
@@ -54,15 +61,15 @@ public class DatabaseManager {
 
 
 
-    public static void getHRDataAsync(String date, ApiCallback callback) {
-        executor.execute(() -> {
-            // This runs in the background
-            JSONArray result = getHRData(date);
-
-            // This sends the result back to the Main (UI) Thread
-            mainHandler.post(() -> callback.onComplete(result));
-        });
-    }
+//    public static void getHRDataAsync(String date, APICallback callback) {
+//        executor.execute(() -> {
+//            // This runs in the background
+//            JSONArray result = getHRData(date);
+//
+//            // This sends the result back to the Main (UI) Thread
+//            mainHandler.post(() -> callback.onComplete(result));
+//        });
+//    }
 
     public static String hashPassword(String password) {
         try {
@@ -108,7 +115,7 @@ public class DatabaseManager {
 
     }
 
-    private static JSONArray fetchFromAPI(String endpoint) {
+    public static JSONArray fetchFromAPI(String endpoint) {
         String url = BASE_URL + endpoint.replace(" ", "%20");
         Request request = new Request.Builder().url(url).build();
         try (Response response = client.newCall(request).execute()) {
@@ -123,22 +130,6 @@ public class DatabaseManager {
         return new JSONArray();
     }
 
-    public static String attemptLogin(String usernameToLogin, String password) {
-        String hashedPassword = hashPassword(password);
-        JSONArray response = fetchFromAPI("check_user/" + usernameToLogin + "/" + hashedPassword);
-
-        if (response != null && response.length() > 0) {
-            try {
-                // This line is what triggers the "Unhandled exception"
-                username = response.getJSONObject(0).optString("username", null);
-                return username;
-            } catch (org.json.JSONException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-        return null;
-    }
 
     public static void attemptLoginAsync(String email, String password, LoginCallback callback) {
         executor.execute(() -> {
@@ -194,12 +185,51 @@ public class DatabaseManager {
         });
     }
 
-    public static boolean registerUser(String username, String password) {
-        JSONArray check = fetchFromAPI("check_username/" + username);
-        if (check != null && check.length() > 0) return false;
-        String hashedPassword = hashPassword(password);
-        fetchFromAPI("create_user/" + username + "/" + hashedPassword);
-        return true;
+    public static void fetchFromAPI(String serviceName, final SimpleCallback callback) {
+        String url = "https://a25pt305.studev.groept.be/api/a25pt305/" + serviceName;
+        Request request = new Request.Builder().url(url).build();
+        executor.execute(() -> {
+            try (Response response = client.newCall(request).execute()){
+
+                if (response.isSuccessful() && response.body() != null) {
+                    mainHandler.post(() -> callback.onSuccess());
+                } else {
+                    mainHandler.post(() -> callback.onFailure("Action failed"));
+                }
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onFailure(e.getMessage()));
+            }
+        });
+
+    }
+
+
+
+    public interface APICallback {
+        void onSuccess(JSONArray response);
+        void onFailure(String message);
+    }
+
+
+    public static void fetchFromAPI(String serviceName, final APICallback callback) {
+        String url = "https://a25pt305.studev.groept.be/api/a25pt305/" + serviceName;
+
+        executor.execute(() -> {
+            try {
+                // Use your preferred networking logic here (e.g., Volley or OkHttp)
+                // This is a conceptual example of the hand-off:
+                JSONArray responseArray =  fetchFromAPI(serviceName);
+
+                if(responseArray != null){
+                    mainHandler.post(() -> callback.onSuccess(responseArray));
+                } else {
+                    mainHandler.post(()-> callback.onFailure("empty response"));
+                }
+
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onFailure(e.getMessage()));
+            }
+        });
     }
 
     public static void resetUsername(){username = "";}
@@ -208,60 +238,43 @@ public class DatabaseManager {
         return username;
     }
 
-    // dynamic parameters restored for heart rate logic
-    public static JSONArray getHRData(String date) {
-        if(username.equals("admin")) {
-            return fetchFromAPI("get_hr_data_admin/" + date);
+    public interface FileCallback {
+        void onLoaded(String localPath);
+        void onError(String message);
+    }
+
+    public static void downloadEffect(Context context, String fileName, FileCallback callback) {
+
+        String fileUrl = "http://a25pt305.studev.groept.be/assets/effects/" + fileName;
+
+        // store it in the internal files directory so its private
+        File targetFile = new File(context.getFilesDir(), fileName);
+
+        // skip download if we already have it
+        if (targetFile.exists()) {
+            callback.onLoaded(targetFile.getAbsolutePath());
+            return;
         }
-        return fetchFromAPI("get_hr_data_by_Name/" + username + "/" + date);
+
+        executor.execute(() -> {
+            try {
+                java.net.URL url = new java.net.URL(fileUrl);
+                try (java.io.InputStream in = url.openStream();
+                     java.io.OutputStream out = new java.io.FileOutputStream(targetFile)) {
+
+                    byte[] buffer = new byte[8192]; // 8Kb buffer
+                    int length;
+                    while ((length = in.read(buffer)) > 0) {
+                        out.write(buffer, 0, length);
+                    }
+
+                    // Switch back to main thread to update UI or DeepAR
+                    mainHandler.post(() -> callback.onLoaded(targetFile.getAbsolutePath()));
+                }
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onError("Download failed: " + e.getMessage()));
+            }
+        });
     }
 
-    public static JSONArray getDHT11Data(int limit, String date) {
-        if(username.equals("admin")) {
-
-            return fetchFromAPI("get_dht11_get_dht11_data_admin/" + date);
-        }
-        return fetchFromAPI("get_dht11_data_by_Name/" + username + "/" + date);
-    }
-
-    public static JSONArray getNoiseData(int minute) {
-        if(username.equals("admin")) {
-            return fetchFromAPI("get_noise_data/" + minute);
-        }
-        return fetchFromAPI("get_noise_data_by_Name/" + username + "/" + minute);
-    }
-
-    public static JSONArray getBodyTempData(String date) {
-        if(username.equals("admin")) {
-            return fetchFromAPI("get_Body_Temp_admin/" + date);
-        }
-        return fetchFromAPI("get_Body_Temp_by_Name/" + username + "/" + date);
-    }
-
-    public static JSONArray getLiveDHT11Data(int minute) {
-        if(username.equals("admin")) {
-
-            return fetchFromAPI("get_live_dht11_data_admin/" + minute);
-        }
-        return fetchFromAPI("get_live_dht11_data_by_name/" + username + "/" + minute);
-    }
-
-    public static JSONArray getLiveBodyTempData(int minute) {
-        if(username.equals("admin")) {
-            return fetchFromAPI("get_live_Body_Temp_admin/" + minute);
-        }
-        return fetchFromAPI("get_live_Body_Temp_by_Name/" + username + "/" + minute);
-    }
-
-    public static JSONArray getLiveHRData(int minute) {
-        if(username.equals("admin")) {
-            return fetchFromAPI("get_live_hr_data_admin/" + minute);
-        }
-        return fetchFromAPI("get_live_hr_data_by_Name/" + username + "/" + minute);
-    }
-
-    public static JSONArray getStepData()
-    {
-        return fetchFromAPI("get_ACC_data_by_Name/" + username);
-    }
 }

@@ -98,6 +98,12 @@ public class PreviewActivity extends AppCompatActivity implements DeepARManager.
     private final Handler captureHandler = new Handler();
     private Runnable longPressRunnable;
 
+    // list for makeovers, fetch form DB
+    private java.util.ArrayList<Makeover> makeoverList = new java.util.ArrayList<>();
+    private int currentIdx = 0;
+
+
+
     // ============================================================
     // LIFECYCLE
     // ============================================================
@@ -285,10 +291,64 @@ public class PreviewActivity extends AppCompatActivity implements DeepARManager.
      */
     @Override
     public void onInitialized() {
-        String effectName = getIntent().getStringExtra("EFFECT_NAME");
-        if (effectName != null) {
-            deepARManager.switchEffect(effectName);
-        }
+        loadMakeoversFromDatabase();
+    }
+
+    private void loadMakeoversFromDatabase() {
+        DatabaseManager.fetchFromAPI("get_all_makeovers", new DatabaseManager.APICallback(){
+            @Override
+            public void onSuccess(org.json.JSONArray response) {
+                try {
+                    makeoverList.clear();
+                    for (int i = 0; i < response.length(); i++) {
+                        org.json.JSONObject obj = response.getJSONObject(i);
+                        makeoverList.add(new Makeover(
+                                obj.getInt("makeoverID"),
+                                obj.getString("name"),
+                                obj.getString("deeparFile"),
+                                obj.getString("imagePreview"),
+                                obj.optDouble("price", 0.0)
+                        ));
+                    }
+
+                    // auto apply the first makeover in list
+                    if (!makeoverList.isEmpty()) {
+                        applyMakeover(0);
+                    }
+                } catch (Exception e) {
+                    android.util.Log.e("PreviewActivity", "JSON Parsing error: " + e.getMessage());
+                }
+            }
+
+            @Override
+            public void onFailure(String msg) {
+                Toast.makeText(PreviewActivity.this, "Failed to load makeovers", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void applyMakeover(int index) {
+
+
+
+
+        if (index < 0 || index >= makeoverList.size()) return;
+
+        Makeover item = makeoverList.get(index);
+
+        // use the download helper
+        DatabaseManager.downloadEffect(this, item.getDeeparFileName(), new DatabaseManager.FileCallback() {
+            @Override
+            public void onLoaded(String localPath) {
+                // Hand the local file path to the manager
+                deepARManager.switchEffect(localPath);
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(PreviewActivity.this, "Filter download failed", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /**

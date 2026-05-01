@@ -65,11 +65,6 @@ public class DeepARManager implements AREventListener, SurfaceHolder.Callback {
      */
     private final Listener listener;
 
-    /** [DEEPAR] Index of the currently active effect in the effects list. */
-    private int currentEffect = 0;
-
-    /** [DEEPAR] Ordered list of effect filenames. "none" = no filter. */
-    private ArrayList<String> effects;
 
     // -------------------------------------------------------
     // LISTENER INTERFACE
@@ -119,7 +114,7 @@ public class DeepARManager implements AREventListener, SurfaceHolder.Callback {
      * to call switchEffect().
      */
     public void initialize() {
-        buildEffectList();
+        // buildEffectList(); not needed anymore
         deepAR = new DeepAR(context);
         deepAR.setLicenseKey(LICENSE_KEY);
         // [DEEPAR] 'this' satisfies AREventListener — DeepAR will call our callbacks below
@@ -181,63 +176,12 @@ public class DeepARManager implements AREventListener, SurfaceHolder.Callback {
     // EFFECTS
     // -------------------------------------------------------
 
-    /**
-     * [DEEPAR] Builds the ordered list of effect filenames bundled in app/src/main/assets/.
-     * "none" = remove all effects (getFilterPath returns null for it).
-     * All .deepar files must exist in assets/ or DeepAR will silently fail to load them.
-     */
-    private void buildEffectList() {
-        effects = new ArrayList<>();
-        effects.add("none");
-        effects.add("viking_helmet.deepar");
-        effects.add("MakeupLook.deepar");
-        effects.add("Split_View_Look.deepar");
-        effects.add("Emotions_Exaggerator.deepar");
-        effects.add("Emotion_Meter.deepar");
-        effects.add("Stallone.deepar");
-        effects.add("flower_face.deepar");
-        effects.add("galaxy_background.deepar");
-        effects.add("Humanoid.deepar");
-        effects.add("Neon_Devil_Horns.deepar");
-        effects.add("Ping_Pong.deepar");
-        effects.add("Pixel_Hearts.deepar");
-        effects.add("Snail.deepar");
-        effects.add("Hope.deepar");
-        effects.add("Vendetta_Mask.deepar");
-        effects.add("Fire_Effect.deepar");
-        effects.add("burning_effect.deepar");
-        effects.add("Elephant_Trunk.deepar");
-    }
+
 
     /**
      * [DEEPAR] Converts an effect filename to the Android asset URI format.
      * "none" returns null — passing null to switchEffect() clears the active effect.
      */
-    private String getFilterPath(String filterName) {
-        if (filterName.equals("none")) return null;
-        return "file:///android_asset/" + filterName;
-    }
-
-    /**
-     * [DEEPAR] Advance to the next effect (wraps around to start after the last one).
-     * "effect" is the slot name — DeepAR supports multiple simultaneous effect slots.
-     */
-    public void gotoNext() {
-        currentEffect = (currentEffect + 1) % effects.size();
-        if (deepAR != null) {
-            deepAR.switchEffect("effect", getFilterPath(effects.get(currentEffect)));
-        }
-    }
-
-    /**
-     * [DEEPAR] Go back to the previous effect (wraps around to end before the first one).
-     */
-    public void gotoPrevious() {
-        currentEffect = (currentEffect - 1 + effects.size()) % effects.size();
-        if (deepAR != null) {
-            deepAR.switchEffect("effect", getFilterPath(effects.get(currentEffect)));
-        }
-    }
 
     // -------------------------------------------------------
     // SCREENSHOT & RECORDING
@@ -321,10 +265,7 @@ public class DeepARManager implements AREventListener, SurfaceHolder.Callback {
      */
     @Override
     public void initialized() {
-        if (deepAR != null) {
-            deepAR.switchEffect("effect", getFilterPath(effects.get(currentEffect)));
-        }
-        if (listener != null) listener.onInitialized();
+        if(listener != null){ listener.onInitialized();} // notify ui deepar is ready
     }
 
     /** [DEEPAR] Screenshot bitmap is ready — forward to UI to save/display. */
@@ -389,9 +330,15 @@ public class DeepARManager implements AREventListener, SurfaceHolder.Callback {
     }
 
     /** [DEEPAR] Apply a specific effect by filename (e.g. "MakeupLook.deepar"). */
-    public void switchEffect(String effectFileName) {
+    public void switchEffect(String localPath) {
         if (deepAR != null) {
-            deepAR.switchEffect("effect", getFilterPath(effectFileName));
+            // passing null to deepAR.switchEffect clears the current filter
+            // if localPath is none/null we clear the slot
+            if (localPath == null || localPath.equalsIgnoreCase("none")) {
+                deepAR.switchEffect("effect", (String ) null);
+            } else {
+                deepAR.switchEffect("effect", localPath);
+            }
         }
     }
 
