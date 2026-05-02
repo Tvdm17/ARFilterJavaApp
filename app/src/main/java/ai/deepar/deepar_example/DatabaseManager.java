@@ -47,6 +47,10 @@ public class DatabaseManager {
 
     private static final String BASE_URL = "https://studev.groept.be/api/a25pt305/";
 
+    public static final String PREVIEW_URL = "https://a25pt305.studev.groept.be/assets/previews/";
+
+    public static final String EFFECTS_URL = "https://a25pt305.studev.groept.be/assets/effects/";
+
     private static final OkHttpClient client = createUnsafeOkHttpClient();
     private static String username = "";
 
@@ -247,7 +251,7 @@ public class DatabaseManager {
 
     public static void downloadEffect(Context context, String fileName, FileCallback callback) {
 
-        String fileUrl = "https://a25pt305.studev.groept.be/assets/effects/" + fileName;
+        String fileUrl = EFFECTS_URL + fileName;
 
         // store it in the internal files directory so its private
         File targetFile = new File(context.getFilesDir(), fileName);

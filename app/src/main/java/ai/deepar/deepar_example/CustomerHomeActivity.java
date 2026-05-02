@@ -3,6 +3,7 @@ package ai.deepar.deepar_example;
 import android.os.Bundle;
 import android.content.Intent;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +19,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.navigation.NavigationView;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 public class CustomerHomeActivity extends AppCompatActivity {
     public MakeoverAdapter myAdapter;
-    public List<CustomerMakeover> makeoverList = new ArrayList<>();
+    public List<Makeover> makeoverList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,14 +60,6 @@ public class CustomerHomeActivity extends AppCompatActivity {
 
         });
 
-        // DUMMY LIST FOR TESTING, TO BE REPLACED WITH DATABASE
-        //List<Makeover> makeovers = new ArrayList<>();
-        makeoverList.add(new CustomerMakeover("Makeup Look 1", "1GrayBlueEyeshadow.deepar"));
-        makeoverList.add(new CustomerMakeover("Makeup Look 2", "2PurpleEyeliner.deepar"));
-        makeoverList.add(new CustomerMakeover("Makeup Look 3", "3RedLips.deepar"));
-        makeoverList.add(new CustomerMakeover("Makeup Look 4", "4ContourLipgloss.deepar"));
-        makeoverList.add(new CustomerMakeover("Makeup Look 5", "5MPaleSymmetricalBlush.deepar"));
-
         RecyclerView rvItems = findViewById(R.id.rvItems);
         int columns = makeoverList.size() > 5 ? 2 : 1;
         rvItems.setLayoutManager(new GridLayoutManager(this, columns));
@@ -73,5 +69,42 @@ public class CustomerHomeActivity extends AppCompatActivity {
         // CAN NOW ADAPT THE RECYCLEVIEW!!
 
         myAdapter.notifyDataSetChanged();
+
+
+        DatabaseManager.fetchFromAPI("get_all_makeovers", new DatabaseManager.APICallback() {
+            @Override
+            public void onSuccess(JSONArray response) {
+                try {
+                    for (int i = 0; i < response.length(); i++) {
+                        JSONObject obj = response.getJSONObject(i);
+
+                        // get data from DB
+                        makeoverList.add(new Makeover(
+                                obj.optInt("makeoverID", 0),
+                                obj.getString("name"),
+                                obj.getString("deeparFile"),
+                                obj.optString("imagePreview", "default.jpg"),
+                                obj.optDouble("price", 0.0)
+                        ));
+                    }
+
+                    // number of colums based on the amount of filters, change to what we want, optional though
+                    int columns = (makeoverList.size() > 6) ? 2 : 1;
+                    ((GridLayoutManager) rvItems.getLayoutManager()).setSpanCount(columns);
+
+                    // Refresh the ui
+                    myAdapter.notifyDataSetChanged();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(String message) {
+                Toast.makeText(CustomerHomeActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 }

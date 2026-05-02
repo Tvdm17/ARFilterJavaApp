@@ -10,12 +10,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
+import com.bumptech.glide.Glide;
 
 public class MakeoverAdapter extends RecyclerView.Adapter<MakeoverAdapter.ViewHolder> {
     private final Context context;
-    private final List<CustomerMakeover> makeovers;
+    private final List<Makeover> makeovers;
 
-    public MakeoverAdapter(Context context, List<CustomerMakeover> makeovers) {
+    public MakeoverAdapter(Context context, List<Makeover> makeovers) {
         this.context = context;
         this.makeovers = makeovers;
     }
@@ -29,20 +30,25 @@ public class MakeoverAdapter extends RecyclerView.Adapter<MakeoverAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        CustomerMakeover makeover = makeovers.get(position);
+        Makeover makeover = makeovers.get(position);
 
-        holder.tvItemName.setText(makeover.makeoverName);
+        holder.tvItemName.setText(makeover.getName());
 
         // Load image — add Glide to build.gradle, then:
-        // Glide.with(context).load(makeover.imagePreview).into(holder.ivItemImage);
+        Glide.with(context)
+                .load(DatabaseManager.PREVIEW_URL + makeover.getPreviewImage())
+                // .placeholder(R.drawable.loading_spinner) // to show while loading
+                // .error(R.drawable.error_image)
+                .centerCrop()
+                .into(holder.ivItemImage);
 
         holder.ivItemImage.setOnClickListener(v -> openPreview(makeover));
         holder.tvItemName.setOnClickListener(v -> openPreview(makeover));
     }
 
-    private void openPreview(CustomerMakeover makeover) {
+    private void openPreview(Makeover makeover) {
         Intent intent = new Intent(context, PreviewActivity.class);
-        intent.putExtra("EFFECT_NAME", makeover.filterFileName);
+        intent.putExtra("EFFECT_NAME", makeover.getDeeparFileName());
         context.startActivity(intent);
     }
 
