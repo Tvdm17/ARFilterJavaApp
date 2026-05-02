@@ -291,7 +291,34 @@ public class PreviewActivity extends AppCompatActivity implements DeepARManager.
      */
     @Override
     public void onInitialized() {
-        loadMakeoversFromDatabase();
+
+        String selectedFilter = getIntent().getStringExtra("EFFECT_NAME");
+
+        if (selectedFilter != null && !selectedFilter.isEmpty()) {
+            // download and apply this filter immediately
+            downloadAndApply(selectedFilter);
+        } else {
+            // no specific filter sent? load the default list from DB
+            loadMakeoversFromDatabase();
+        }
+
+
+    }
+
+    private void downloadAndApply(String fileName) {
+        android.util.Log.d("DOWNLOAD_DEBUG", "Attempting to download: [" + fileName + "]");
+
+        DatabaseManager.downloadEffect(this, fileName, new DatabaseManager.FileCallback() {
+            @Override
+            public void onLoaded(String localPath) {
+                deepARManager.switchEffect(localPath);
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(PreviewActivity.this, "Filter download failed", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void loadMakeoversFromDatabase() {
@@ -311,7 +338,7 @@ public class PreviewActivity extends AppCompatActivity implements DeepARManager.
                         ));
                     }
 
-                    // auto apply the first makeover in list
+
                     if (!makeoverList.isEmpty()) {
                         applyMakeover(0);
                     }
@@ -329,27 +356,10 @@ public class PreviewActivity extends AppCompatActivity implements DeepARManager.
 
     private void applyMakeover(int index) {
 
-
-
-
         if (index < 0 || index >= makeoverList.size()) return;
-
         Makeover item = makeoverList.get(index);
-        android.util.Log.d("DOWNLOAD_DEBUG", "Attempting to download: [" + item.getDeeparFileName() + "]");
+        downloadAndApply(item.getDeeparFileName());
 
-        // use the download helper
-        DatabaseManager.downloadEffect(this, item.getDeeparFileName(), new DatabaseManager.FileCallback() {
-            @Override
-            public void onLoaded(String localPath) {
-                // Hand the local file path to the manager
-                deepARManager.switchEffect(localPath);
-            }
-
-            @Override
-            public void onError(String message) {
-                Toast.makeText(PreviewActivity.this, "Filter download failed", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     /**
