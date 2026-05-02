@@ -52,7 +52,7 @@ public class DatabaseManager {
     public static final String EFFECTS_URL = "https://a25pt305.studev.groept.be/assets/effects/";
 
     private static final OkHttpClient client = createUnsafeOkHttpClient();
-    private static String username = "";
+    private static int userid = -1;
 
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -151,12 +151,12 @@ public class DatabaseManager {
                         String userEmail = userObj.optString("emailAddress", null);
                         int userId = userObj.optInt("userid", -1);
 
-                        // Success! Back to the UI thread
+                        // success, back to the ui thread
                         mainHandler.post(() -> callback.onSuccess(userEmail, userId));
                         return;
                     }
                 }
-                // If we reach here, either response was empty or object was null
+                // if we reach here, either response was empty or object was null
                 mainHandler.post(() -> callback.onFailure("Invalid email or password."));
 
             } catch (Exception e) {
@@ -238,11 +238,34 @@ public class DatabaseManager {
         });
     }
 
-    public static void resetUsername(){username = "";}
+    public static void resetUsername(){userid = -1;}
 
-    public static String getUsername() {
-        return username;
+    public static int getUsername() {
+        return userid;
     }
+
+    public static void setUserid(int id){
+        userid = id;
+    }
+
+    public static void fetchOwnedMakeovers(int clientNumber, APICallback callback) {
+        executor.execute(() -> {
+            try {
+
+                String endpoint = "get_makeovers/" + clientNumber;
+                JSONArray response = fetchFromAPI(endpoint);
+
+                if (response != null) {
+                    mainHandler.post(() -> callback.onSuccess(response));
+                } else {
+                    mainHandler.post(() -> callback.onFailure("no makeovers found."));
+                }
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onFailure("Network error: " + e.getMessage()));
+            }
+        });
+    }
+
 
     public interface FileCallback {
         void onLoaded(String localPath);

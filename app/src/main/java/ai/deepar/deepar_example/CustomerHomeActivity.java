@@ -33,6 +33,13 @@ public class CustomerHomeActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_customer_home);
 
+        // recover if app is inactive and gets reset
+        if(DatabaseManager.getUsername() == -1){
+            int recover = getIntent().getIntExtra("USER_ID", -1);
+            DatabaseManager.setUserid(recover);
+        }
+
+
         DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
         ImageButton btnMenu = findViewById(R.id.btnMenu);
         NavigationView navigationView = findViewById(R.id.navigationView);
@@ -70,11 +77,15 @@ public class CustomerHomeActivity extends AppCompatActivity {
 
         myAdapter.notifyDataSetChanged();
 
+        int id = DatabaseManager.getUsername();
 
-        DatabaseManager.fetchFromAPI("get_all_makeovers", new DatabaseManager.APICallback() {
+        DatabaseManager.fetchOwnedMakeovers(id, new DatabaseManager.APICallback() {
             @Override
             public void onSuccess(JSONArray response) {
                 try {
+
+                    makeoverList.clear(); // avoid duplicates
+
                     for (int i = 0; i < response.length(); i++) {
                         JSONObject obj = response.getJSONObject(i);
 
@@ -89,8 +100,10 @@ public class CustomerHomeActivity extends AppCompatActivity {
                     }
 
                     // number of colums based on the amount of filters, change to what we want, optional though
-                    int columns = (makeoverList.size() > 6) ? 2 : 1;
-                    ((GridLayoutManager) rvItems.getLayoutManager()).setSpanCount(columns);
+                    int columns = (makeoverList.size() > 8) ? 2 : 1;
+                    if(rvItems.getLayoutManager() instanceof  GridLayoutManager) {
+                        ((GridLayoutManager) rvItems.getLayoutManager()).setSpanCount(columns);
+                    }
 
                     // Refresh the ui
                     myAdapter.notifyDataSetChanged();
