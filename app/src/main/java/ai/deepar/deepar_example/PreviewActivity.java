@@ -335,6 +335,7 @@ public class PreviewActivity extends AppCompatActivity implements DeepARManager.
         if (index < 0 || index >= makeoverList.size()) return;
 
         Makeover item = makeoverList.get(index);
+        android.util.Log.d("DOWNLOAD_DEBUG", "Attempting to download: [" + item.getDeeparFileName() + "]");
 
         // use the download helper
         DatabaseManager.downloadEffect(this, item.getDeeparFileName(), new DatabaseManager.FileCallback() {

@@ -8,6 +8,8 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import okhttp3.OkHttpClient;
@@ -245,7 +247,7 @@ public class DatabaseManager {
 
     public static void downloadEffect(Context context, String fileName, FileCallback callback) {
 
-        String fileUrl = "http://a25pt305.studev.groept.be/assets/effects/" + fileName;
+        String fileUrl = "https://a25pt305.studev.groept.be/assets/effects/" + fileName;
 
         // store it in the internal files directory so its private
         File targetFile = new File(context.getFilesDir(), fileName);
@@ -257,21 +259,23 @@ public class DatabaseManager {
         }
 
         executor.execute(() -> {
-            try {
-                java.net.URL url = new java.net.URL(fileUrl);
-                try (java.io.InputStream in = url.openStream();
-                     java.io.OutputStream out = new java.io.FileOutputStream(targetFile)) {
+            Request request = new Request.Builder().url(fileUrl).build();
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful()) throw new IOException("Failed to download file: " + response);
 
-                    byte[] buffer = new byte[8192]; // 8Kb buffer
+                try (InputStream in = response.body().byteStream();
+                     FileOutputStream out = new FileOutputStream(targetFile)) {
+
+                    byte[] buffer = new byte[8192];
                     int length;
                     while ((length = in.read(buffer)) > 0) {
                         out.write(buffer, 0, length);
                     }
 
-                    // Switch back to main thread to update UI or DeepAR
                     mainHandler.post(() -> callback.onLoaded(targetFile.getAbsolutePath()));
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 mainHandler.post(() -> callback.onError("Download failed: " + e.getMessage()));
             }
         });
