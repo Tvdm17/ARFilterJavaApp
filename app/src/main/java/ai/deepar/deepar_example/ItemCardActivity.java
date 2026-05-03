@@ -25,7 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
 
-public class ItemCardActivity extends AppCompatActivity {
+public class ItemCardActivity extends DrawerMenu {
 
     public Makeover currentItem;
 
@@ -34,6 +34,8 @@ public class ItemCardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_item_card);
+
+        startDrawer();
 
        int id = getIntent().getIntExtra("MAKEOVER_ID", -1);
 
@@ -125,7 +127,6 @@ public class ItemCardActivity extends AppCompatActivity {
             // LeaveReviewDialogFragment dialog = new LeaveReviewDialogFragment(); //TODO
             // dialog.show(getSupportFragmentManager(), "LeaveReviewDialog");
         });
-
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());

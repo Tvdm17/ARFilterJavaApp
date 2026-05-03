@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="700dp"
+    android:padding="24dp">
+
+    <!-- Close button top left -->
+    <ImageButton
+        android:id="@+id/btnCloseDrawer"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_marginTop="32dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/eye_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!-- Username below close button -->
+    <TextView
+        android:id="@+id/tvNavUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnCloseDrawer"/>
+
+    <!-- Email below username -->
+    <TextView
+        android:id="@+id/tvNavEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvNavUsername"/>
+
+    <!-- Home row -->
+    <ImageView
+        android:id="@+id/ivHome"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/eye_icon"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintBottom_toTopOf="@id/ivShop"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/tvHome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Home"
+        android:textSize="16sp"
+        android:layout_marginStart="12dp"
+        app:layout_constraintStart_toEndOf="@id/ivHome"
+        app:layout_constraintTop_toTopOf="@id/ivHome"
+        app:layout_constraintBottom_toBottomOf="@id/ivHome"/>
+
+    <!-- Shop row -->
+    <ImageView
+        android:id="@+id/ivShop"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/eye_icon"
+        android:layout_marginBottom="320dp"
+        app:layout_constraintBottom_toTopOf="@id/ivSignOut"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/tvShop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Shop"
+        android:textSize="16sp"
+        android:layout_marginStart="12dp"
+        app:layout_constraintStart_toEndOf="@id/ivShop"
+        app:layout_constraintTop_toTopOf="@id/ivShop"
+        app:layout_constraintBottom_toBottomOf="@id/ivShop"/>
+
+    <!-- Sign Out row pinned to bottom -->
+    <ImageView
+        android:id="@+id/ivSignOut"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/eye_icon"
+        android:layout_marginBottom="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/tvSignOut"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sign Out"
+        android:textSize="16sp"
+        android:layout_marginStart="12dp"
+        app:layout_constraintStart_toEndOf="@id/ivSignOut"
+        app:layout_constraintTop_toTopOf="@id/ivSignOut"
+        app:layout_constraintBottom_toBottomOf="@id/ivSignOut"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

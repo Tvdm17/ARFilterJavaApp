@@ -24,7 +24,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShopActivity extends AppCompatActivity {
+public class ShopActivity extends DrawerMenu {
 
     public ShopAdapter myAdapter;
     public List<ShopItem> itemList = new ArrayList<>();
@@ -36,30 +36,7 @@ public class ShopActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_shop);
 
-        String username = DatabaseManager.getUsername();
-
-        TextView tvUsername = findViewById(R.id.tvUsername);
-        tvUsername.setText(username);
-
-
-
-        DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
-        ImageButton btnMenu = findViewById(R.id.btnMenu);
-        NavigationView navigationView = findViewById(R.id.navigationView);
-
-        btnMenu.setOnClickListener(v -> {
-            drawerLayout.openDrawer(GravityCompat.START);
-        });
-
-        navigationView.setNavigationItemSelectedListener(item -> {
-
-            if (item.getItemId() == R.id.nav_customer_home) {
-                Intent intent = new Intent(this, CustomerHomeActivity.class);
-                startActivity(intent);
-                drawerLayout.closeDrawer(GravityCompat.START);
-            }
-            return true;
-        });
+        startDrawer();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -67,14 +44,11 @@ public class ShopActivity extends AppCompatActivity {
             return insets;
         });
 
-        ;
-
         RecyclerView rvItems = findViewById(R.id.rvShopItems);
         int columns = itemList.size() > 8 ? 2 : 1;
         rvItems.setLayoutManager(new GridLayoutManager(this, columns));
         myAdapter = new ShopAdapter(this, itemList);
         rvItems.setAdapter(myAdapter);
-
 
         int id = DatabaseManager.getUserid();
 
@@ -122,8 +96,6 @@ public class ShopActivity extends AppCompatActivity {
                 Toast.makeText(ShopActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
-
-
 
         // CAN NOW ADAPT THE RECYCLEVIEW!!
 

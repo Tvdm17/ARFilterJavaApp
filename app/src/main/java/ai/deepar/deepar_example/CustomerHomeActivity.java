@@ -23,7 +23,7 @@ import com.google.android.material.navigation.NavigationView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class CustomerHomeActivity extends AppCompatActivity {
+public class CustomerHomeActivity extends DrawerMenu {
     public MakeoverAdapter myAdapter;
 
 
@@ -34,6 +34,8 @@ public class CustomerHomeActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_customer_home);
 
+        startDrawer();
+
         // recover if app is inactive and gets reset
         if(DatabaseManager.getUserid() == -1){
             int recover = getIntent().getIntExtra("USER_ID", -1);
@@ -42,37 +44,11 @@ public class CustomerHomeActivity extends AppCompatActivity {
 
         int id = DatabaseManager.getUserid();
 
-        String username = DatabaseManager.getUsername();
-
-        TextView tvUsername = findViewById(R.id.tvUsername);
-        tvUsername.setText(username);
-
-
-        DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
-        ImageButton btnMenu = findViewById(R.id.btnMenu);
-        NavigationView navigationView = findViewById(R.id.navigationView);
-
-        btnMenu.setOnClickListener(v -> {
-            drawerLayout.openDrawer(GravityCompat.START);
-        });
-
-        navigationView.setNavigationItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.nav_shop) {
-                Intent intent = new Intent(this, ShopActivity.class);
-                startActivity(intent);
-                drawerLayout.closeDrawer(GravityCompat.START);
-            }
-            return true;
-        });
-
-
-
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
-
         });
 
         RecyclerView rvItems = findViewById(R.id.rvItems);
@@ -84,8 +60,6 @@ public class CustomerHomeActivity extends AppCompatActivity {
         // CAN NOW ADAPT THE RECYCLEVIEW!!
 
         myAdapter.notifyDataSetChanged();
-
-
 
         DatabaseManager.fetchOwnedMakeovers(id, new DatabaseManager.APICallback() {
             @Override
