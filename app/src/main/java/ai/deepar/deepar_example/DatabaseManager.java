@@ -48,11 +48,15 @@ public class DatabaseManager {
 
     private static String username = "";
 
+    private static boolean isCustomer = true;
+
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public static List<Makeover> ownedMakeovers = new ArrayList<>();
     public static List<ShopItem> shopItems = new ArrayList<>();
+
+
 
 
     public interface LoginCallback {
@@ -349,6 +353,14 @@ public class DatabaseManager {
             }
         }
         return false;
+    }
+
+    public static boolean isIsCustomer() {
+        return isCustomer;
+    }
+
+    public static void setIsCustomer(boolean var) {
+        isCustomer = var;
     }
 
 }

@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="700dp"
     android:padding="24dp">
@@ -38,47 +39,74 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvNavUsername"/>
 
+    <!-- Profile below username -->
+
     <!-- Home row -->
+
+    <TextView
+        android:id="@+id/tvProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Profile"
+        android:textSize="16sp"
+        tools:layout_editor_absoluteX="60dp"
+        tools:layout_editor_absoluteY="192dp" />
+
+    <ImageView
+        android:id="@+id/ivProfile"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="436dp"
+        android:src="@drawable/eye_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <ImageView
         android:id="@+id/ivHome"
         android:layout_width="24dp"
         android:layout_height="24dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="8dp"
         android:src="@drawable/eye_icon"
-        android:layout_marginBottom="12dp"
-        app:layout_constraintBottom_toTopOf="@id/ivShop"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintBottom_toTopOf="@id/ivChanging"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/ivChanging"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="316dp"
+        android:src="@drawable/eye_icon"
+        app:layout_constraintBottom_toTopOf="@id/ivSignOut"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/tvChanging"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:text="Shop"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@id/ivChanging"
+        app:layout_constraintStart_toEndOf="@id/ivChanging"
+        app:layout_constraintTop_toTopOf="@id/ivChanging"
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/tvHome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
         android:text="Home"
         android:textSize="16sp"
-        android:layout_marginStart="12dp"
+        app:layout_constraintBottom_toBottomOf="@id/ivHome"
         app:layout_constraintStart_toEndOf="@id/ivHome"
         app:layout_constraintTop_toTopOf="@id/ivHome"
-        app:layout_constraintBottom_toBottomOf="@id/ivHome"/>
+        app:layout_constraintVertical_bias="0.0" />
 
-    <!-- Shop row -->
-    <ImageView
-        android:id="@+id/ivShop"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/eye_icon"
-        android:layout_marginBottom="320dp"
-        app:layout_constraintBottom_toTopOf="@id/ivSignOut"
-        app:layout_constraintStart_toStartOf="parent"/>
-
-    <TextView
-        android:id="@+id/tvShop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Shop"
-        android:textSize="16sp"
-        android:layout_marginStart="12dp"
-        app:layout_constraintStart_toEndOf="@id/ivShop"
-        app:layout_constraintTop_toTopOf="@id/ivShop"
-        app:layout_constraintBottom_toBottomOf="@id/ivShop"/>
+    <!-- Changing row -->
 
     <!-- Sign Out row pinned to bottom -->
     <ImageView
