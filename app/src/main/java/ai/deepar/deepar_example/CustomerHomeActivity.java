@@ -25,7 +25,7 @@ import org.json.JSONObject;
 
 public class CustomerHomeActivity extends AppCompatActivity {
     public MakeoverAdapter myAdapter;
-    public List<Makeover> makeoverList = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,9 +76,9 @@ public class CustomerHomeActivity extends AppCompatActivity {
         });
 
         RecyclerView rvItems = findViewById(R.id.rvItems);
-        int columns = makeoverList.size() > 5 ? 2 : 1;
+        int columns = DatabaseManager.ownedMakeovers.size() > 5 ? 2 : 1;
         rvItems.setLayoutManager(new GridLayoutManager(this, columns));
-        myAdapter = new MakeoverAdapter(this, makeoverList);
+        myAdapter = new MakeoverAdapter(this, DatabaseManager.ownedMakeovers);
         rvItems.setAdapter(myAdapter);
 
         // CAN NOW ADAPT THE RECYCLEVIEW!!
@@ -92,23 +92,24 @@ public class CustomerHomeActivity extends AppCompatActivity {
             public void onSuccess(JSONArray response) {
                 try {
 
-                    makeoverList.clear(); // avoid duplicates
+                    DatabaseManager.ownedMakeovers.clear(); // avoid duplicates
 
                     for (int i = 0; i < response.length(); i++) {
                         JSONObject obj = response.getJSONObject(i);
 
                         // get data from DB
-                        makeoverList.add(new Makeover(
+                        DatabaseManager.ownedMakeovers.add(new Makeover(
                                 obj.optInt("makeoverID", 0),
                                 obj.getString("name"),
                                 obj.getString("deeparFile"),
                                 obj.optString("imagePreview", "default.jpg"),
-                                obj.optDouble("price", 0.0)
+                                obj.optDouble("price", 0.0),
+                                obj.optDouble("averageRating", 0.0)
                         ));
                     }
 
                     // number of colums based on the amount of filters, change to what we want, optional though
-                    int columns = (makeoverList.size() > 8) ? 2 : 1;
+                    int columns = (DatabaseManager.ownedMakeovers.size() > 8) ? 2 : 1;
                     if(rvItems.getLayoutManager() instanceof  GridLayoutManager) {
                         ((GridLayoutManager) rvItems.getLayoutManager()).setSpanCount(columns);
                     }

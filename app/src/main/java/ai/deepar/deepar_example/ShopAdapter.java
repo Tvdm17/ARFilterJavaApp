@@ -63,8 +63,16 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ViewHolder> {
                 .into(holder.ivItemImage);
 
         holder.btnView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, PreviewActivity.class);
+            intent.putExtra("MAKEOVER_ID", item.getId());
+            // extra flag for pictures only ? how was this implemented ?
+            intent.putExtra("CAMERA_MODE", "PICTURE_ONLY");
+            context.startActivity(intent);
+        });
+
+        holder.ivItemImage.setOnClickListener(v -> {
             Intent intent = new Intent(context, ItemCardActivity.class);
-            intent.putExtra("shopItem", item);
+            intent.putExtra("MAKEOVER_ID", item.getId());
             context.startActivity(intent);
         });
 

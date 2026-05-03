@@ -98,8 +98,6 @@ public class PreviewActivity extends AppCompatActivity implements DeepARManager.
     private final Handler captureHandler = new Handler();
     private Runnable longPressRunnable;
 
-    // list for makeovers, fetch form DB
-    private java.util.ArrayList<Makeover> makeoverList = new java.util.ArrayList<>();
     private int currentIdx = 0;
 
 
@@ -112,6 +110,19 @@ public class PreviewActivity extends AppCompatActivity implements DeepARManager.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preview);
+
+        String cameraMode = getIntent().getStringExtra("CAMERA_MODE");
+        ImageButton btnRecordVideo = findViewById(R.id.recordButton);
+
+        if ("PICTURE_ONLY".equals(cameraMode)) {
+            // hide the video button if they haven't bought the item yet
+            btnRecordVideo.setVisibility(View.GONE);
+            Toast.makeText(this, "Purchase to unlock Video Recording!", Toast.LENGTH_LONG).show();
+        } else {
+            // standard mode
+            btnRecordVideo.setVisibility(View.VISIBLE);
+        }
+
     }
 
     /**
@@ -292,17 +303,23 @@ public class PreviewActivity extends AppCompatActivity implements DeepARManager.
     @Override
     public void onInitialized() {
 
+        int id = getIntent().getIntExtra("MAKEOVER_ID", -1);
+
         String selectedFilter = getIntent().getStringExtra("EFFECT_NAME");
 
-        if (selectedFilter != null && !selectedFilter.isEmpty()) {
-            // download and apply this filter immediately
+        if (id != -1) {
+            Makeover item = DatabaseManager.getMakeoverById(id);
+
+            if (item != null) {
+                downloadAndApply(item.getDeeparFileName());
+            } else {
+                loadMakeoversFromDatabase();
+            }
+        } else if (selectedFilter != null && !selectedFilter.isEmpty()) {
             downloadAndApply(selectedFilter);
         } else {
-            // no specific filter sent? load the default list from DB
             loadMakeoversFromDatabase();
         }
-
-
     }
 
     private void downloadAndApply(String fileName) {
@@ -326,20 +343,21 @@ public class PreviewActivity extends AppCompatActivity implements DeepARManager.
             @Override
             public void onSuccess(org.json.JSONArray response) {
                 try {
-                    makeoverList.clear();
+                    DatabaseManager.ownedMakeovers.clear();
                     for (int i = 0; i < response.length(); i++) {
                         org.json.JSONObject obj = response.getJSONObject(i);
-                        makeoverList.add(new Makeover(
+                        DatabaseManager.ownedMakeovers.add(new Makeover(
                                 obj.getInt("makeoverID"),
                                 obj.getString("name"),
                                 obj.getString("deeparFile"),
                                 obj.getString("imagePreview"),
-                                obj.optDouble("price", 0.0)
+                                obj.optDouble("price", 0.0),
+                                obj.optDouble("averageRating", 0.0)
                         ));
                     }
 
 
-                    if (!makeoverList.isEmpty()) {
+                    if (!DatabaseManager.ownedMakeovers.isEmpty()) {
                         applyMakeover(0);
                     }
                 } catch (Exception e) {
@@ -356,8 +374,8 @@ public class PreviewActivity extends AppCompatActivity implements DeepARManager.
 
     private void applyMakeover(int index) {
 
-        if (index < 0 || index >= makeoverList.size()) return;
-        Makeover item = makeoverList.get(index);
+        if (index < 0 || index >= DatabaseManager.ownedMakeovers.size()) return;
+        Makeover item = DatabaseManager.ownedMakeovers.get(index);
         downloadAndApply(item.getDeeparFileName());
 
     }

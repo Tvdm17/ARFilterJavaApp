@@ -24,6 +24,7 @@ import android.content.Context;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +51,8 @@ public class DatabaseManager {
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    private static List<Integer> ownedMakeoversIDs = new ArrayList<>();
+    public static List<Makeover> ownedMakeovers = new ArrayList<>();
+    public static List<ShopItem> shopItems = new ArrayList<>();
 
 
     public interface LoginCallback {
@@ -317,11 +319,36 @@ public class DatabaseManager {
 
     public static void addPurchase(int clientId, int makeoverId, SimpleCallback simpleCallback) {
 
+        postToAPI("add_purchase", simpleCallback,
+                String.valueOf(clientId),
+                String.valueOf(makeoverId)
+        );
+
+    }
+    public static Makeover getMakeoverById(int id) {
+
+        Log.d("SYNC_CHECK", "Searching for ID: " + id);
+        Log.d("SYNC_CHECK", "Shop items count: " + shopItems.size());
+        Log.d("SYNC_CHECK", "Owned items count: " + ownedMakeovers.size());
+
+        // Check owned items
+        for (Makeover m : ownedMakeovers) {
+            if (m.getId() == id) return m;
+        }
+        // Check shop items
+        for (ShopItem s : shopItems) {
+            if (s.getId() == id) return s;
+        }
+        return null;
     }
 
-    public static boolean isMakeoverOwned(int id){
-        //for(Makeover m :
-        return true;
+    public static boolean isItemOwned(int id){
+        for(Makeover m : ownedMakeovers){
+            if(m.getId() == id){
+                return true;
+            }
+        }
+        return false;
     }
 
 }

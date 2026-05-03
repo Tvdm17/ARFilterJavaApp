@@ -47,8 +47,9 @@ public class MakeoverAdapter extends RecyclerView.Adapter<MakeoverAdapter.ViewHo
     }
 
     private void openPreview(Makeover makeover) {
-        Intent intent = new Intent(context, PreviewActivity.class);
-        intent.putExtra("EFFECT_NAME", makeover.getDeeparFileName());
+        Intent intent = new Intent(context, PreviewActivity.class); // change to Itemcardactivity if you want to see the remove button
+        intent.putExtra("MAKEOVER_ID", makeover.getId());
+        intent.putExtra("CAMERA_MODE", "FULL_FEATURES");
         context.startActivity(intent);
     }
 

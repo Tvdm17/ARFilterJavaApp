@@ -82,6 +82,7 @@ public class ShopActivity extends AppCompatActivity {
             @Override
             public void onSuccess(JSONArray response) {
                 itemList.clear();
+                DatabaseManager.shopItems.clear(); // shopItems !!!!!!!!!
                 if(response.length() == 0){
                     Toast.makeText(ShopActivity.this, "You own all makeovers, come back later.", Toast.LENGTH_LONG).show();
                     // message to show if there you own all makeovers
@@ -91,7 +92,7 @@ public class ShopActivity extends AppCompatActivity {
 
                         JSONObject obj = response.getJSONObject(i);
 
-                        itemList.add(new ShopItem(
+                        ShopItem newItem = new ShopItem(
                            obj.getInt("makeoverID"),
                            obj.getString("name"),
                            obj.getString("deeparFile"),
@@ -99,7 +100,10 @@ public class ShopActivity extends AppCompatActivity {
                            obj.optDouble("price", 0.0),
                            obj.optDouble("averageRating",0.0)
 
-                        ));
+                        );
+
+                        itemList.add(newItem);
+                        DatabaseManager.shopItems.add(newItem);
 
                     }
 
