@@ -1,6 +1,8 @@
 package ai.deepar.deepar_example;
 
-public class Makeover {
+import java.io.Serializable;
+
+public class Makeover implements Serializable {
     private int id;
     private String name;
     private String deeparFileName;

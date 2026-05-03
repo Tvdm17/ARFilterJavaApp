@@ -15,8 +15,7 @@
         private val COLUMN_THRESHOLD = 5
 
     ADDING LOGIC LATER:
-    - Hamburger menu  : find "TODO: Open navigation drawer / menu" DONE!!!!
-    - Username from DB: find "TODO: Load username from DB"
+e    - Username from DB: find "TODO: Load username from DB"
     - Search logic    : find "TODO: Implement search logic"
     - Item click      : find "TODO: Navigate to item detail screen" (in your RecyclerView Adapter)
     - Load items      : find "TODO: Load items from DB and call updateGrid()"

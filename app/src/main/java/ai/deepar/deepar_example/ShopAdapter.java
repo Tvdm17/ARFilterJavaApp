@@ -62,10 +62,9 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ViewHolder> {
                 //.error(R.drawable.default_something) // default if error
                 .into(holder.ivItemImage);
 
-        // "View" opens PreviewActivity, applying the makeover's DeepAR filter on the camera feed
         holder.btnView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, PreviewActivity.class);
-            intent.putExtra("EFFECT_NAME", item.getDeeparFileName());
+            Intent intent = new Intent(context, ItemCardActivity.class);
+            intent.putExtra("shopItem", item);
             context.startActivity(intent);
         });
 
