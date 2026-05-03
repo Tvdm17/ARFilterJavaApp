@@ -42,6 +42,8 @@ public class DatabaseManager {
     private static final OkHttpClient client = createUnsafeOkHttpClient();
     private static int userid = -1;
 
+    private static String username = "";
+
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
@@ -138,6 +140,12 @@ public class DatabaseManager {
                     if (userObj != null) {
                         String userEmail = userObj.optString("emailAddress", null);
                         int userId = userObj.optInt("userid", -1);
+                        String username = userObj.optString("fullName", "");
+                        if(username.isEmpty() || username.equals("null")){
+                            username = userEmail;
+                        }
+                        setUsername(username);
+                        setUserid(userId); // set userid for session
 
                         // success, back to the ui thread
                         mainHandler.post(() -> callback.onSuccess(userEmail, userId));
@@ -232,9 +240,15 @@ public class DatabaseManager {
         return userid;
     }
 
+    public static String getUsername(){
+        return username;
+    }
+
     public static void setUserid(int id){
         userid = id;
     }
+
+    public static void setUsername(String name){username = name;}
 
     public static void fetchOwnedMakeovers(int clientNumber, APICallback callback) {
         executor.execute(() -> {

@@ -65,7 +65,6 @@ public class LoginActivity extends AppCompatActivity {
                     intent.putExtra("USER_ID", userId);
                     startActivity(intent);
                     finish(); //  prevents going back to Login when hitting the back button
-                    DatabaseManager.setUserid(userId); // set userid for session
                 }
 
                 @Override

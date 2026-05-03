@@ -3,6 +3,7 @@ package ai.deepar.deepar_example;
 import android.os.Bundle;
 import android.content.Intent;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -38,6 +39,13 @@ public class CustomerHomeActivity extends AppCompatActivity {
             int recover = getIntent().getIntExtra("USER_ID", -1);
             DatabaseManager.setUserid(recover);
         }
+
+        int id = DatabaseManager.getUserid();
+
+        String username = DatabaseManager.getUsername();
+
+        TextView tvUsername = findViewById(R.id.tvUsername);
+        tvUsername.setText(username);
 
 
         DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
@@ -77,7 +85,7 @@ public class CustomerHomeActivity extends AppCompatActivity {
 
         myAdapter.notifyDataSetChanged();
 
-        int id = DatabaseManager.getUserid();
+
 
         DatabaseManager.fetchOwnedMakeovers(id, new DatabaseManager.APICallback() {
             @Override
