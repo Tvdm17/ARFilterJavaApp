@@ -3,6 +3,7 @@ package ai.deepar.deepar_example;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -34,6 +35,13 @@ public class ShopActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_shop);
+
+        String username = DatabaseManager.getUsername();
+
+        TextView tvUsername = findViewById(R.id.tvUsername);
+        tvUsername.setText(username);
+
+
 
         DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
         ImageButton btnMenu = findViewById(R.id.btnMenu);

@@ -24,6 +24,9 @@ import android.content.Context;
 
 import android.os.Handler;
 import android.os.Looper;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 // you cannot run network operations in the main thread, that's why we need to process this in the background
@@ -47,25 +50,13 @@ public class DatabaseManager {
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
+    private static List<Integer> ownedMakeoversIDs = new ArrayList<>();
 
 
     public interface LoginCallback {
         void onSuccess(String email, int userId);
         void onFailure(String message);
     }
-
-
-
-
-//    public static void getHRDataAsync(String date, APICallback callback) {
-//        executor.execute(() -> {
-//            // This runs in the background
-//            JSONArray result = getHRData(date);
-//
-//            // This sends the result back to the Main (UI) Thread
-//            mainHandler.post(() -> callback.onComplete(result));
-//        });
-//    }
 
     public static String hashPassword(String password) {
         try {
@@ -205,13 +196,10 @@ public class DatabaseManager {
 
     }
 
-
-
     public interface APICallback {
         void onSuccess(JSONArray response);
         void onFailure(String message);
     }
-
 
     public static void fetchFromAPI(String serviceName, final APICallback callback) {
         String url = "https://a25pt305.studev.groept.be/api/a25pt305/" + serviceName;
@@ -325,6 +313,15 @@ public class DatabaseManager {
                 mainHandler.post(() -> callback.onError("Download failed: " + e.getMessage()));
             }
         });
+    }
+
+    public static void addPurchase(int clientId, int makeoverId, SimpleCallback simpleCallback) {
+
+    }
+
+    public static boolean isMakeoverOwned(int id){
+        //for(Makeover m :
+        return true;
     }
 
 }
