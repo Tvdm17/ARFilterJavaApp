@@ -34,7 +34,7 @@ public class CustomerHomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_customer_home);
 
         // recover if app is inactive and gets reset
-        if(DatabaseManager.getUsername() == -1){
+        if(DatabaseManager.getUserid() == -1){
             int recover = getIntent().getIntExtra("USER_ID", -1);
             DatabaseManager.setUserid(recover);
         }
@@ -77,7 +77,7 @@ public class CustomerHomeActivity extends AppCompatActivity {
 
         myAdapter.notifyDataSetChanged();
 
-        int id = DatabaseManager.getUsername();
+        int id = DatabaseManager.getUserid();
 
         DatabaseManager.fetchOwnedMakeovers(id, new DatabaseManager.APICallback() {
             @Override

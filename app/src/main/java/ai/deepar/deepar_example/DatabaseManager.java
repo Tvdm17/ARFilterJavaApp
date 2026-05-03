@@ -11,28 +11,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
-import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 import android.content.Context;
-
-import android.os.Bundle;
-
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -240,7 +228,7 @@ public class DatabaseManager {
 
     public static void resetUsername(){userid = -1;}
 
-    public static int getUsername() {
+    public static int getUserid() {
         return userid;
     }
 
@@ -259,6 +247,23 @@ public class DatabaseManager {
                     mainHandler.post(() -> callback.onSuccess(response));
                 } else {
                     mainHandler.post(() -> callback.onFailure("no makeovers found."));
+                }
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onFailure("Network error: " + e.getMessage()));
+            }
+        });
+    }
+
+    public static void fetchShopItems(int clientNumber, APICallback callback) {
+        executor.execute(() -> {
+            try {
+                String endpoint = "get_shop_makeovers/" + clientNumber;
+                JSONArray response = fetchFromAPI(endpoint);
+
+                if (response != null) {
+                    mainHandler.post(() -> callback.onSuccess(response));
+                } else {
+                    mainHandler.post(() -> callback.onFailure("Shop is empty!"));
                 }
             } catch (Exception e) {
                 mainHandler.post(() -> callback.onFailure("Network error: " + e.getMessage()));

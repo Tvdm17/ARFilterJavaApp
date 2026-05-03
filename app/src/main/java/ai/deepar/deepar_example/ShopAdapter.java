@@ -11,6 +11,9 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 /**
@@ -45,17 +48,24 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ShopItem item = items.get(position);
 
-        holder.tvItemName.setText(item.name);
+        holder.tvItemName.setText(item.getName());
         holder.rbRating.setRating((float) item.averageRating);
         holder.tvRatingValue.setText(String.valueOf(item.averageRating));
 
+        String fullImageurl = DatabaseManager.PREVIEW_URL + item.getPreviewImage();
+
+
         // Image loading — add Glide to build.gradle, then replace this with:
-        // Glide.with(context).load(item.imagePreview).into(holder.ivItemImage);
+        Glide.with(context)
+                .load(fullImageurl)
+                //.placeholder(R.drawable.loading_spinner) add a loading thingie same as customerview
+                //.error(R.drawable.default_something) // default if error
+                .into(holder.ivItemImage);
 
         // "View" opens PreviewActivity, applying the makeover's DeepAR filter on the camera feed
         holder.btnView.setOnClickListener(v -> {
             Intent intent = new Intent(context, PreviewActivity.class);
-            intent.putExtra("EFFECT_NAME", item.deeparFile);
+            intent.putExtra("EFFECT_NAME", item.getDeeparFileName());
             context.startActivity(intent);
         });
 
