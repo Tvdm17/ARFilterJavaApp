@@ -5,6 +5,7 @@ import static ai.deepar.deepar_example.DatabaseManager.isIsCustomer;
 
 import android.content.Intent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -24,15 +25,24 @@ public class  DrawerMenu extends AppCompatActivity  {
         navigationView = findViewById(R.id.navigationView);
         ImageButton btnMenu = findViewById(R.id.btnMenu);
 
+        btnMenu.setOnClickListener(v -> {
+            drawerLayout.openDrawer(GravityCompat.START);
+        });
+
         View header = navigationView.getHeaderView(0);
+
+        ImageButton btnCloseDrawer = findViewById(R.id.btnCloseDrawer);
+        btnCloseDrawer.setOnClickListener(v -> finish());
+
         TextView tvNavUsername = header.findViewById(R.id.tvNavUsername);
         tvNavUsername.setText(DatabaseManager.getUsername());
 
-        btnMenu.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
+        TextView tvNavEmail = header.findViewById(R.id.tvNavEmail);
+        tvNavEmail.setText(DatabaseManager.getEmail());
+
 
         TextView tvChanging = header.findViewById(R.id.tvChanging);
-
-        TextView tvHome = header.findViewById(R.id.tvChanging);
+        TextView tvHome = header.findViewById(R.id.tvHome);
         TextView tvProfile = header.findViewById(R.id.tvProfile);
         if (!isIsCustomer()) {
             tvHome.setOnClickListener(v -> {
@@ -41,30 +51,30 @@ public class  DrawerMenu extends AppCompatActivity  {
             });
 
             tvProfile.setOnClickListener(v-> {
-                startActivity(new Intent(this, ClientProfile.class));
+                startActivity(new Intent(this, UserPageActivity.class));
                 drawerLayout.closeDrawer(GravityCompat.START);
             });
 
             tvChanging.setText("Reports");
             tvChanging.setOnClickListener(v -> {
-                startActivity(new Intent(this, CreatorReports.class));
+                startActivity(new Intent(this, CreatorReportsActivity.class));
                 drawerLayout.closeDrawer(GravityCompat.START);
             });
 
         } else {
             tvHome.setOnClickListener(v -> {
-                startActivity(new Intent(this, ShopActivity.class));
+                startActivity(new Intent(this, CustomerHomeActivity.class));
                 drawerLayout.closeDrawer(GravityCompat.START);
             });
 
             tvProfile.setOnClickListener(v-> {
-                startActivity(new Intent(this, CreatorProfile.class));
+                startActivity(new Intent(this, UserPageActivity.class));
                 drawerLayout.closeDrawer(GravityCompat.START);
             });
 
-            tvChanging.setText("Home");
+            tvChanging.setText("Shop"); // tvChanging.setText(R.string.my_words)?? cant try this yet bc server is down ;
             tvChanging.setOnClickListener(v -> {
-                startActivity(new Intent(this, CustomerHomeActivity.class));
+                startActivity(new Intent(this, ShopActivity.class));
                 drawerLayout.closeDrawer(GravityCompat.START);
             });
         }

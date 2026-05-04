@@ -48,6 +48,8 @@ public class DatabaseManager {
 
     private static String username = "";
 
+    private static String email = "";
+
     private static boolean isCustomer = true;
 
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -141,8 +143,10 @@ public class DatabaseManager {
                         if(username.isEmpty() || username.equals("null")){
                             username = userEmail;
                         }
+
                         setUsername(username);
-                        setUserid(userId); // set userid for session
+                        setUserid(userId);// set userid for session
+                        setEmail(userEmail);
 
                         // success, back to the ui thread
                         mainHandler.post(() -> callback.onSuccess(userEmail, userId));
@@ -238,11 +242,15 @@ public class DatabaseManager {
         return username;
     }
 
+    public static String getEmail() { return email;}
+
     public static void setUserid(int id){
         userid = id;
     }
 
     public static void setUsername(String name){username = name;}
+
+    public static void setEmail(String emailgot){ email = emailgot;}
 
     public static void fetchOwnedMakeovers(int clientNumber, APICallback callback) {
         executor.execute(() -> {

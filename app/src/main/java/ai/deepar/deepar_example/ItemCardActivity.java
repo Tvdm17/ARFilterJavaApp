@@ -47,29 +47,6 @@ public class ItemCardActivity extends DrawerMenu {
             return;
         }
 
-
-        DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
-
-        ImageButton btnMenu = findViewById(R.id.btnMenu);
-        btnMenu.setOnClickListener(v -> {
-            drawerLayout.openDrawer(GravityCompat.START);
-        });
-
-        NavigationView navigationView = findViewById(R.id.navigationView);
-        navigationView.setNavigationItemSelectedListener(menuItem -> {
-            if (menuItem.getItemId() == R.id.nav_shop) {
-                Intent intent = new Intent(this, ShopActivity.class);
-                startActivity(intent);
-                drawerLayout.closeDrawer(GravityCompat.START);
-            }
-            else if (menuItem.getItemId() == R.id.nav_customer_home) {
-                Intent intent = new Intent(this, CustomerHomeActivity.class);
-                startActivity(intent);
-                drawerLayout.closeDrawer(GravityCompat.START);
-            }
-            return true;
-        });
-
         //DO THIS! GET USERNAME FROM DB
         TextView tvUsername = findViewById(R.id.tvUsername);
         tvUsername.setText(DatabaseManager.getUsername());

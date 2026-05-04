@@ -29,7 +29,7 @@
             android:name=".ItemCardActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".CustomerHomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,7 +41,7 @@
             android:name=".SignUpActivity"
             android:exported="false" />
         <activity
-            android:name=".CustomerHomeActivity"
+            android:name=".LoginActivity"
             android:exported="false" />
         <activity
             android:name=".ShopActivity"
@@ -55,6 +55,13 @@
         <activity
             android:name=".PrivacyPolicyActivity"
             android:exported="false" />
+        <activity
+            android:name=".UserPageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CreatorReportsActivity"
+            android:exported="false" />
+
         <!--
          [DEEPAR] Optional OpenCL acceleration for GPU-based face tracking.
              required="false" = app works without it, just falls back to CPU.
