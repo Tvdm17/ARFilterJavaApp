@@ -31,8 +31,8 @@ public class  DrawerMenu extends AppCompatActivity  {
 
         View header = navigationView.getHeaderView(0);
 
-        ImageButton btnCloseDrawer = findViewById(R.id.btnCloseDrawer);
-        btnCloseDrawer.setOnClickListener(v -> finish());
+        ImageButton btnCloseDrawer = header.findViewById(R.id.btnCloseDrawer); // <-- through header
+        btnCloseDrawer.setOnClickListener(v -> drawerLayout.closeDrawer(GravityCompat.START));
 
         TextView tvNavUsername = header.findViewById(R.id.tvNavUsername);
         tvNavUsername.setText(DatabaseManager.getUsername());

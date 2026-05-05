@@ -29,7 +29,7 @@
             android:name=".ItemCardActivity"
             android:exported="false" />
         <activity
-            android:name=".CustomerHomeActivity"
+            android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,7 +41,7 @@
             android:name=".SignUpActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".CustomerHomeActivity"
             android:exported="false" />
         <activity
             android:name=".ShopActivity"

@@ -54,7 +54,7 @@ public class UserPageActivity extends DrawerMenu {
             // disable button to prevent multiple logins
             btnChangeUsername.setEnabled(false);
 
-            DatabaseManager.postToAPI("ENDPOINTNAMEFORUSERNAME", new DatabaseManager.SimpleCallback() {
+            DatabaseManager.postToAPI("update_usernameENDPOINT", new DatabaseManager.SimpleCallback() {
                 @Override
                 public void onSuccess() {
                     btnChangePassword.setEnabled(true);
@@ -64,7 +64,7 @@ public class UserPageActivity extends DrawerMenu {
 
                 @Override
                 public void onFailure(String message) {
-                    btnChangePassword.setEnabled(true);
+                    btnChangeUsername.setEnabled(true);
                     Toast.makeText(UserPageActivity.this, "Username change failed:" + message, Toast.LENGTH_SHORT).show();
                 }
             }, String.valueOf(DatabaseManager.getUserid()),username);
@@ -92,7 +92,7 @@ public class UserPageActivity extends DrawerMenu {
 
                 @Override
                 public void onFailure(String message) {
-                    btnChangePassword.setEnabled(true);
+                    btnChangeEmail.setEnabled(true);
                     Toast.makeText(UserPageActivity.this, "Password change failed:" + message, Toast.LENGTH_SHORT).show();
 
                 }

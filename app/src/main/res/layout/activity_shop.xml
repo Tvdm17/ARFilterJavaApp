@@ -80,7 +80,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Username"
             android:textColor="@color/textPrimary"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -230,6 +229,7 @@
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"
+        app:headerLayout="@layout/nav_header"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"

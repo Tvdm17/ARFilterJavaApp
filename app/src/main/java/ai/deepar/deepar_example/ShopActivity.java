@@ -36,6 +36,9 @@ public class ShopActivity extends DrawerMenu {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_shop);
 
+        TextView tvUsername = findViewById(R.id.tvUsername);
+        tvUsername.setText(DatabaseManager.getUsername());
+
         startDrawer();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {

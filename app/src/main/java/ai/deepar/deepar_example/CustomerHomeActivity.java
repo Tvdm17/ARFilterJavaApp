@@ -34,6 +34,10 @@ public class CustomerHomeActivity extends DrawerMenu {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_customer_home);
 
+
+        TextView tvUsername = findViewById(R.id.tvUsername);
+        tvUsername.setText(DatabaseManager.getUsername());
+
         startDrawer();
 
         // recover if app is inactive and gets reset

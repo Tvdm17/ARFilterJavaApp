@@ -35,6 +35,8 @@ public class ItemCardActivity extends DrawerMenu {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_item_card);
 
+        findViewById(R.id.backButton).setOnClickListener(v -> finish());
+
         startDrawer();
 
        int id = getIntent().getIntExtra("MAKEOVER_ID", -1);

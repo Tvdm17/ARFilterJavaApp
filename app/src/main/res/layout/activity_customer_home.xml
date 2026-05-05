@@ -60,7 +60,8 @@ e    - Username from DB: find "TODO: Load username from DB"
 <androidx.drawerlayout.widget.DrawerLayout android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -104,7 +105,6 @@ e    - Username from DB: find "TODO: Load username from DB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Username"
             android:textColor="@color/textPrimary"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -228,6 +228,7 @@ e    - Username from DB: find "TODO: Load username from DB"
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"
+        app:headerLayout="@layout/nav_header"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
