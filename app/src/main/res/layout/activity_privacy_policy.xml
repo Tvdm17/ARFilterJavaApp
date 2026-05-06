@@ -32,9 +32,10 @@
             android:layout_marginTop="48dp"
             android:layout_marginBottom="8dp"
             android:background="@null"
-            android:src="@drawable/arrow_left"
+            android:contentDescription="Back"
             android:scaleType="centerInside"
-            android:contentDescription="Back" />
+            android:src="@drawable/arrow_left"
+            android:tint="@android:color/black" />
 
         <TextView
             android:id="@+id/tvTitle"

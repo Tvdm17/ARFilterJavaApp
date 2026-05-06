@@ -337,6 +337,7 @@ public class DatabaseManager {
         );
 
     }
+
     public static Makeover getMakeoverById(int id) {
 
         Log.d("SYNC_CHECK", "Searching for ID: " + id);
@@ -352,6 +353,17 @@ public class DatabaseManager {
             if (s.getId() == id) return s;
         }
         return null;
+    }
+
+    public static void fetchTagsForMakeover(int makeoverId, APICallback callback) {
+        executor.execute(() -> {
+            try {
+                JSONArray response = fetchFromAPI("get_makeover_tags/" + makeoverId);
+                mainHandler.post(() -> callback.onSuccess(response));
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onFailure(e.getMessage()));
+            }
+        });
     }
 
     public static boolean isItemOwned(int id){

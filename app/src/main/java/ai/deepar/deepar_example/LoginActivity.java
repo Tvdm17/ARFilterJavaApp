@@ -1,6 +1,7 @@
 package ai.deepar.deepar_example;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.text.InputType;
 import android.widget.Button;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -16,23 +18,24 @@ import androidx.core.view.WindowInsetsCompat;
 public class LoginActivity extends AppCompatActivity {
 
     private EditText etEmail, etPassword;
-    private Button btnSignIn;
+    private Button btnSignIn, btnCustomer, btnCreator;
+    private boolean isCustomerSelected = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-    // views from xml
-        etEmail = findViewById(R.id.etEmail);
+        // views from xml
+        etEmail    = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
-        btnSignIn = findViewById(R.id.btnSignIn);
+        btnSignIn  = findViewById(R.id.btnSignIn);
+        btnCustomer = findViewById(R.id.btnCustomer);
+        btnCreator  = findViewById(R.id.btnCreator);
 
-        TextView tvSignUp = findViewById(R.id.tvSignUp);
-        tvSignUp.setOnClickListener(v -> {
-            Intent intent = new Intent(this, SignUpActivity.class);
-            startActivity(intent);
-        });
+        btnCustomer.setOnClickListener(v -> setRoleSelected(true));
+        btnCreator .setOnClickListener(v -> setRoleSelected(false));
+        setRoleSelected(true);
 
         ImageView ivPasswordToggle = findViewById(R.id.ivPasswordToggle);
         ivPasswordToggle.setOnClickListener(v -> {
@@ -41,6 +44,12 @@ public class LoginActivity extends AppCompatActivity {
             } else {
                 etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
             }
+        });
+
+        TextView tvSignUp = findViewById(R.id.tvSignUp);
+        tvSignUp.setOnClickListener(v -> {
+            Intent intent = new Intent(this, SignUpActivity.class);
+            startActivity(intent);
         });
 
         btnSignIn.setOnClickListener(v -> {
@@ -59,8 +68,13 @@ public class LoginActivity extends AppCompatActivity {
             DatabaseManager.attemptLoginAsync(email, password, new DatabaseManager.LoginCallback() {
                 @Override
                 public void onSuccess(String email, int userId) {
-                    // Logic for successful login: Move to MainActivity
-                    Intent intent = new Intent(LoginActivity.this, CustomerHomeActivity.class);
+                    DatabaseManager.setIsCustomer(isCustomerSelected);
+
+                    Class<?> destination = isCustomerSelected
+                            ? CustomerHomeActivity.class
+                            : CreatorHomeActivity.class;
+
+                    Intent intent = new Intent(LoginActivity.this, destination);
                     intent.putExtra("USER_EMAIL", email);
                     intent.putExtra("USER_ID", userId);
                     startActivity(intent);
@@ -81,5 +95,20 @@ public class LoginActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+
+    private void setRoleSelected(boolean customerActive) {
+        isCustomerSelected = customerActive;
+        applyButtonState(btnCustomer, customerActive);
+        applyButtonState(btnCreator, !customerActive);
+    }
+
+    private void applyButtonState(Button btn, boolean isActive) {
+        btn.setBackgroundTintList(ColorStateList.valueOf(
+                ContextCompat.getColor(this, isActive ? R.color.buttonPrimary : R.color.buttonDisabled)
+        ));
+        btn.setTextColor(
+                ContextCompat.getColor(this, isActive ? R.color.textOnGold : R.color.textSecondary)
+        );
     }
 }

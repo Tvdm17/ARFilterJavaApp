@@ -1,6 +1,9 @@
 package ai.deepar.deepar_example;
 
+import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
 
 public class Makeover {
     private int id;
@@ -10,6 +13,9 @@ public class Makeover {
     private double price;
     public double averageRating;
 
+    private List<String> tags = new ArrayList<>();
+    private boolean tagsLoaded = false;
+
     public Makeover(int id, String name, String deeparFileName, String previewImage, double price, double averageRating) {
         this.id = id;
         this.name = name;
@@ -18,6 +24,7 @@ public class Makeover {
         this.price = price;
         this.averageRating = averageRating;
     }
+
     // old dummy test code break prevention protocol I'm calling it TCBPP
     public Makeover(String name, String deeparFileName) {
         this.name = name;
@@ -27,14 +34,29 @@ public class Makeover {
         this.price = 0.0;
     }
 
+    public static Makeover fromJson(JSONObject obj) throws Exception {
+        return new Makeover(
+                obj.getInt("makeoverID"),
+                obj.getString("name"),
+                obj.getString("deeparFile"),
+                obj.optString("imagePreview", "default.jpg"),
+                obj.optDouble("price", 0.0),
+                obj.optDouble("averageRating", 0.0)
+        );
+    }
+
     // Getters
     public int getId() { return id; }
     public String getName() { return name; }
     public String getDeeparFileName() { return deeparFileName; }
     public String getPreviewImage() { return previewImage; }
     public double getPrice() { return price; }
+    public double getAverageRating() { return averageRating; }
+    public List<String> getTags() { return tags; }
+    public boolean isTagsLoaded() { return tagsLoaded; }
 
-    public double getAverageRating() {
-        return averageRating;
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+        this.tagsLoaded = true;
     }
 }

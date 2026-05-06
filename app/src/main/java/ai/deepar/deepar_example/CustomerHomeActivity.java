@@ -1,31 +1,31 @@
 package ai.deepar.deepar_example;
 
 import android.os.Bundle;
-import android.content.Intent;
-import android.widget.ImageButton;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
-import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.navigation.NavigationView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class CustomerHomeActivity extends DrawerMenu {
-    public MakeoverAdapter myAdapter;
+import java.util.ArrayList;
+import java.util.List;
 
+public class CustomerHomeActivity extends DrawerMenu {
+
+    private MakeoverAdapter myAdapter;
+    private final List<Makeover> displayList = new ArrayList<>();
+    private String currentQuery = "";
+    private RecyclerView rvItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +33,6 @@ public class CustomerHomeActivity extends DrawerMenu {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_customer_home);
-
 
         TextView tvUsername = findViewById(R.id.tvUsername);
         tvUsername.setText(DatabaseManager.getUsername());
@@ -48,22 +47,27 @@ public class CustomerHomeActivity extends DrawerMenu {
 
         int id = DatabaseManager.getUserid();
 
-
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        RecyclerView rvItems = findViewById(R.id.rvItems);
-        int columns = DatabaseManager.ownedMakeovers.size() > 5 ? 2 : 1;
-        rvItems.setLayoutManager(new GridLayoutManager(this, columns));
-        myAdapter = new MakeoverAdapter(this, DatabaseManager.ownedMakeovers);
+        rvItems = findViewById(R.id.rvItems);
+        rvItems.setLayoutManager(new GridLayoutManager(this, 1));
+        myAdapter = new MakeoverAdapter(this, displayList);
         rvItems.setAdapter(myAdapter);
 
-        // CAN NOW ADAPT THE RECYCLEVIEW!!
-
-        myAdapter.notifyDataSetChanged();
+        EditText etSearch = findViewById(R.id.etSearch);
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void afterTextChanged(Editable s) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                currentQuery = s.toString().trim().toLowerCase();
+                applySearch();
+            }
+        });
 
         DatabaseManager.fetchOwnedMakeovers(id, new DatabaseManager.APICallback() {
             @Override
@@ -86,14 +90,7 @@ public class CustomerHomeActivity extends DrawerMenu {
                         ));
                     }
 
-                    // number of colums based on the amount of filters, change to what we want, optional though
-                    int columns = (DatabaseManager.ownedMakeovers.size() > 8) ? 2 : 1;
-                    if(rvItems.getLayoutManager() instanceof  GridLayoutManager) {
-                        ((GridLayoutManager) rvItems.getLayoutManager()).setSpanCount(columns);
-                    }
-
-                    // Refresh the ui
-                    myAdapter.notifyDataSetChanged();
+                    applySearch();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -106,5 +103,18 @@ public class CustomerHomeActivity extends DrawerMenu {
             }
         });
 
+    }
+
+    private void applySearch() {
+        displayList.clear();
+        for (Makeover m : DatabaseManager.ownedMakeovers) {
+            if (currentQuery.isEmpty() || m.getName().toLowerCase().contains(currentQuery)) {
+                displayList.add(m);
+            }
+        }
+        // number of columns based on the amount of items
+        int columns = (displayList.size() > 8) ? 2 : 1;
+        ((GridLayoutManager) rvItems.getLayoutManager()).setSpanCount(columns);
+        myAdapter.notifyDataSetChanged();
     }
 }

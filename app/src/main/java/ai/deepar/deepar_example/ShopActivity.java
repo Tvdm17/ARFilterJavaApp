@@ -1,22 +1,19 @@
 package ai.deepar.deepar_example;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ImageButton;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
-import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.navigation.NavigationView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -24,11 +21,15 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShopActivity extends DrawerMenu {
+public class ShopActivity extends DrawerMenu implements FilterDialogFragment.OnFiltersApplied {
 
-    public ShopAdapter myAdapter;
-    public List<ShopItem> itemList = new ArrayList<>();
+    private ShopAdapter myAdapter;
+    private final List<ShopItem> itemList = new ArrayList<>();
+    private final List<ShopItem> displayList = new ArrayList<>();
 
+    private String currentQuery = "";
+    private List<String> activeFilters = new ArrayList<>();
+    private RecyclerView rvItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,14 +48,30 @@ public class ShopActivity extends DrawerMenu {
             return insets;
         });
 
-        RecyclerView rvItems = findViewById(R.id.rvShopItems);
-        int columns = itemList.size() > 8 ? 2 : 1;
-        rvItems.setLayoutManager(new GridLayoutManager(this, columns));
-        myAdapter = new ShopAdapter(this, itemList);
+        rvItems = findViewById(R.id.rvShopItems);
+        rvItems.setLayoutManager(new GridLayoutManager(this, 1));
+        myAdapter = new ShopAdapter(this, displayList);
         rvItems.setAdapter(myAdapter);
 
-        int id = DatabaseManager.getUserid();
+        ImageView ivFilter = findViewById(R.id.ivFilter);
+        ivFilter.setOnClickListener(v -> {
+            FilterDialogFragment dialog = new FilterDialogFragment();
+            dialog.setOnFiltersAppliedListener(this);
+            dialog.show(getSupportFragmentManager(), "FilterDialog");
+        });
 
+        EditText etSearch = findViewById(R.id.etSearch);
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void afterTextChanged(Editable s) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                currentQuery = s.toString().trim().toLowerCase();
+                applyFilters();
+            }
+        });
+
+        int id = DatabaseManager.getUserid();
         DatabaseManager.fetchShopItems(id, new DatabaseManager.APICallback() {
             @Override
             public void onSuccess(JSONArray response) {
@@ -76,18 +93,14 @@ public class ShopActivity extends DrawerMenu {
                            obj.getString("imagePreview"),
                            obj.optDouble("price", 0.0),
                            obj.optDouble("averageRating",0.0)
-
                         );
 
                         itemList.add(newItem);
                         DatabaseManager.shopItems.add(newItem);
-
                     }
 
-                    int columns = itemList.size() > 8 ? 2 : 1;
-                    ((GridLayoutManager) rvItems.getLayoutManager()).setSpanCount(columns);
-                    myAdapter.notifyDataSetChanged();
-
+                    applyFilters();
+                    fetchTagsForAll();
                 }
                 catch (Exception e){
                     e.printStackTrace();
@@ -102,5 +115,66 @@ public class ShopActivity extends DrawerMenu {
 
         // CAN NOW ADAPT THE RECYCLEVIEW!!
 
+    }
+
+    @Override
+    public void onFiltersApplied(List<String> selectedCategories) {
+        activeFilters = selectedCategories;
+        applyFilters();
+    }
+
+    private void applyFilters() {
+        displayList.clear();
+        for (ShopItem item : itemList) {
+            if (matchesSearch(item) && matchesTagFilter(item)) {
+                displayList.add(item);
+            }
+        }
+        int columns = displayList.size() > 8 ? 2 : 1;
+        ((GridLayoutManager) rvItems.getLayoutManager()).setSpanCount(columns);
+        myAdapter.notifyDataSetChanged();
+    }
+
+    private boolean matchesSearch(ShopItem item) {
+        return currentQuery.isEmpty() || item.getName().toLowerCase().contains(currentQuery);
+    }
+
+    private boolean matchesTagFilter(ShopItem item) {
+        if (activeFilters.isEmpty()) return true;
+        if (!item.isTagsLoaded()) return true;
+        for (String filter : activeFilters) {
+            if (item.getTags().contains(filter)) return true;
+        }
+        return false;
+    }
+
+    private void fetchTagsForAll() {
+        if (itemList.isEmpty()) return;
+        int[] remaining = {itemList.size()};
+        for (ShopItem item : itemList) {
+            DatabaseManager.fetchTagsForMakeover(item.getId(), new DatabaseManager.APICallback() {
+                @Override
+                public void onSuccess(JSONArray response) {
+                    List<String> tags = new ArrayList<>();
+                    for (int i = 0; i < response.length(); i++) {
+                        JSONObject obj = response.optJSONObject(i);
+                        if (obj != null) {
+                            String group = obj.optString("group", "");
+                            if (!group.isEmpty()) tags.add(group);
+                        }
+                    }
+                    item.setTags(tags);
+                    remaining[0]--;
+                    if (remaining[0] == 0) applyFilters();
+                }
+
+                @Override
+                public void onFailure(String message) {
+                    item.setTags(new ArrayList<>());
+                    remaining[0]--;
+                    if (remaining[0] == 0) applyFilters();
+                }
+            });
+        }
     }
 }

@@ -23,6 +23,9 @@
             android:name=".EditMaskActivity"
             android:exported="false" />
         <activity
+            android:name=".CreatorHomeActivity"
+            android:exported="false" />
+        <activity
             android:name=".CreatorItemCardActivity"
             android:exported="false" />
         <activity
