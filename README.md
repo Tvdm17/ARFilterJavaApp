@@ -64,4 +64,25 @@ Claude Code, Claude, and Gemini were used throughout development to assist mainl
 - window for MUA to modify makeovers 
 - encrypt deepAR files
 
+## Design patterns                                                                                             
+                                                                                                                    
+1. Facade / Manager pattern                                                                                          
+                                                                                                                    
+DatabaseManager, DeepARManager, and CameraManager each hide a complex subsystem behind a simple interface. Activities never import OkHttp, DeepAR SDK classes, or CameraX — they only call the manager.                                                          
+                                                            
+2. Callback / Observer pattern
+
+Every async operation exposes a typed callback interface: LoginCallback, SimpleCallback, APICallback, FileCallback, DeepARManager.Listener, FilterDialogFragment.OnFiltersApplied.                                                                 
+                                                            
+3. Template Method pattern
+
+DrawerMenu defines a step (startDrawer()) that every subclass must call in onCreate(). The base class owns the drawer wiring logic; subclasses just trigger it at the right moment.                                                         
+                                                            
+4. Adapter pattern (RecyclerView)
+
+MakeoverAdapter and ShopAdapter both implement the standard Android Adapter + ViewHolder pattern — adapting a plain List<T> into something RecyclerView can render, with view recycling handled by ViewHolder.
+                                                                                                                                                                     
+5. Double-buffer pattern *belongs to the sample DeepAR project
+
+CameraManager alternates between two ByteBuffers each frame. While DeepAR processes buffer[0], CameraX writes the next frame into buffer[1] and vice versa — a classic producer/consumer double-buffer to avoid frame drops.
 
