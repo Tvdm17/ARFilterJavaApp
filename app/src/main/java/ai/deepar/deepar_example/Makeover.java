@@ -35,11 +35,12 @@ public class Makeover {
     }
 
     public static Makeover fromJson(JSONObject obj) throws Exception {
+        String preview = obj.isNull("imagePreview") ? "default.jpg" : obj.optString("imagePreview", "default.jpg");
         return new Makeover(
                 obj.getInt("makeoverID"),
                 obj.getString("name"),
                 obj.getString("deeparFile"),
-                obj.optString("imagePreview", "default.jpg"),
+                preview,
                 obj.optDouble("price", 0.0),
                 obj.optDouble("averageRating", 0.0)
         );

@@ -12,24 +12,29 @@
         android:id="@+id/tvFilterTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Filter"
+        android:text="Filter by category"
         android:textColor="@color/textPrimary"
-        android:textSize="18sp"
+        android:textSize="20sp"
         android:textStyle="bold"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="20dp" />
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/chipGroupFilters"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:singleSelection="false">
+        app:singleSelection="false"
+        app:chipSpacingHorizontal="8dp"
+        app:chipSpacingVertical="8dp">
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipAverageLook"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="averagelook"
+            android:layout_height="48dp"
+            android:text="Average Look"
+            android:textSize="14sp"
             android:checkable="true"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
             app:chipBackgroundColor="@color/backgroundSecondary"
             app:checkedIconTint="@color/colorPrimary"
             app:chipStrokeColor="@color/colorPrimary"
@@ -38,9 +43,12 @@
         <com.google.android.material.chip.Chip
             android:id="@+id/chipNatural"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="natural"
+            android:layout_height="48dp"
+            android:text="Natural"
+            android:textSize="14sp"
             android:checkable="true"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
             app:chipBackgroundColor="@color/backgroundSecondary"
             app:checkedIconTint="@color/colorPrimary"
             app:chipStrokeColor="@color/colorPrimary"
@@ -49,9 +57,12 @@
         <com.google.android.material.chip.Chip
             android:id="@+id/chipMedium"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="medium"
+            android:layout_height="48dp"
+            android:text="Medium"
+            android:textSize="14sp"
             android:checkable="true"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
             app:chipBackgroundColor="@color/backgroundSecondary"
             app:checkedIconTint="@color/colorPrimary"
             app:chipStrokeColor="@color/colorPrimary"
@@ -60,9 +71,12 @@
         <com.google.android.material.chip.Chip
             android:id="@+id/chipBright"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="bright"
+            android:layout_height="48dp"
+            android:text="Bright"
+            android:textSize="14sp"
             android:checkable="true"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
             app:chipBackgroundColor="@color/backgroundSecondary"
             app:checkedIconTint="@color/colorPrimary"
             app:chipStrokeColor="@color/colorPrimary"
@@ -75,26 +89,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="24dp">
+        android:layout_marginTop="28dp">
 
         <Button
             android:id="@+id/btnClearFilter"
-            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
-            android:layout_height="44dp"
+            android:layout_height="52dp"
             android:layout_weight="1"
             android:text="Clear"
+            android:textSize="15sp"
             android:textColor="@color/textPrimary"
             android:backgroundTint="@color/buttonDisabled"
             android:layout_marginEnd="8dp" />
 
         <Button
             android:id="@+id/btnApplyFilter"
-            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
-            android:layout_height="44dp"
+            android:layout_height="52dp"
             android:layout_weight="1"
             android:text="Apply"
+            android:textSize="15sp"
             android:textColor="@color/textOnGold"
             android:backgroundTint="@color/buttonPrimary"
             android:layout_marginStart="8dp" />
