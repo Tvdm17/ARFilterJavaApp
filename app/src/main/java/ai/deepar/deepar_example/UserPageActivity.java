@@ -1,7 +1,6 @@
 package ai.deepar.deepar_example;
 
 import android.content.Intent;
-import android.media.MediaRouter;
 import android.os.Bundle;
 import android.text.InputType;
 import android.widget.Button;
@@ -40,7 +39,7 @@ public class UserPageActivity extends DrawerMenu {
 
 
         btnChangeUsername = findViewById(R.id.btnChangeUsername);
-        btnChangeEmail = findViewById(R.id.btnChangeEmail);;
+        btnChangeEmail = findViewById(R.id.btnChangeEmail);
         btnChangePassword = findViewById(R.id.btnChangePassword);
 
         btnChangeUsername.setOnClickListener(v -> {
@@ -54,7 +53,7 @@ public class UserPageActivity extends DrawerMenu {
             // disable button to prevent multiple logins
             btnChangeUsername.setEnabled(false);
 
-            DatabaseManager.postToAPI("update_usernameENDPOINT", new DatabaseManager.SimpleCallback() {
+            DatabaseManager.postToAPI("update_username", new DatabaseManager.SimpleCallback() {
                 @Override
                 public void onSuccess() {
                     btnChangePassword.setEnabled(true);
@@ -82,7 +81,7 @@ public class UserPageActivity extends DrawerMenu {
             // disable button to prevent multiple logins
             btnChangeEmail.setEnabled(false);
 
-            DatabaseManager.postToAPI("ENDPOINTNAMEFOREMAIL", new DatabaseManager.SimpleCallback() {
+            DatabaseManager.postToAPI("update_email", new DatabaseManager.SimpleCallback() {
                 @Override
                 public void onSuccess() {
                     btnChangePassword.setEnabled(true);
@@ -113,7 +112,7 @@ public class UserPageActivity extends DrawerMenu {
 
             String hashedPassword = DatabaseManager.hashPassword(password);
 
-            DatabaseManager.postToAPI("ENDPOINTNAMEFORPASSWORD", new DatabaseManager.SimpleCallback() {
+            DatabaseManager.postToAPI("update_password", new DatabaseManager.SimpleCallback() {
                 @Override
                 public void onSuccess() {
                     btnChangePassword.setEnabled(true);

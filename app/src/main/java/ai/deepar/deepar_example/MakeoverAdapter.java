@@ -15,10 +15,19 @@ import com.bumptech.glide.Glide;
 public class MakeoverAdapter extends RecyclerView.Adapter<MakeoverAdapter.ViewHolder> {
     private final Context context;
     private final List<Makeover> makeovers;
+    private OnItemClickListener clickListener;
+
+    public interface OnItemClickListener {
+        void onItemClick(int makeoverId);
+    }
 
     public MakeoverAdapter(Context context, List<Makeover> makeovers) {
         this.context = context;
         this.makeovers = makeovers;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.clickListener = listener;
     }
 
     @NonNull
@@ -47,7 +56,11 @@ public class MakeoverAdapter extends RecyclerView.Adapter<MakeoverAdapter.ViewHo
     }
 
     private void openPreview(Makeover makeover) {
-        Intent intent = new Intent(context, PreviewActivity.class); // change to Itemcardactivity if you want to see the remove button
+        if (clickListener != null) {
+            clickListener.onItemClick(makeover.getId());
+            return;
+        }
+        Intent intent = new Intent(context, PreviewActivity.class);
         intent.putExtra("MAKEOVER_ID", makeover.getId());
         intent.putExtra("CAMERA_MODE", "FULL_FEATURES");
         context.startActivity(intent);

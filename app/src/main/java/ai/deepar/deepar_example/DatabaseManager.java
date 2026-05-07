@@ -55,8 +55,9 @@ public class DatabaseManager {
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    public static List<Makeover> ownedMakeovers = new ArrayList<>();
-    public static List<ShopItem> shopItems = new ArrayList<>();
+    public static List<Makeover> ownedMakeovers   = new ArrayList<>();
+    public static List<ShopItem> shopItems        = new ArrayList<>();
+    public static List<Makeover> creatorMakeovers = new ArrayList<>();
 
 
 
@@ -344,15 +345,68 @@ public class DatabaseManager {
         Log.d("SYNC_CHECK", "Shop items count: " + shopItems.size());
         Log.d("SYNC_CHECK", "Owned items count: " + ownedMakeovers.size());
 
-        // Check owned items
         for (Makeover m : ownedMakeovers) {
             if (m.getId() == id) return m;
         }
-        // Check shop items
         for (ShopItem s : shopItems) {
             if (s.getId() == id) return s;
         }
+        for (Makeover m : creatorMakeovers) {
+            if (m.getId() == id) return m;
+        }
         return null;
+    }
+
+    // ── Reviews ──────────────────────────────────────────────────────────────
+    // Endpoint: GET get_reviews/{makeoverId}
+    // Response: [{reviewId, makeoverID, userid, authorName, rating, comment}]
+    public static void fetchReviews(int makeoverId, APICallback callback) {
+        executor.execute(() -> {
+            try {
+                JSONArray response = fetchFromAPI("get_reviews/" + makeoverId);
+                mainHandler.post(() -> callback.onSuccess(response));
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onFailure(e.getMessage()));
+            }
+        });
+    }
+
+    // Endpoint: POST add_review/{makeoverId}/{userId}/{rating}/{comment}
+    public static void addReview(int makeoverId, int userId, float rating, String comment, SimpleCallback callback) {
+        postToAPI("add_review", callback,
+                String.valueOf(makeoverId),
+                String.valueOf(userId),
+                String.valueOf(rating),
+                comment);
+    }
+
+    // ── Creator makeovers ─────────────────────────────────────────────────────
+    // Endpoint: GET get_creator_makeovers/{userId}
+    // Response: [{makeoverID, name, deeparFile, imagePreview, price, averageRating}]
+    public static void fetchCreatorMakeovers(int userId, APICallback callback) {
+        executor.execute(() -> {
+            try {
+                JSONArray response = fetchFromAPI("get_creator_makeovers/" + userId);
+                mainHandler.post(() -> callback.onSuccess(response));
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onFailure(e.getMessage()));
+            }
+        });
+    }
+
+    // Endpoint: POST create_makeover/{userId}/{name}
+    // Returns the new makeoverID in response (backend should return [{makeoverID: X}])
+    public static void createMakeover(int userId, String name, SimpleCallback callback) {
+        postToAPI("create_makeover", callback,
+                String.valueOf(userId),
+                name);
+    }
+
+    // Endpoint: POST update_makeover/{makeoverId}/{name}
+    public static void updateMakeover(int makeoverId, String name, SimpleCallback callback) {
+        postToAPI("update_makeover", callback,
+                String.valueOf(makeoverId),
+                name);
     }
 
     public static void fetchTagsForMakeover(int makeoverId, APICallback callback) {
