@@ -36,7 +36,7 @@ public class UserPageActivity extends DrawerMenu {
         tvUsername.setText(DatabaseManager.getUsername());
 
         TextView tvEmail = findViewById(R.id.tvEmail);
-        tvEmail.setText(DatabaseManager.getUsername());
+        tvEmail.setText(DatabaseManager.getEmail());
 
 
         btnChangeUsername = findViewById(R.id.btnChangeUsername);
