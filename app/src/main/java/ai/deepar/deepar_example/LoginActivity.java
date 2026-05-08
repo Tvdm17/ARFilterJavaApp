@@ -1,7 +1,6 @@
 package ai.deepar.deepar_example;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.text.InputType;
 import android.widget.Button;
@@ -10,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -18,8 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 public class LoginActivity extends AppCompatActivity {
 
     private EditText etEmail, etPassword;
-    private Button btnSignIn, btnCustomer, btnCreator;
-    private boolean isCustomerSelected = true;
+    private Button btnSignIn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,12 +27,6 @@ public class LoginActivity extends AppCompatActivity {
         etEmail    = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnSignIn  = findViewById(R.id.btnSignIn);
-        btnCustomer = findViewById(R.id.btnCustomer);
-        btnCreator  = findViewById(R.id.btnCreator);
-
-        btnCustomer.setOnClickListener(v -> setRoleSelected(true));
-        btnCreator .setOnClickListener(v -> setRoleSelected(false));
-        setRoleSelected(true);
 
         ImageView ivPasswordToggle = findViewById(R.id.ivPasswordToggle);
         ivPasswordToggle.setOnClickListener(v -> {
@@ -68,9 +59,7 @@ public class LoginActivity extends AppCompatActivity {
             DatabaseManager.attemptLoginAsync(email, password, new DatabaseManager.LoginCallback() {
                 @Override
                 public void onSuccess(String email, int userId) {
-                    DatabaseManager.setIsCustomer(isCustomerSelected);
-
-                    Class<?> destination = isCustomerSelected
+                    Class<?> destination = DatabaseManager.isIsCustomer()
                             ? CustomerHomeActivity.class
                             : CreatorHomeActivity.class;
 
@@ -97,18 +86,6 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void setRoleSelected(boolean customerActive) {
-        isCustomerSelected = customerActive;
-        applyButtonState(btnCustomer, customerActive);
-        applyButtonState(btnCreator, !customerActive);
-    }
 
-    private void applyButtonState(Button btn, boolean isActive) {
-        btn.setBackgroundTintList(ColorStateList.valueOf(
-                ContextCompat.getColor(this, isActive ? R.color.buttonPrimary : R.color.buttonDisabled)
-        ));
-        btn.setTextColor(
-                ContextCompat.getColor(this, isActive ? R.color.textOnGold : R.color.textSecondary)
-        );
-    }
+
 }

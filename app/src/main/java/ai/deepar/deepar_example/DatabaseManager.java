@@ -146,10 +146,19 @@ public class DatabaseManager {
                         }
 
                         setUsername(username);
-                        setUserid(userId);// set userid for session
+                        setUserid(userId);
                         setEmail(userEmail);
 
-                        // success, back to the ui thread
+                        JSONArray typeResponse = fetchFromAPI("check_usertype/" + userId);
+                        if (typeResponse != null && typeResponse.length() > 0) {
+                            JSONObject typeObj = typeResponse.optJSONObject(0);
+                            if (typeObj != null) {
+                                setIsCustomer(typeObj.optInt("isIsCustomer", 1) == 1);
+                            }
+                        } else {
+                            setIsCustomer(false);
+                        }
+
                         mainHandler.post(() -> callback.onSuccess(userEmail, userId));
                         return;
                     }
@@ -162,6 +171,7 @@ public class DatabaseManager {
             }
         });
     }
+
 
     public interface SimpleCallback {
         void onSuccess();
@@ -427,6 +437,25 @@ public class DatabaseManager {
             }
         }
         return false;
+    }
+
+
+
+    public static void fetchUserType(int userId) {
+        executor.execute(() -> {
+            JSONArray response = fetchFromAPI("check_usertype/" + userId);
+            if (response != null && response.length() > 0) {
+                JSONObject obj = response.optJSONObject(0);
+                if (obj != null) {
+                    boolean customer = obj.optInt("isCustomer", 1) == 1;
+                    setIsCustomer(customer);
+
+                    return;
+                }
+
+
+            }
+        });
     }
 
     public static boolean isIsCustomer() {
