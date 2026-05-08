@@ -56,7 +56,7 @@
         android:id="@+id/tvAllReviewsTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Reviews"
+        android:text="@string/reviews_title"
         android:textColor="@color/textPrimary"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -88,7 +88,7 @@
             android:id="@+id/tvAverageRating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="  0.0 / 5"
+            android:text="@string/placeholder_avg_rating"
             android:textColor="@color/textSecondary"
             android:textSize="13sp" />
 
@@ -112,7 +112,7 @@
         android:id="@+id/btnCloseReviews"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:text="Close"
+        android:text="@string/btn_close"
         android:textColor="@color/textOnGold"
         android:backgroundTint="@color/buttonPrimary"
         android:layout_marginTop="16dp" />

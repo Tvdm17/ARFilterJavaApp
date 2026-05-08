@@ -120,7 +120,7 @@
         android:id="@+id/tvReadMore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="more"
+        android:text="@string/read_more"
         android:textColor="@color/textGold"
         android:textSize="13sp"
         android:textStyle="bold"

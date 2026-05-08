@@ -9,6 +9,8 @@ import androidx.fragment.app.DialogFragment;
 
 import com.github.mikephil.charting.charts.LineChart;
 
+import java.util.Locale;
+
 public class PurchaseMetricsDialogFragment extends DialogFragment {
 
     private static final String ARG_MAKEOVER_ID  = "makeover_id";
@@ -45,7 +47,7 @@ public class PurchaseMetricsDialogFragment extends DialogFragment {
         float avgRating = getArguments() != null ? getArguments().getFloat(ARG_AVG_RATING, 0f) : 0f;
 
         android.widget.TextView tvAvgValue = view.findViewById(R.id.tvAvgRatingValue);
-        tvAvgValue.setText(String.format("%.1f / 5", avgRating));
+        tvAvgValue.setText(String.format(Locale.getDefault(), "%.1f / 5", avgRating));
 
         // Charts: data endpoints not yet available — initialise as empty
         initEmptyChart(view.findViewById(R.id.chartAdds));

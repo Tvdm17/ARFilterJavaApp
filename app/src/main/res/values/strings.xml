@@ -1,18 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- App -->
     <string name="app_name">DeepAR_Example</string>
-    <string name="email">Email</string>
-    <string name="your_email_address">Your email address</string>
-    <string name="password">Password</string>
-    <string name="your_password">Your password</string>
+    <string name="app_display_name">VirtuGlow</string>
+
+    <!-- Sign-in screen -->
+    <string name="sign_in">Sign In</string>
+    <string name="sign_in_subtitle">Hi there! Nice to see you again.</string>
+    <string name="no_account_prompt">Don\'t have an account?</string>
+    <string name="sign_up">Sign Up</string>
+
+    <!-- Sign-up screen -->
+    <string name="have_an_account">Have an Account?</string>
+    <string name="continuation">Continue</string>
     <string name="i_agree_to_the">I agree to the</string>
     <string name="terms_of_services">Terms of Services</string>
     <string name="and">and</string>
     <string name="privacy_policy">Privacy Policy</string>
-    <string name="customer">Customer</string>
     <string name="or">Or</string>
+    <string name="customer">Customer</string>
     <string name="creator">Creator</string>
-    <string name="continuation">Continue</string>
-    <string name="have_an_account">Have an Account?</string>
-    <string name="sign_in">Sign In</string>
-    <string name="sign_up">Sign Up</string>
+
+    <!-- Common field labels -->
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+
+    <!-- Common hints -->
+    <string name="your_email_address">Your email address</string>
+    <string name="your_password">Your password</string>
+    <string name="hint_example_email">example@email.com</string>
+    <string name="hint_password_masked">••••••••••</string>
+    <string name="hint_search">Search</string>
+
+    <!-- Preview screen -->
+    <string name="rec_label">REC</string>
+    <string name="rec_timer_default">  00:00</string>
+
+    <!-- User page -->
+    <string name="placeholder_email_display">email@email.email</string>
+    <string name="placeholder_username_display">USERNAME</string>
+    <string name="label_new_email">Type your new email here:</string>
+    <string name="label_new_username">Type your new username here:</string>
+    <string name="hint_new_username">NewUsername</string>
+    <string name="label_new_password">Type your new password here:</string>
+    <string name="btn_change">Change</string>
+
+    <!-- Filter dialog -->
+    <string name="filter_title">Filter by category</string>
+    <string name="filter_average_look">Average Look</string>
+    <string name="filter_natural">Natural</string>
+    <string name="filter_medium">Medium</string>
+    <string name="filter_bright">Bright</string>
+    <string name="btn_clear">Clear</string>
+    <string name="btn_apply">Apply</string>
+
+    <!-- Shop / Item card -->
+    <string name="btn_view">View</string>
+    <string name="placeholder_rating_numeric">0.0</string>
+    <string name="placeholder_username">Username</string>
+    <string name="placeholder_mask_name">Mask Name</string>
+    <string name="btn_add">Add</string>
+    <string name="placeholder_rating">0.0 / 5</string>
+    <string name="recent_reviews">Recent reviews</string>
+    <string name="leave_review">Leave a Review</string>
+
+    <!-- All reviews dialog -->
+    <string name="reviews_title">Reviews</string>
+    <string name="placeholder_avg_rating">  0.0 / 5</string>
+    <string name="btn_close">Close</string>
+
+    <!-- Leave review dialog -->
+    <string name="leave_review_subtitle">Share your experience with this mask</string>
+    <string name="label_your_rating">Your rating</string>
+    <string name="label_your_review">Your review</string>
+    <string name="hint_review_comment">Write your review here...</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_submit">Submit</string>
+
+    <!-- Purchase metrics dialog -->
+    <string name="purchase_metrics_title">Purchase Metrics</string>
+    <string name="label_average_rating">Average Rating</string>
+    <string name="label_adds_over_time">Adds over time</string>
+    <string name="label_removes_over_time">Removes over time</string>
+    <string name="label_reviews_over_time">Reviews over time</string>
+
+    <!-- Review item -->
+    <string name="read_more">more</string>
+
+    <!-- Creator item card -->
+    <string name="btn_edit">Edit</string>
+    <string name="purchase_metrics">Purchase metrics</string>
+
+    <!-- Edit mask -->
+    <string name="label_name_of_mask">Name of the mask</string>
+    <string name="hint_mask_name">Enter mask name</string>
+    <string name="label_photos_videos">Photos / Videos</string>
+    <string name="label_main_picture">Main picture</string>
+    <string name="label_first_picture">First picture</string>
+    <string name="label_second_picture">Second picture</string>
+    <string name="label_third_picture">Third picture</string>
+    <string name="label_fourth_picture">Fourth picture</string>
+    <string name="label_tags">Tags</string>
+    <string name="hint_new_tag">New tag...</string>
+    <string name="btn_add_tag">+</string>
+    <string name="btn_save">Save</string>
+
+    <!-- Navigation drawer -->
+    <string name="nav_profile">Profile</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_sign_out">Sign Out</string>
+
 </resources>

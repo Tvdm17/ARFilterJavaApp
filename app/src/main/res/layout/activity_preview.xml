@@ -100,7 +100,7 @@
                 android:id="@+id/recLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="REC"
+                android:text="@string/rec_label"
                 android:textColor="@android:color/holo_red_dark"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -109,7 +109,7 @@
                 android:id="@+id/recTimer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="  00:00"
+                android:text="@string/rec_timer_default"
                 android:textColor="@android:color/white"
                 android:textSize="14sp"
                 android:textStyle="bold" />

@@ -79,6 +79,7 @@ public class LeaveReviewDialogFragment extends DialogFragment {
                     new DatabaseManager.SimpleCallback() {
                         @Override
                         public void onSuccess() {
+                            if (getContext() == null) return;
                             Toast.makeText(getContext(), "Review submitted!", Toast.LENGTH_SHORT).show();
                             if (listener != null) listener.onReviewSubmitted();
                             dismiss();
@@ -86,6 +87,7 @@ public class LeaveReviewDialogFragment extends DialogFragment {
 
                         @Override
                         public void onFailure(String message) {
+                            if (getContext() == null) return;
                             btnSubmit.setEnabled(true);
                             Toast.makeText(getContext(), "Failed to submit: " + message, Toast.LENGTH_SHORT).show();
                         }

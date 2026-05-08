@@ -45,6 +45,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import ai.deepar.ar.ARErrorType;
 import ai.deepar.ar.ARTouchInfo;
@@ -404,7 +405,7 @@ public class PreviewActivity extends AppCompatActivity implements DeepARManager.
                 long elapsed = System.currentTimeMillis() - recordingStartTime;
                 long seconds = (elapsed / 1000) % 60;
                 long minutes = (elapsed / 1000) / 60;
-                recTimer.setText(String.format("  %02d:%02d", minutes, seconds));
+                recTimer.setText(String.format(Locale.getDefault(), "  %02d:%02d", minutes, seconds));
                 timerHandler.postDelayed(this, 1000);
             }
         };

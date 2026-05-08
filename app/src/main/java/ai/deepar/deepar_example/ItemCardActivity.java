@@ -22,6 +22,7 @@ import com.bumptech.glide.Glide;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.List;
 
 public class ItemCardActivity extends DrawerMenu implements LeaveReviewDialogFragment.OnReviewSubmitted {
@@ -97,7 +98,7 @@ public class ItemCardActivity extends DrawerMenu implements LeaveReviewDialogFra
         rbAverageRating.setRating((float) currentItem.getAverageRating());
 
         TextView tvAverageValue = findViewById(R.id.tvAverageValue);
-        tvAverageValue.setText(String.format("%.1f / 5", currentItem.getAverageRating()));
+        tvAverageValue.setText(String.format(Locale.getDefault(), "%.1f / 5", currentItem.getAverageRating()));
 
         // ── Reviews RecyclerView ─────────────────────────────────────────────
         reviewList    = new ArrayList<>();

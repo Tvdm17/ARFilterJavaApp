@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.List;
 
 public class AllReviewsDialogFragment extends DialogFragment {
@@ -66,6 +67,7 @@ public class AllReviewsDialogFragment extends DialogFragment {
         DatabaseManager.fetchReviews(makeoverId, new DatabaseManager.APICallback() {
             @Override
             public void onSuccess(JSONArray response) {
+                if (getContext() == null) return;
                 reviewList.clear();
                 float ratingSum = 0;
                 for (int i = 0; i < response.length(); i++) {
@@ -81,11 +83,12 @@ public class AllReviewsDialogFragment extends DialogFragment {
 
                 float avg = reviewList.isEmpty() ? 0 : ratingSum / reviewList.size();
                 rbAverageRating.setRating(avg);
-                tvAverageRating.setText(String.format("  %.1f / 5", avg));
+                tvAverageRating.setText(String.format(Locale.getDefault(), "  %.1f / 5", avg));
             }
 
             @Override
             public void onFailure(String message) {
+                if (getContext() == null) return;
                 Toast.makeText(getContext(), "Could not load reviews", Toast.LENGTH_SHORT).show();
             }
         });

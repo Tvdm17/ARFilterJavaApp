@@ -68,7 +68,7 @@
         android:id="@+id/tvDialogTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Leave a Review"
+        android:text="@string/leave_review"
         android:textColor="@color/textPrimary"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -78,7 +78,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Share your experience with this mask"
+        android:text="@string/leave_review_subtitle"
         android:textColor="@color/textSecondary"
         android:textSize="13sp"
         android:layout_marginBottom="20dp" />
@@ -88,7 +88,7 @@
         android:id="@+id/tvRatingHint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Your rating"
+        android:text="@string/label_your_rating"
         android:textColor="@color/colorPrimary"
         android:textSize="12sp"
         android:textStyle="bold"
@@ -110,7 +110,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Your review"
+        android:text="@string/label_your_review"
         android:textColor="@color/colorPrimary"
         android:textSize="12sp"
         android:textStyle="bold"
@@ -134,7 +134,7 @@
             android:id="@+id/etReviewComment"
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:hint="Write your review here..."
+            android:hint="@string/hint_review_comment"
             android:textColorHint="@color/textMuted"
             android:textColor="@color/textPrimary"
             android:textSize="14sp"
@@ -160,7 +160,7 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
-            android:text="Cancel"
+            android:text="@string/btn_cancel"
             android:textColor="@color/textPrimary"
             android:backgroundTint="@color/buttonDisabled"
             android:layout_marginEnd="8dp" />
@@ -171,7 +171,7 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
-            android:text="Submit"
+            android:text="@string/btn_submit"
             android:textColor="@color/textOnGold"
             android:backgroundTint="@color/buttonPrimary"
             android:layout_marginStart="8dp" />

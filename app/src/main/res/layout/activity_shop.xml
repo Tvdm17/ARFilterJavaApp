@@ -127,7 +127,7 @@
                     android:id="@+id/etSearch"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:hint="Search"
+                    android:hint="@string/hint_search"
                     android:textColorHint="@color/textMuted"
                     android:textColor="@color/textPrimary"
                     android:textSize="14sp"
