@@ -66,7 +66,7 @@ public class UserPageActivity extends DrawerMenu {
                     btnChangeUsername.setEnabled(true);
                     Toast.makeText(UserPageActivity.this, "Username change failed:" + message, Toast.LENGTH_SHORT).show();
                 }
-            }, String.valueOf(DatabaseManager.getUserid()),username);
+            }, username, String.valueOf(DatabaseManager.getUserid()));
         });
 
 
@@ -95,7 +95,7 @@ public class UserPageActivity extends DrawerMenu {
                     Toast.makeText(UserPageActivity.this, "Password change failed:" + message, Toast.LENGTH_SHORT).show();
 
                 }
-            }, String.valueOf(DatabaseManager.getUserid()),email);
+            }, email, String.valueOf(DatabaseManager.getUserid()));
         });
 
         btnChangePassword.setOnClickListener(v -> {
@@ -126,7 +126,7 @@ public class UserPageActivity extends DrawerMenu {
                     Toast.makeText(UserPageActivity.this, "Password change failed:" + message, Toast.LENGTH_SHORT).show();
 
                 }
-            }, String.valueOf(DatabaseManager.getUserid()) ,hashedPassword);
+            }, hashedPassword, String.valueOf(DatabaseManager.getUserid()));
         });
 
         ImageView ivPasswordToggle = findViewById(R.id.ivPasswordToggle);
