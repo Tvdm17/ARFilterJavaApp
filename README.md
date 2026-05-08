@@ -45,13 +45,12 @@ Claude Code, Claude, and Gemini were used throughout development to assist mainl
 - agreement Terms of Use and Privacy Policy
 - shop for users
 - image preview of the available makeovers in the shop
-- video preview of the available makeovers in the shop
-- satisfaction scores and average satisfaction scores 
+- satisfaction scores per makeover 
+- average satisfaction scores at the shop page
 - reviews for MUA for common free makeovers
 - tags for filtering + search function (by tag)
-- ranking of makeovers
-- MUA personal look catalogue
-- window for uploading a new makeover
+- MUA personal look catalogue window
+- window for uploading a new makeover with any tags
 
 3. optional
 
@@ -63,6 +62,8 @@ Claude Code, Claude, and Gemini were used throughout development to assist mainl
 - window for requesting a new makeover
 - window for MUA to modify makeovers 
 - encrypt deepAR files
+- camera preview of the available makeovers in the shop
+
 
 ## Design patterns                                                                                             
                                                                                                                     
