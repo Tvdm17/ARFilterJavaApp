@@ -25,7 +25,7 @@
         android:layout_height="44dp"
         android:layout_marginTop="32dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/eye_icon"
+        android:src="@drawable/close_icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
