@@ -381,6 +381,19 @@ public class DatabaseManager {
         });
     }
 
+    // Endpoint: GET get_creator_reviews/{userId}
+    // Response: [{reviewId, makeoverID, userid, authorName, rating, comment, maskName}]
+    public static void fetchCreatorReviews(int userId, APICallback callback) {
+        executor.execute(() -> {
+            try {
+                JSONArray response = fetchFromAPI("get_creator_reviews/" + userId);
+                mainHandler.post(() -> callback.onSuccess(response));
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onFailure(e.getMessage()));
+            }
+        });
+    }
+
     // Endpoint: POST add_review/{makeoverId}/{userId}/{rating}/{comment}
     public static void addReview(int makeoverId, int userId, float rating, String comment, SimpleCallback callback) {
         postToAPI("add_review", callback,
