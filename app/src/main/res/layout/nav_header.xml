@@ -66,7 +66,7 @@
         android:layout_height="24dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="70dp"
-        android:src="@drawable/eye_icon"
+        android:src="@drawable/profile_icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvNavEmail" />
 
@@ -76,7 +76,7 @@
         android:layout_height="24dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:src="@drawable/eye_icon"
+        android:src="@drawable/home_icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivProfile" />
 
@@ -120,7 +120,7 @@
         android:layout_height="24dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="140dp"
-        android:src="@drawable/eye_icon"
+        android:src="@drawable/signout_icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivChanging" />
 

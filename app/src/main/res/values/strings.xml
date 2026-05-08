@@ -110,5 +110,7 @@
     <string name="nav_profile">Profile</string>
     <string name="nav_home">Home</string>
     <string name="nav_sign_out">Sign Out</string>
+    <string name="nav_reviews">Reviews</string>
+    <string name="nav_shop">Shop</string>
 
 </resources>

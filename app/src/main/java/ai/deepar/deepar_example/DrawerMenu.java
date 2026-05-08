@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -44,18 +45,21 @@ public class  DrawerMenu extends AppCompatActivity  {
         TextView tvChanging = header.findViewById(R.id.tvChanging);
         TextView tvHome = header.findViewById(R.id.tvHome);
         TextView tvProfile = header.findViewById(R.id.tvProfile);
+        ImageView ivChanging = header.findViewById(R.id.ivChanging);
+
         if (!isIsCustomer()) {
             tvHome.setOnClickListener(v -> {
                 startActivity(new Intent(this, CreatorHomeActivity.class));
                 drawerLayout.closeDrawer(GravityCompat.START);
             });
 
-            tvProfile.setOnClickListener(v-> {
+            tvProfile.setOnClickListener(v -> {
                 startActivity(new Intent(this, UserPageActivity.class));
                 drawerLayout.closeDrawer(GravityCompat.START);
             });
 
-            tvChanging.setText("Reports");
+            tvChanging.setText(R.string.nav_reviews);
+            ivChanging.setImageResource(R.drawable.reviews_icon);
             tvChanging.setOnClickListener(v -> {
                 startActivity(new Intent(this, CreatorReportsActivity.class));
                 drawerLayout.closeDrawer(GravityCompat.START);
@@ -67,12 +71,13 @@ public class  DrawerMenu extends AppCompatActivity  {
                 drawerLayout.closeDrawer(GravityCompat.START);
             });
 
-            tvProfile.setOnClickListener(v-> {
+            tvProfile.setOnClickListener(v -> {
                 startActivity(new Intent(this, UserPageActivity.class));
                 drawerLayout.closeDrawer(GravityCompat.START);
             });
 
-            tvChanging.setText("Shop"); // tvChanging.setText(R.string.my_words)?? cant try this yet bc server is down ;
+            tvChanging.setText(R.string.nav_shop);
+            ivChanging.setImageResource(R.drawable.shop_icon);
             tvChanging.setOnClickListener(v -> {
                 startActivity(new Intent(this, ShopActivity.class));
                 drawerLayout.closeDrawer(GravityCompat.START);
