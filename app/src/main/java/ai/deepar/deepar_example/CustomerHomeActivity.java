@@ -72,6 +72,7 @@ public class CustomerHomeActivity extends DrawerMenu {
     @Override
     protected void onResume() {
         super.onResume();
+        refreshUIFromGlobalList();
         DatabaseManager.fetchOwnedMakeovers(DatabaseManager.getUserid(), new DatabaseManager.APICallback() {
             @Override
             public void onSuccess(JSONArray response) {
@@ -92,13 +93,41 @@ public class CustomerHomeActivity extends DrawerMenu {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                refreshUIFromGlobalList(); // safety refresh
             }
+
+
 
             @Override
             public void onFailure(String message) {
                 Toast.makeText(CustomerHomeActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void refreshUIFromGlobalList() {
+        displayList.clear();
+        displayList.addAll(DatabaseManager.ownedMakeovers);
+
+        // Re-apply search/filtering if a query exists, this is for when you where searching but didnt exit the search bar
+
+        if (!currentQuery.isEmpty()) {
+            String query = currentQuery.toLowerCase();
+            java.util.Iterator<Makeover> iterator = displayList.iterator();
+
+            while (iterator.hasNext()) {
+                Makeover m = iterator.next();
+                // remove if not in search query
+                if (!m.getName().toLowerCase().contains(query)) {
+                    iterator.remove();
+                }
+            }
+        }
+
+
+        int columns = (displayList.size() > 8) ? 2 : 1;
+        ((GridLayoutManager) rvItems.getLayoutManager()).setSpanCount(columns);
+        myAdapter.notifyDataSetChanged();
     }
 
     private void applySearch() {

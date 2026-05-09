@@ -43,7 +43,7 @@ public class DatabaseManager {
 
     public static final String EFFECTS_URL = "https://a25pt305.studev.groept.be/upload/assets/effects/";
 
-    public static final String TARGET_URL = "https://a25pt305.studev.be/upload.php";
+    public static final String TARGET_URL = "https://a25pt305.studev.groept.be/file_upload.php";
 
     private static final OkHttpClient client = createUnsafeOkHttpClient();
     private static int userid = -1;
@@ -342,9 +342,9 @@ public class DatabaseManager {
         });
     }
 
-    public static void addPurchase(int clientId, int makeoverId, SimpleCallback simpleCallback) {
+    public static void addPurchase(int clientId, int makeoverId, SimpleCallback callback) {
 
-        postToAPI("add_purchase", simpleCallback,
+        postToAPI("add_purchase", callback,
                 String.valueOf(clientId),
                 String.valueOf(makeoverId)
         );
@@ -421,17 +421,58 @@ public class DatabaseManager {
 
     // Endpoint: POST create_makeover/{userId}/{name}
     // Returns the new makeoverID in response (backend should return [{makeoverID: X}])
-    public static void createMakeover(int userId, String name, SimpleCallback callback) {
+    public static void createMakeover(int userId, String name,String serverFileName, SimpleCallback callback) {
         postToAPI("create_makeover", callback,
                 String.valueOf(userId),
-                name);
+                name,
+                serverFileName);
     }
 
     // Endpoint: POST update_makeover/{makeoverId}/{name}
-    public static void updateMakeover(int makeoverId, String name, SimpleCallback callback) {
+    public static void updateMakeover(int makeoverId, String name, String serverFileName , SimpleCallback callback) {
         postToAPI("update_makeover", callback,
                 String.valueOf(makeoverId),
-                name);
+                name,
+                serverFileName);
+        // no endpoint yet !!
+    }
+
+    public interface UploadCallback {
+        void onSuccess(String fileNameFromServer);
+        void onFailure(String error);
+    }
+
+    public static void uploadFile(byte[] fileBytes, String fileName, UploadCallback callback) {
+        executor.execute(() -> {
+            try {
+                okhttp3.RequestBody requestBody = new okhttp3.MultipartBody.Builder()
+                        .setType(okhttp3.MultipartBody.FORM)
+                        // The file key must match $_FILES['file'] in php
+                        .addFormDataPart(
+                                "file",
+                                fileName,
+                                okhttp3.RequestBody.create(okhttp3.MediaType.parse("application/octet-stream"), fileBytes))
+                        .build();
+
+                Request request = new Request.Builder().url(TARGET_URL).post(requestBody).build();
+
+                try (Response response = client.newCall(request).execute()) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        JSONObject jsonResponse = new JSONObject(response.body().string());
+                        if (jsonResponse.getString("status").equals("success")) {
+                            String newName = jsonResponse.getString("filename");
+                            mainHandler.post(() -> callback.onSuccess(newName));
+                        } else {
+                            mainHandler.post(() -> callback.onFailure(jsonResponse.optString("message", "Upload failed")));
+                        }
+                    } else {
+                        mainHandler.post(() -> callback.onFailure("Server Error: " + response.code()));
+                    }
+                }
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onFailure(e.getMessage()));
+            }
+        });
     }
 
     public static void fetchTagsForMakeover(int makeoverId, APICallback callback) {
