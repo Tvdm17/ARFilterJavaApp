@@ -39,9 +39,11 @@ public class DatabaseManager {
 
     private static final String BASE_URL = "https://studev.groept.be/api/a25pt305/";
 
-    public static final String PREVIEW_URL = "https://a25pt305.studev.groept.be/assets/previews/";
+    public static final String PREVIEW_URL = "https://a25pt305.studev.groept.be/upload/assets/previews/";
 
-    public static final String EFFECTS_URL = "https://a25pt305.studev.groept.be/assets/effects/";
+    public static final String EFFECTS_URL = "https://a25pt305.studev.groept.be/upload/assets/effects/";
+
+    public static final String TARGET_URL = "https://a25pt305.studev.be/upload.php";
 
     private static final OkHttpClient client = createUnsafeOkHttpClient();
     private static int userid = -1;
