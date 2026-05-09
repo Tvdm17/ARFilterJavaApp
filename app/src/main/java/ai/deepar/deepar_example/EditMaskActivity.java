@@ -1,8 +1,10 @@
 package ai.deepar.deepar_example;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -20,6 +22,11 @@ import androidx.core.view.WindowInsetsCompat;
 import com.bumptech.glide.Glide;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class EditMaskActivity extends DrawerMenu {
 
@@ -41,6 +48,7 @@ public class EditMaskActivity extends DrawerMenu {
                     if (mediaUri != null && thumbViews[activeSlot] != null) {
                         Glide.with(this).load(mediaUri).into(thumbViews[activeSlot]);
                         // TODO: upload to server once upload_makeover_preview endpoint is available
+                        startUpload(mediaUri); // php upload
                     }
                 }
             });
@@ -131,9 +139,9 @@ public class EditMaskActivity extends DrawerMenu {
             };
 
             if (isEditMode) {
-                DatabaseManager.updateMakeover(makeoverId, name, onDone);
+                DatabaseManager.updateMakeover(makeoverId, name, serverFileName, onDone);
             } else {
-                DatabaseManager.createMakeover(DatabaseManager.getUserid(), name, onDone);
+                DatabaseManager.createMakeover(DatabaseManager.getUserid(), name,serverFileName, onDone);
             }
         });
 
@@ -142,6 +150,61 @@ public class EditMaskActivity extends DrawerMenu {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+
+    private String serverFileName = ""; // var to store filename returned buy php
+
+    private void startUpload(Uri uri) {
+
+        try {
+            // Open a stream from the URI and read it into a byte array
+            InputStream inputStream = getContentResolver().openInputStream(uri);
+            byte[] fileBytes = getBytes(inputStream); // Helper method below
+
+            // Get the real filename from the Uri
+//            When you pick a file using a URI in Android,
+//            you don't get a direct file path like C:/Downloads/file.jpg
+//            you get a reference to a database entry managed by the Android system
+//            the cursor allows you to "read" the metadata of that file, like its name and size
+            String fileName = "file_" + System.currentTimeMillis();
+            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            if(cursor != null && cursor.moveToFirst()){
+                int nameindex  = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                fileName = cursor.getString(nameindex);
+                cursor.close();
+            }
+            // no fall back, add if it's a "file" URI or if the cursor failed
+
+
+            DatabaseManager.uploadFile(fileBytes, fileName ,new DatabaseManager.UploadCallback() {
+                @Override
+                public void onSuccess(String fileNameFromServer) {
+                    serverFileName = fileNameFromServer;
+                    runOnUiThread(() -> Toast.makeText(EditMaskActivity.this, "File ready", Toast.LENGTH_SHORT).show());
+                }
+
+                @Override
+                public void onFailure(String error) {
+                    // Toast.makeText(EditMaskActivity.this, "Save failed", Toast.LENGTH_SHORT).show();
+                    runOnUiThread(() -> Toast.makeText(EditMaskActivity.this, "Upload failed: " + error, Toast.LENGTH_SHORT).show());
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public byte[] getBytes(InputStream input) throws IOException {
+
+        ByteArrayOutputStream bytebuffer = new ByteArrayOutputStream();
+        int buffersize = 1024;
+        byte[] buffer =  new byte[buffersize];
+        int len  = 0;
+        while((len = input.read(buffer)) != -1 ){
+            bytebuffer.write(buffer, 0, len);
+        }
+        return bytebuffer.toByteArray();
+
     }
 
     private void prefillFields(int makeoverId) {
