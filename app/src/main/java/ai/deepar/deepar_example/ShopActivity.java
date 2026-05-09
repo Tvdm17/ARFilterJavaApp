@@ -71,38 +71,42 @@ public class ShopActivity extends DrawerMenu implements FilterDialogFragment.OnF
             }
         });
 
-        int id = DatabaseManager.getUserid();
-        DatabaseManager.fetchShopItems(id, new DatabaseManager.APICallback() {
+    }
+
+    @Override
+    public void onFiltersApplied(List<String> selectedCategories) {
+        activeFilters = selectedCategories;
+        applyFilters();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        DatabaseManager.fetchShopItems(DatabaseManager.getUserid(), new DatabaseManager.APICallback() {
             @Override
             public void onSuccess(JSONArray response) {
                 itemList.clear();
-                DatabaseManager.shopItems.clear(); // shopItems !!!!!!!!!
-                if(response.length() == 0){
+                DatabaseManager.shopItems.clear();
+                if (response.length() == 0) {
                     Toast.makeText(ShopActivity.this, "You own all makeovers, come back later.", Toast.LENGTH_LONG).show();
-                    // message to show if there you own all makeovers
                 }
                 try {
-                    for(int i = 0; i < response.length(); i++){
-
+                    for (int i = 0; i < response.length(); i++) {
                         JSONObject obj = response.getJSONObject(i);
-
                         ShopItem newItem = new ShopItem(
-                           obj.getInt("makeoverID"),
-                           obj.getString("name"),
-                           obj.getString("deeparFile"),
-                           obj.getString("imagePreview"),
-                           obj.optDouble("price", 0.0),
-                           obj.optDouble("averageRating",0.0)
+                                obj.getInt("makeoverID"),
+                                obj.getString("name"),
+                                obj.getString("deeparFile"),
+                                obj.getString("imagePreview"),
+                                obj.optDouble("price", 0.0),
+                                obj.optDouble("averageRating", 0.0)
                         );
-
                         itemList.add(newItem);
                         DatabaseManager.shopItems.add(newItem);
                     }
-
                     applyFilters();
                     fetchTagsForAll();
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -112,20 +116,11 @@ public class ShopActivity extends DrawerMenu implements FilterDialogFragment.OnF
                 Toast.makeText(ShopActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
-
-        // CAN NOW ADAPT THE RECYCLEVIEW!!
-
-    }
-
-    @Override
-    public void onFiltersApplied(List<String> selectedCategories) {
-        activeFilters = selectedCategories;
-        applyFilters();
     }
 
     private void applyFilters() {
         displayList.clear();
-        for (ShopItem item : itemList) {
+        for (ShopItem item : DatabaseManager.shopItems) {
             if (matchesSearch(item) && matchesTagFilter(item)) {
                 displayList.add(item);
             }

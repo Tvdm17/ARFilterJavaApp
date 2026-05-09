@@ -67,25 +67,34 @@ public class CreatorHomeActivity extends DrawerMenu {
         findViewById(R.id.btnAddMask).setOnClickListener(v ->
                 startActivity(new Intent(this, EditMaskActivity.class)));
 
-        // ── Load creator's makeovers ─────────────────────────────────────────
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         DatabaseManager.fetchCreatorMakeovers(DatabaseManager.getUserid(), new DatabaseManager.APICallback() {
             @Override
             public void onSuccess(JSONArray response) {
                 DatabaseManager.creatorMakeovers.clear();
-                try {
-                    for (int i = 0; i < response.length(); i++) {
+                for (int i = 0; i < response.length(); i++) {
+                    try {
                         JSONObject obj = response.getJSONObject(i);
                         DatabaseManager.creatorMakeovers.add(new Makeover(
                                 obj.optInt("makeoverID", 0),
-                                obj.getString("name"),
-                                obj.getString("deeparFile"),
+                                obj.optString("name", "Unnamed"),
+                                obj.optString("deeparFile", ""),
                                 obj.optString("imagePreview", "default.jpg"),
                                 obj.optDouble("price", 0.0),
                                 obj.optDouble("averageRating", 0.0)
                         ));
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
                 applySearch();
             }
@@ -94,12 +103,6 @@ public class CreatorHomeActivity extends DrawerMenu {
             public void onFailure(String message) {
                 Toast.makeText(CreatorHomeActivity.this, "Could not load your masks: " + message, Toast.LENGTH_SHORT).show();
             }
-        });
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
         });
     }
 

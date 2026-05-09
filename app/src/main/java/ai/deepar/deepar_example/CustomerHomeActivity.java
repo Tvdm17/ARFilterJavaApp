@@ -45,8 +45,6 @@ public class CustomerHomeActivity extends DrawerMenu {
             DatabaseManager.setUserid(recover);
         }
 
-        int id = DatabaseManager.getUserid();
-
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -69,17 +67,18 @@ public class CustomerHomeActivity extends DrawerMenu {
             }
         });
 
-        DatabaseManager.fetchOwnedMakeovers(id, new DatabaseManager.APICallback() {
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        DatabaseManager.fetchOwnedMakeovers(DatabaseManager.getUserid(), new DatabaseManager.APICallback() {
             @Override
             public void onSuccess(JSONArray response) {
                 try {
-
-                    DatabaseManager.ownedMakeovers.clear(); // avoid duplicates
-
+                    DatabaseManager.ownedMakeovers.clear();
                     for (int i = 0; i < response.length(); i++) {
                         JSONObject obj = response.getJSONObject(i);
-
-                        // get data from DB
                         DatabaseManager.ownedMakeovers.add(new Makeover(
                                 obj.optInt("makeoverID", 0),
                                 obj.getString("name"),
@@ -89,9 +88,7 @@ public class CustomerHomeActivity extends DrawerMenu {
                                 obj.optDouble("averageRating", 0.0)
                         ));
                     }
-
                     applySearch();
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -102,7 +99,6 @@ public class CustomerHomeActivity extends DrawerMenu {
                 Toast.makeText(CustomerHomeActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
     private void applySearch() {

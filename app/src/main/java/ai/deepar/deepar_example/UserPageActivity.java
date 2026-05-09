@@ -18,6 +18,7 @@ public class UserPageActivity extends DrawerMenu {
 
     private EditText etChangeUsername, etChangeEmail, etChangePassword;
     private Button btnChangeUsername, btnChangeEmail, btnChangePassword;
+    private TextView tvUsername;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +32,7 @@ public class UserPageActivity extends DrawerMenu {
         etChangeEmail = findViewById(R.id.etChangeEmail);
         etChangePassword = findViewById(R.id.etChangePassword);
 
-        TextView tvUsername = findViewById(R.id.tvUsername);
+        tvUsername = findViewById(R.id.tvUsername);
         tvUsername.setText(DatabaseManager.getUsername());
 
         TextView tvEmail = findViewById(R.id.tvEmail);
@@ -56,15 +57,19 @@ public class UserPageActivity extends DrawerMenu {
             DatabaseManager.postToAPI("update_username", new DatabaseManager.SimpleCallback() {
                 @Override
                 public void onSuccess() {
-                    btnChangePassword.setEnabled(true);
+                    DatabaseManager.setUsername(username);
+                    btnChangeUsername.setEnabled(true);
                     Toast.makeText(UserPageActivity.this, "Username changed successfully!", Toast.LENGTH_SHORT).show();
-                    etChangePassword.setText("");
+                    etChangeUsername.setText("");
+                    tvUsername.setText(username);
+                    android.view.View header = navigationView.getHeaderView(0);
+                    ((TextView) header.findViewById(R.id.tvNavUsername)).setText(username);
                 }
 
                 @Override
                 public void onFailure(String message) {
                     btnChangeUsername.setEnabled(true);
-                    Toast.makeText(UserPageActivity.this, "Username change failed:" + message, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserPageActivity.this, "Username change failed: " + message, Toast.LENGTH_SHORT).show();
                 }
             }, username, String.valueOf(DatabaseManager.getUserid()));
         });
@@ -84,16 +89,15 @@ public class UserPageActivity extends DrawerMenu {
             DatabaseManager.postToAPI("update_email", new DatabaseManager.SimpleCallback() {
                 @Override
                 public void onSuccess() {
-                    btnChangePassword.setEnabled(true);
-                    Toast.makeText(UserPageActivity.this, "Password changed successfully!", Toast.LENGTH_SHORT).show();
-                    etChangePassword.setText("");
+                    btnChangeEmail.setEnabled(true);
+                    Toast.makeText(UserPageActivity.this, "Email changed successfully!", Toast.LENGTH_SHORT).show();
+                    etChangeEmail.setText("");
                 }
 
                 @Override
                 public void onFailure(String message) {
                     btnChangeEmail.setEnabled(true);
-                    Toast.makeText(UserPageActivity.this, "Password change failed:" + message, Toast.LENGTH_SHORT).show();
-
+                    Toast.makeText(UserPageActivity.this, "Email change failed: " + message, Toast.LENGTH_SHORT).show();
                 }
             }, email, String.valueOf(DatabaseManager.getUserid()));
         });
