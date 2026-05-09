@@ -531,6 +531,92 @@
         </androidx.cardview.widget.CardView>
 
         <!-- ══════════════════════════════════════
+             DEEPAR FILE CARD
+             ══════════════════════════════════════ -->
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardDeepArFile"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/backgroundPrimary"
+            app:layout_constraintTop_toBottomOf="@id/cardPhotos"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="14dp">
+
+                <TextView
+                    android:id="@+id/tvDeepArLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="DeepAR effect file"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="13sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/btnPickDeepAr" />
+
+                <!--
+                    TODO: Open .deepar file picker
+                    btnPickDeepAr.setOnClickListener(v -> openDeepArPicker());
+                -->
+                <ImageView
+                    android:id="@+id/btnPickDeepAr"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/edit_icon"
+                    app:tint="@color/textSecondary"
+                    android:scaleType="centerInside"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:contentDescription="Pick DeepAR file"
+                    app:layout_constraintTop_toTopOf="@id/tvDeepArLabel"
+                    app:layout_constraintBottom_toBottomOf="@id/tvDeepArLabel"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <View
+                    android:id="@+id/dividerDeepAr"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:background="@color/dividerLight"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintTop_toBottomOf="@id/tvDeepArLabel"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <!--
+                    Shows the selected filename, e.g. "my_effect.deepar".
+                    TODO: Pre-fill fields if editing existing mask
+                    tvDeepArFileName.setText(mask.getDeepArFileName());
+                -->
+                <TextView
+                    android:id="@+id/tvDeepArFileName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="No file selected"
+                    android:textColor="@color/textMuted"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:gravity="end"
+                    android:paddingTop="10dp"
+                    android:ellipsize="start"
+                    android:maxLines="1"
+                    app:layout_constraintTop_toBottomOf="@id/dividerDeepAr"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- ══════════════════════════════════════
              TAGS CARD
              ══════════════════════════════════════ -->
 
@@ -544,7 +630,7 @@
             app:cardCornerRadius="12dp"
             app:cardElevation="2dp"
             app:cardBackgroundColor="@color/backgroundPrimary"
-            app:layout_constraintTop_toBottomOf="@id/cardPhotos"
+            app:layout_constraintTop_toBottomOf="@id/cardDeepArFile"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 

@@ -26,6 +26,8 @@ public class EditMaskActivity extends DrawerMenu {
     private EditText  etMaskName;
     private ChipGroup chipGroupTags;
     private EditText  etNewTag;
+    private TextView  tvDeepArFileName;
+    private Uri       deepArFileUri = null;
 
     // thumbnail previews: index 0 = main, 1–4 = secondary slots
     private final ImageView[] thumbViews = new ImageView[5];
@@ -43,6 +45,17 @@ public class EditMaskActivity extends DrawerMenu {
                 }
             });
 
+    private final ActivityResultLauncher<Intent> deepArPickerLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    deepArFileUri = result.getData().getData();
+                    if (deepArFileUri != null) {
+                        String path = deepArFileUri.getLastPathSegment();
+                        tvDeepArFileName.setText(path != null ? path : deepArFileUri.toString());
+                    }
+                }
+            });
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,15 +67,19 @@ public class EditMaskActivity extends DrawerMenu {
         TextView tvUsername = findViewById(R.id.tvUsername);
         tvUsername.setText(DatabaseManager.getUsername());
 
-        etMaskName    = findViewById(R.id.etMaskName);
-        chipGroupTags = findViewById(R.id.chipGroupTags);
-        etNewTag      = findViewById(R.id.etNewTag);
+        etMaskName      = findViewById(R.id.etMaskName);
+        chipGroupTags   = findViewById(R.id.chipGroupTags);
+        etNewTag        = findViewById(R.id.etNewTag);
+        tvDeepArFileName = findViewById(R.id.tvDeepArFileName);
 
         thumbViews[0] = findViewById(R.id.ivThumbMain);
         thumbViews[1] = findViewById(R.id.ivThumb1);
         thumbViews[2] = findViewById(R.id.ivThumb2);
         thumbViews[3] = findViewById(R.id.ivThumb3);
         thumbViews[4] = findViewById(R.id.ivThumb4);
+
+        // ── DeepAR file picker ───────────────────────────────────────────────
+        findViewById(R.id.btnPickDeepAr).setOnClickListener(v -> openDeepArPicker());
 
         // ── Media pickers ────────────────────────────────────────────────────
         findViewById(R.id.btnPickMain).setOnClickListener(v -> openMediaPicker(0));
@@ -142,6 +159,13 @@ public class EditMaskActivity extends DrawerMenu {
         Glide.with(this)
                 .load(DatabaseManager.PREVIEW_URL + item.getPreviewImage())
                 .into(thumbViews[0]);
+    }
+
+    private void openDeepArPicker() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        deepArPickerLauncher.launch(intent);
     }
 
     private void openMediaPicker(int slot) {
