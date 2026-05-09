@@ -17,6 +17,9 @@
 apply plugin: 'com.android.application'
 
 android {
+    // [ANDROID] compileSdk: which SDK version to compile against (access to API 36 classes).
+    compileSdk 36
+
     defaultConfig {
         // [ANDROID] applicationId is the unique identifier for this app on the device
         // and on the Play Store. This MUST match the DeepAR license key domain.
@@ -30,10 +33,6 @@ android {
         // [ANDROID] targetSdkVersion: which Android API version the app is designed for.
         // Affects behavior flags (e.g. scoped storage, notification channels).
         targetSdkVersion 36
-
-        // [ANDROID] compileSdk: which SDK version to compile against (access to API 36 classes).
-        // Should match targetSdkVersion.
-        compileSdk 36
 
         // [ANDROID] Version code: integer that must increase with each Play Store release.
         versionCode 1
