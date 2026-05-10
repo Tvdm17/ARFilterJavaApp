@@ -556,6 +556,17 @@ public class DatabaseManager {
         });
     }
 
+    public static void fetchSecondaryImages(int makeoverId, APICallback callback) {
+        executor.execute(() -> {
+            try {
+                JSONArray response = fetchFromAPI("get_makeover_images/" + makeoverId);
+                mainHandler.post(() -> callback.onSuccess(response));
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onFailure(e.getMessage()));
+            }
+        });
+    }
+
     public static boolean isIsCustomer() {
         return isCustomer;
     }
