@@ -31,6 +31,8 @@ public class ItemCardActivity extends DrawerMenu implements LeaveReviewDialogFra
     private List<Review> reviewList;
     private ReviewAdapter reviewAdapter;
 
+    private String currentMainFileName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +50,8 @@ public class ItemCardActivity extends DrawerMenu implements LeaveReviewDialogFra
             finish();
             return;
         }
+
+        currentMainFileName = currentItem.getPreviewImage();
 
         TextView tvUsername = findViewById(R.id.tvUsername);
         tvUsername.setText(DatabaseManager.getUsername());
@@ -161,9 +165,15 @@ public class ItemCardActivity extends DrawerMenu implements LeaveReviewDialogFra
     private void setupThumbClick(ImageView thumb, String fileName) {
         thumb.setOnClickListener(v -> {
             ImageView ivMainImage = findViewById(R.id.ivMainImage);
+            String oldmain = currentMainFileName;
+            currentMainFileName = fileName;
             Glide.with(this)
-                    .load(DatabaseManager.PREVIEW_URL + fileName)
+                    .load(DatabaseManager.PREVIEW_URL + currentMainFileName)
                     .into(ivMainImage);
+            Glide.with(this)
+                    .load(DatabaseManager.PREVIEW_URL + oldmain)
+                    .into(thumb);
+            setupThumbClick(thumb, oldmain);
         });
     }
 
