@@ -25,10 +25,11 @@ public class ShopActivity extends DrawerMenu implements FilterDialogFragment.OnF
 
     private ShopAdapter myAdapter;
     private final List<ShopItem> itemList = new ArrayList<>();
-    private final List<ShopItem> displayList = new ArrayList<>();
+    private List<ShopItem> displayList = new ArrayList<>();
 
     private String currentQuery = "";
     private List<String> activeFilters = new ArrayList<>();
+    private List<String> availableTags = new ArrayList<>();
     private RecyclerView rvItems;
 
     @Override
@@ -57,6 +58,8 @@ public class ShopActivity extends DrawerMenu implements FilterDialogFragment.OnF
         ivFilter.setOnClickListener(v -> {
             FilterDialogFragment dialog = new FilterDialogFragment();
             dialog.setOnFiltersAppliedListener(this);
+            dialog.setAvailableTags(availableTags);
+            dialog.setPreSelectedTags(activeFilters);
             dialog.show(getSupportFragmentManager(), "FilterDialog");
         });
 
@@ -82,6 +85,21 @@ public class ShopActivity extends DrawerMenu implements FilterDialogFragment.OnF
     @Override
     protected void onResume() {
         super.onResume();
+        DatabaseManager.fetchAllTags(new DatabaseManager.APICallback() {
+            @Override
+            public void onSuccess(JSONArray response) {
+                availableTags.clear();
+                for (int i = 0; i < response.length(); i++) {
+                    JSONObject obj = response.optJSONObject(i);
+                    if (obj != null) {
+                        String tag = obj.optString("tagName", obj.optString("group", ""));
+                        if (!tag.isEmpty() && !availableTags.contains(tag)) availableTags.add(tag);
+                    }
+                }
+            }
+            @Override
+            public void onFailure(String message) {}
+        });
         DatabaseManager.fetchShopItems(DatabaseManager.getUserid(), new DatabaseManager.APICallback() {
             @Override
             public void onSuccess(JSONArray response) {
@@ -136,9 +154,11 @@ public class ShopActivity extends DrawerMenu implements FilterDialogFragment.OnF
 
     private boolean matchesTagFilter(ShopItem item) {
         if (activeFilters.isEmpty()) return true;
-        if (!item.isTagsLoaded()) return true;
+        if (!item.isTagsLoaded()) return false;
         for (String filter : activeFilters) {
-            if (item.getTags().contains(filter)) return true;
+            for (String tag : item.getTags()) {
+                if (tag.equalsIgnoreCase(filter)) return true;
+            }
         }
         return false;
     }
@@ -154,8 +174,8 @@ public class ShopActivity extends DrawerMenu implements FilterDialogFragment.OnF
                     for (int i = 0; i < response.length(); i++) {
                         JSONObject obj = response.optJSONObject(i);
                         if (obj != null) {
-                            String group = obj.optString("group", "");
-                            if (!group.isEmpty()) tags.add(group);
+                            String tag = obj.optString("tagName", obj.optString("group", ""));
+                            if (!tag.isEmpty()) tags.add(tag);
                         }
                     }
                     item.setTags(tags);

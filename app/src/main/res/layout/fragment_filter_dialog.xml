@@ -24,65 +24,7 @@
         android:layout_height="wrap_content"
         app:singleSelection="false"
         app:chipSpacingHorizontal="8dp"
-        app:chipSpacingVertical="8dp">
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipAverageLook"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="@string/filter_average_look"
-            android:textSize="14sp"
-            android:checkable="true"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            app:chipBackgroundColor="@color/backgroundSecondary"
-            app:checkedIconTint="@color/colorPrimary"
-            app:chipStrokeColor="@color/colorPrimary"
-            app:chipStrokeWidth="1dp" />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipNatural"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="@string/filter_natural"
-            android:textSize="14sp"
-            android:checkable="true"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            app:chipBackgroundColor="@color/backgroundSecondary"
-            app:checkedIconTint="@color/colorPrimary"
-            app:chipStrokeColor="@color/colorPrimary"
-            app:chipStrokeWidth="1dp" />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipMedium"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="@string/filter_medium"
-            android:textSize="14sp"
-            android:checkable="true"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            app:chipBackgroundColor="@color/backgroundSecondary"
-            app:checkedIconTint="@color/colorPrimary"
-            app:chipStrokeColor="@color/colorPrimary"
-            app:chipStrokeWidth="1dp" />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipBright"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="@string/filter_bright"
-            android:textSize="14sp"
-            android:checkable="true"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            app:chipBackgroundColor="@color/backgroundSecondary"
-            app:checkedIconTint="@color/colorPrimary"
-            app:chipStrokeColor="@color/colorPrimary"
-            app:chipStrokeWidth="1dp" />
-
-    </com.google.android.material.chip.ChipGroup>
+        app:chipSpacingVertical="8dp" />
 
     <LinearLayout
         style="?android:attr/buttonBarStyle"

@@ -152,6 +152,8 @@ public class DatabaseManager {
                         setUserid(userId);
                         setEmail(userEmail);
 
+                        Log.d("LOGIN_ROLE", "check_user full obj: " + userObj);
+
                         JSONArray typeResponse = fetchFromAPI("check_usertype/" + userId);
                         if (typeResponse != null && typeResponse.length() > 0) {
                             JSONObject typeObj = typeResponse.optJSONObject(0);
@@ -499,6 +501,17 @@ public class DatabaseManager {
         executor.execute(() -> {
             try {
                 JSONArray response = fetchFromAPI("get_makeover_tags/" + makeoverId);
+                mainHandler.post(() -> callback.onSuccess(response));
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onFailure(e.getMessage()));
+            }
+        });
+    }
+
+    public static void fetchAllTags(APICallback callback) {
+        executor.execute(() -> {
+            try {
+                JSONArray response = fetchFromAPI("get_makeover_tags");
                 mainHandler.post(() -> callback.onSuccess(response));
             } catch (Exception e) {
                 mainHandler.post(() -> callback.onFailure(e.getMessage()));

@@ -1,44 +1,40 @@
 package ai.deepar.deepar_example;
 
+import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Filter popup shown when the user taps the filter icon in ShopActivity.
- * Displays category chips (averagelook / natural / medium / bright) that map to
- * the `group` column in the `tag` table.
- *
- * When DB is ready, replace the hardcoded chips in fragment_filter_dialog.xml with
- * chips built dynamically from:
- *   SELECT DISTINCT `group` FROM tag ORDER BY `group`
- *
- * Usage from ShopActivity:
- *   FilterDialogFragment dialog = new FilterDialogFragment();
- *   dialog.setOnFiltersAppliedListener(this);   // ShopActivity implements OnFiltersApplied
- *   dialog.show(getSupportFragmentManager(), "FilterDialog");
- */
 public class FilterDialogFragment extends DialogFragment {
 
-    /**
-     * Callback interface — ShopActivity implements this to receive the list of
-     * selected category names when the user taps Apply.
-     */
     public interface OnFiltersApplied {
         void onFiltersApplied(List<String> selectedCategories);
     }
 
     private OnFiltersApplied listener;
+    private List<String> availableTags = new ArrayList<>();
+    private List<String> preSelectedTags = new ArrayList<>();
 
     public void setOnFiltersAppliedListener(OnFiltersApplied listener) {
         this.listener = listener;
+    }
+
+    public void setAvailableTags(List<String> tags) {
+        this.availableTags = new ArrayList<>(tags);
+    }
+
+    public void setPreSelectedTags(List<String> tags) {
+        this.preSelectedTags = new ArrayList<>(tags);
     }
 
     @Override
@@ -64,11 +60,11 @@ public class FilterDialogFragment extends DialogFragment {
         Button btnClear = view.findViewById(R.id.btnClearFilter);
         Button btnApply = view.findViewById(R.id.btnApplyFilter);
 
-        // Clear deselects all chips without closing the dialog
+        buildChips(chipGroup);
+
         btnClear.setOnClickListener(v -> chipGroup.clearCheck());
 
         btnApply.setOnClickListener(v -> {
-            // Collect the text of every checked chip — these are the selected category names
             List<String> selected = new ArrayList<>();
             for (int id : chipGroup.getCheckedChipIds()) {
                 Chip chip = view.findViewById(id);
@@ -77,5 +73,42 @@ public class FilterDialogFragment extends DialogFragment {
             if (listener != null) listener.onFiltersApplied(selected);
             dismiss();
         });
+    }
+
+    private void buildChips(ChipGroup chipGroup) {
+        chipGroup.removeAllViews();
+
+        if (availableTags.isEmpty()) {
+            TextView empty = new TextView(requireContext());
+            empty.setText("No filters available.");
+            empty.setTextColor(ContextCompat.getColor(requireContext(), R.color.textPrimary));
+            chipGroup.addView(empty);
+            return;
+        }
+
+        int heightPx = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 48, getResources().getDisplayMetrics());
+        float strokePx = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics());
+
+        ColorStateList bgColor = ColorStateList.valueOf(
+                ContextCompat.getColor(requireContext(), R.color.backgroundSecondary));
+        ColorStateList accentColor = ColorStateList.valueOf(
+                ContextCompat.getColor(requireContext(), R.color.colorPrimary));
+
+        for (String tag : availableTags) {
+            Chip chip = new Chip(requireContext());
+            chip.setId(View.generateViewId());
+            chip.setText(tag);
+            chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            chip.setMinHeight(heightPx);
+            chip.setCheckable(true);
+            chip.setChecked(preSelectedTags.contains(tag));
+            chip.setChipBackgroundColor(bgColor);
+            chip.setCheckedIconTint(accentColor);
+            chip.setChipStrokeColor(accentColor);
+            chip.setChipStrokeWidth(strokePx);
+            chipGroup.addView(chip);
+        }
     }
 }
