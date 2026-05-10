@@ -519,6 +519,17 @@ public class DatabaseManager {
         });
     }
 
+    public static void fetchPopularTags(APICallback callback) {
+        executor.execute(() -> {
+            try {
+                JSONArray response = fetchFromAPI("get_popular_tags");
+                mainHandler.post(() -> callback.onSuccess(response));
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onFailure(e.getMessage()));
+            }
+        });
+    }
+
     public static boolean isItemOwned(int id){
         for(Makeover m : ownedMakeovers){
             if(m.getId() == id){

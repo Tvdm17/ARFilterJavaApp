@@ -5,7 +5,14 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -24,10 +31,14 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
-import java.io.ByteArrayInputStream;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EditMaskActivity extends DrawerMenu {
 
@@ -35,6 +46,7 @@ public class EditMaskActivity extends DrawerMenu {
     private ChipGroup chipGroupTags;
     private EditText  etNewTag;
     private TextView  tvDeepArFileName;
+    private TextView  tvTagSuggestions;
     private Uri       deepArFileUri = null;
 
     // thumbnail previews: index 0 = main, 1–4 = secondary slots
@@ -87,10 +99,13 @@ public class EditMaskActivity extends DrawerMenu {
         TextView tvUsername = findViewById(R.id.tvUsername);
         tvUsername.setText(DatabaseManager.getUsername());
 
-        etMaskName      = findViewById(R.id.etMaskName);
-        chipGroupTags   = findViewById(R.id.chipGroupTags);
-        etNewTag        = findViewById(R.id.etNewTag);
-        tvDeepArFileName = findViewById(R.id.tvDeepArFileName);
+        etMaskName        = findViewById(R.id.etMaskName);
+        chipGroupTags     = findViewById(R.id.chipGroupTags);
+        etNewTag          = findViewById(R.id.etNewTag);
+        tvDeepArFileName  = findViewById(R.id.tvDeepArFileName);
+        tvTagSuggestions  = findViewById(R.id.tvTagSuggestions);
+
+        loadPopularTags();
 
         thumbViews[0] = findViewById(R.id.ivThumbMain);
         thumbViews[1] = findViewById(R.id.ivThumb1);
@@ -341,6 +356,49 @@ public class EditMaskActivity extends DrawerMenu {
         intent.setType("*/*");
         intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*"});
         mediaPickerLauncher.launch(intent);
+    }
+
+    private void loadPopularTags() {
+        DatabaseManager.fetchPopularTags(new DatabaseManager.APICallback() {
+            @Override
+            public void onSuccess(JSONArray response) {
+                List<String> suggestions = new ArrayList<>();
+                for (int i = 0; i < response.length(); i++) {
+                    JSONObject obj = response.optJSONObject(i);
+                    if (obj != null) {
+                        String tag = obj.optString("tagName", "");
+                        if (!tag.isEmpty()) suggestions.add(tag);
+                    }
+                }
+                if (suggestions.isEmpty()) return;
+
+                String prefix = "popular: ";
+                String joined = prefix + TextUtils.join(", ", suggestions);
+                SpannableString ss = new SpannableString(joined);
+                int start = prefix.length();
+                for (String tag : suggestions) {
+                    int end = start + tag.length();
+                    final String t = tag;
+                    ss.setSpan(new ClickableSpan() {
+                        @Override
+                        public void onClick(View widget) { addTag(t); }
+                        @Override
+                        public void updateDrawState(TextPaint ds) {
+                            ds.setColor(ContextCompat.getColor(EditMaskActivity.this, R.color.colorPrimary));
+                            ds.setUnderlineText(false);
+                        }
+                    }, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    start = end + 2;
+                }
+
+                tvTagSuggestions.setText(ss);
+                tvTagSuggestions.setMovementMethod(LinkMovementMethod.getInstance());
+                tvTagSuggestions.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onFailure(String message) {}
+        });
     }
 
     private void addTag(String tagText) {
