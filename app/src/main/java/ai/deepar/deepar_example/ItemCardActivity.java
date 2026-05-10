@@ -31,6 +31,8 @@ public class ItemCardActivity extends DrawerMenu implements LeaveReviewDialogFra
     private List<Review> reviewList;
     private ReviewAdapter reviewAdapter;
 
+    private String currentMainFileName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +51,8 @@ public class ItemCardActivity extends DrawerMenu implements LeaveReviewDialogFra
             return;
         }
 
+        currentMainFileName = currentItem.getPreviewImage();
+
         TextView tvUsername = findViewById(R.id.tvUsername);
         tvUsername.setText(DatabaseManager.getUsername());
 
@@ -56,7 +60,41 @@ public class ItemCardActivity extends DrawerMenu implements LeaveReviewDialogFra
         tvMaskName.setText(currentItem.getName());
 
         ImageView ivMainImage = findViewById(R.id.ivMainImage);
+
+        ImageView[] thumbs = {
+                findViewById(R.id.ivThumb1),
+                findViewById(R.id.ivThumb2),
+                findViewById(R.id.ivThumb3),
+                findViewById(R.id.ivThumb4)
+        };
+
         Glide.with(this).load(DatabaseManager.PREVIEW_URL + currentItem.getPreviewImage()).into(ivMainImage);
+
+        // load secondary images
+        DatabaseManager.fetchSecondaryImages(currentItem.getId(), new DatabaseManager.APICallback() {
+            @Override
+            public void onSuccess(JSONArray response) {
+                try {
+                    for (int i = 0; i < response.length() && i < thumbs.length; i++) {
+                        String fileName = response.getJSONObject(i).getString("fileName");
+                        String fullUrl = DatabaseManager.PREVIEW_URL + fileName;
+
+                        Glide.with(ItemCardActivity.this)
+                                .load(fullUrl)
+                                .centerCrop()
+                                .into(thumbs[i]);
+                        setupThumbClick(thumbs[i], fileName);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(String message) {
+                // If it fails, the thumbs just stay empty/default
+            }
+        });
 
         // ── Add / Remove button ──────────────────────────────────────────────
         Button btnAddDelete   = findViewById(R.id.btnAddDelete);
@@ -121,6 +159,21 @@ public class ItemCardActivity extends DrawerMenu implements LeaveReviewDialogFra
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+    }
+
+    private void setupThumbClick(ImageView thumb, String fileName) {
+        thumb.setOnClickListener(v -> {
+            ImageView ivMainImage = findViewById(R.id.ivMainImage);
+            String oldmain = currentMainFileName;
+            currentMainFileName = fileName;
+            Glide.with(this)
+                    .load(DatabaseManager.PREVIEW_URL + currentMainFileName)
+                    .into(ivMainImage);
+            Glide.with(this)
+                    .load(DatabaseManager.PREVIEW_URL + oldmain)
+                    .into(thumb);
+            setupThumbClick(thumb, oldmain);
         });
     }
 

@@ -3,6 +3,7 @@ package ai.deepar.deepar_example;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,7 +15,11 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
 
+import org.json.JSONArray;
+
 public class CreatorItemCardActivity extends DrawerMenu {
+
+    private String currentMainFileName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +38,8 @@ public class CreatorItemCardActivity extends DrawerMenu {
             return;
         }
 
+        currentMainFileName = item.getPreviewImage();
+
         // ── Top bar ──────────────────────────────────────────────────────────
         TextView tvUsername = findViewById(R.id.tvUsername);
         tvUsername.setText(DatabaseManager.getUsername());
@@ -42,20 +49,42 @@ public class CreatorItemCardActivity extends DrawerMenu {
 
         // ── Main image ───────────────────────────────────────────────────────
         ImageView ivMainImage = findViewById(R.id.ivMainImage);
-        Glide.with(this)
-                .load(DatabaseManager.PREVIEW_URL + item.getPreviewImage())
-                .into(ivMainImage);
 
-        // ── Thumbnails (swap main image on tap) ──────────────────────────────
-        ImageView ivThumb1 = findViewById(R.id.ivThumb1);
-        ImageView ivThumb2 = findViewById(R.id.ivThumb2);
-        ImageView ivThumb3 = findViewById(R.id.ivThumb3);
-        ImageView ivThumb4 = findViewById(R.id.ivThumb4);
 
-        ivThumb1.setOnClickListener(v -> swapMainImage(ivMainImage, ivThumb1));
-        ivThumb2.setOnClickListener(v -> swapMainImage(ivMainImage, ivThumb2));
-        ivThumb3.setOnClickListener(v -> swapMainImage(ivMainImage, ivThumb3));
-        ivThumb4.setOnClickListener(v -> swapMainImage(ivMainImage, ivThumb4));
+        ImageView[] thumbs = {
+                findViewById(R.id.ivThumb1),
+                findViewById(R.id.ivThumb2),
+                findViewById(R.id.ivThumb3),
+                findViewById(R.id.ivThumb4)
+        };
+
+        Glide.with(this).load(DatabaseManager.PREVIEW_URL + item.getPreviewImage()).into(ivMainImage);
+
+        // load secondary images
+        DatabaseManager.fetchSecondaryImages(item.getId(), new DatabaseManager.APICallback() {
+            @Override
+            public void onSuccess(JSONArray response) {
+                try {
+                    for (int i = 0; i < response.length() && i < thumbs.length; i++) {
+                        String fileName = response.getJSONObject(i).getString("fileName");
+                        String fullUrl = DatabaseManager.PREVIEW_URL + fileName;
+
+                        Glide.with(CreatorItemCardActivity.this)
+                                .load(fullUrl)
+                                .centerCrop()
+                                .into(thumbs[i]);
+                        setupThumbClick(thumbs[i], fileName);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(String message) {
+                // If it fails, the thumbs just stay empty/default
+            }
+        });
 
         // ── Edit button → EditMaskActivity (edit mode) ───────────────────────
         findViewById(R.id.btnEdit).setOnClickListener(v -> {
@@ -84,10 +113,18 @@ public class CreatorItemCardActivity extends DrawerMenu {
         });
     }
 
-    private void swapMainImage(ImageView main, ImageView thumb) {
-        Drawable mainDrawable  = main.getDrawable();
-        Drawable thumbDrawable = thumb.getDrawable();
-        main.setImageDrawable(thumbDrawable);
-        thumb.setImageDrawable(mainDrawable);
+    private void setupThumbClick(ImageView thumb, String fileName) {
+        thumb.setOnClickListener(v -> {
+            ImageView ivMainImage = findViewById(R.id.ivMainImage);
+            String oldmain = currentMainFileName;
+            currentMainFileName = fileName;
+            Glide.with(this)
+                    .load(DatabaseManager.PREVIEW_URL + currentMainFileName)
+                    .into(ivMainImage);
+            Glide.with(this)
+                    .load(DatabaseManager.PREVIEW_URL + oldmain)
+                    .into(thumb);
+            setupThumbClick(thumb, oldmain);
+        });
     }
 }
