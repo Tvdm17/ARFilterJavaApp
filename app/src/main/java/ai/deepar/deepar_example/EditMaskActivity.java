@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -38,6 +39,13 @@ public class EditMaskActivity extends DrawerMenu {
 
     // thumbnail previews: index 0 = main, 1–4 = secondary slots
     private final ImageView[] thumbViews = new ImageView[5];
+
+    private String[] serverImageNames = new String[5]; // To store the 5 names from PHP
+
+    private String serverFileName = ""; // var to store filename returned buy php
+
+    private String serverDeepArName ="";//name of deeparfile
+
     private int activeSlot = 0;
 
     // single launcher for all 5 image/video slots
@@ -48,7 +56,8 @@ public class EditMaskActivity extends DrawerMenu {
                     if (mediaUri != null && thumbViews[activeSlot] != null) {
                         Glide.with(this).load(mediaUri).into(thumbViews[activeSlot]);
                         // TODO: upload to server once upload_makeover_preview endpoint is available
-                        startUpload(mediaUri); // php upload
+                        startImageUpload(mediaUri, activeSlot); // php image upload
+                        // optional, add names of files to thumbview, just use getFilename(uri)
                     }
                 }
             });
@@ -58,8 +67,11 @@ public class EditMaskActivity extends DrawerMenu {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     deepArFileUri = result.getData().getData();
                     if (deepArFileUri != null) {
-                        String path = deepArFileUri.getLastPathSegment();
-                        tvDeepArFileName.setText(path != null ? path : deepArFileUri.toString());
+                        //String path = deepArFileUri.getLastPathSegment();
+                        // use the new method to get the name instead
+                        tvDeepArFileName.setText(getFileName(deepArFileUri));
+
+                        startDeepArUpload(deepArFileUri);// php deepar upload
                     }
                 }
             });
@@ -121,6 +133,11 @@ public class EditMaskActivity extends DrawerMenu {
                 Toast.makeText(this, "Please enter a mask name", Toast.LENGTH_SHORT).show();
                 return;
             }
+            if (serverImageNames[0] == null || serverDeepArName.isEmpty()) {
+                Toast.makeText(this, "Main image and DeepAR file are required", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             btnSave.setEnabled(false);
 
             DatabaseManager.SimpleCallback onDone = new DatabaseManager.SimpleCallback() {
@@ -139,9 +156,62 @@ public class EditMaskActivity extends DrawerMenu {
             };
 
             if (isEditMode) {
-                DatabaseManager.updateMakeover(makeoverId, name, serverFileName, onDone);
+//                DatabaseManager.updateMakeover(makeoverId, name, serverImageNames[0], serverDeepArName, new DatabaseManager.SimpleCallback() {
+//                    @Override
+//                    public void onSuccess() {
+//                        Toast.makeText(EditMaskActivity.this, "Mask updated!", Toast.LENGTH_SHORT).show();
+//                        finish();
+//                    }
+//
+//                    @Override
+//                    public void onFailure(String message) {
+//                        btnSave.setEnabled(true);
+//                        Toast.makeText(EditMaskActivity.this, "Update failed: " + message, Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+                DatabaseManager.updateMakeover(makeoverId, name, serverFileName, onDone); // old method, new on top
             } else {
-                DatabaseManager.createMakeover(DatabaseManager.getUserid(), name,serverFileName, onDone);
+                DatabaseManager.createMakeover(DatabaseManager.getUserid(), name, serverImageNames[0], serverDeepArName, new DatabaseManager.SimpleCallback() {
+                    @Override
+                    public void onSuccess() {
+
+                        DatabaseManager.getLatestMakeoverId(DatabaseManager.getUserid(), new DatabaseManager.IdCallback() {
+                            @Override
+                            public void onSuccess(int id) {
+                                for(int i =1; i < serverImageNames.length; i++){
+                                    if(serverImageNames[i] != null && !serverImageNames[i].isEmpty()){
+                                        DatabaseManager.addImageToMakeover(serverImageNames[i],
+                                        id,
+                                        new DatabaseManager.SimpleCallback() {
+                                            @Override
+                                            public void onSuccess() { } // image linked
+                                            @Override
+                                            public void onFailure(String message) {} // errormessage
+                                        });
+                                    }
+                                }
+
+                                Toast.makeText(EditMaskActivity.this, "Makeover fully created.", Toast.LENGTH_SHORT).show();
+                                finish();
+
+                            }
+
+                            @Override
+                            public void onFailure(String message) {
+                                btnSave.setEnabled(true);
+                                Toast.makeText(EditMaskActivity.this, "ID Lookup failed: " + message, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(String message) {
+
+                        btnSave.setEnabled(true);
+                        Toast.makeText(EditMaskActivity.this, "save failed" + message,Toast.LENGTH_SHORT).show();
+
+                    }
+                });
             }
         });
 
@@ -152,46 +222,79 @@ public class EditMaskActivity extends DrawerMenu {
         });
     }
 
-    private String serverFileName = ""; // var to store filename returned buy php
 
-    private void startUpload(Uri uri) {
 
-        try {
-            // Open a stream from the URI and read it into a byte array
-            InputStream inputStream = getContentResolver().openInputStream(uri);
-            byte[] fileBytes = getBytes(inputStream); // Helper method below
 
-            // Get the real filename from the Uri
-//            When you pick a file using a URI in Android,
-//            you don't get a direct file path like C:/Downloads/file.jpg
-//            you get a reference to a database entry managed by the Android system
-//            the cursor allows you to "read" the metadata of that file, like its name and size
-            String fileName = "file_" + System.currentTimeMillis();
-            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-            if(cursor != null && cursor.moveToFirst()){
-                int nameindex  = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                fileName = cursor.getString(nameindex);
-                cursor.close();
+    private String getFileName(Uri uri){
+//  When you pick a file using a URI in Android,
+//  you don't get a direct file path like C:/Downloads/file.jpg
+//  you get a reference to a database entry managed by the Android system
+//  the cursor allows you to "read" the metadata of that file, like its name and size
+    String fileName = null;
+    try {
+        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            int nameindex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+            if(nameindex != -1){fileName = cursor.getString(nameindex);}
+            //fileName = cursor.getString(nameindex);
+            cursor.close();
             }
-            // no fall back, add if it's a "file" URI or if the cursor failed
+        }
+    catch (Exception e){
+        e.printStackTrace();
+        }
+    // fallback:
+    if(fileName == null){
+        fileName = uri.getPath();
+        int cut = fileName.lastIndexOf('/');
+        if(cut != -1){fileName = fileName.substring(cut + 1);}
+        }
+    // return filename
+    return fileName;
+    }
 
 
-            DatabaseManager.uploadFile(fileBytes, fileName ,new DatabaseManager.UploadCallback() {
+    private void startImageUpload(Uri uri, int slot) {
+        try {
+            InputStream is = getContentResolver().openInputStream(uri);
+            byte[] bytes = getBytes(is);
+            String name = getFileName(uri);
+
+            DatabaseManager.uploadPreviewImage(bytes, name, new DatabaseManager.UploadCallback() {
                 @Override
                 public void onSuccess(String fileNameFromServer) {
-                    serverFileName = fileNameFromServer;
-                    runOnUiThread(() -> Toast.makeText(EditMaskActivity.this, "File ready", Toast.LENGTH_SHORT).show());
+                    serverImageNames[slot] = fileNameFromServer; // Store image name
+                    runOnUiThread(() -> Toast.makeText(EditMaskActivity.this, "Slot: " +slot +" Preview image ready", Toast.LENGTH_SHORT).show());
                 }
 
                 @Override
                 public void onFailure(String error) {
-                    // Toast.makeText(EditMaskActivity.this, "Save failed", Toast.LENGTH_SHORT).show();
-                    runOnUiThread(() -> Toast.makeText(EditMaskActivity.this, "Upload failed: " + error, Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> Toast.makeText(EditMaskActivity.this, "Image Error: " + error, Toast.LENGTH_SHORT).show());
+                    Log.d("image error", error);
                 }
             });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException e) { e.printStackTrace(); }
+    }
+
+    private void startDeepArUpload(Uri uri) {
+        try {
+            InputStream is = getContentResolver().openInputStream(uri);
+            byte[] bytes = getBytes(is);
+            String name = getFileName(uri);
+
+            DatabaseManager.uploadDeepArFile(bytes, name, new DatabaseManager.UploadCallback() {
+                @Override
+                public void onSuccess(String fileNameFromServer) {
+                    serverDeepArName = fileNameFromServer; // Store .deepar name
+                    runOnUiThread(() -> Toast.makeText(EditMaskActivity.this, "DeepAR file ready", Toast.LENGTH_SHORT).show());
+                }
+
+                @Override
+                public void onFailure(String error) {
+                    runOnUiThread(() -> Toast.makeText(EditMaskActivity.this, "DeepAR Error: " + error, Toast.LENGTH_SHORT).show());
+                }
+            });
+        } catch (IOException e) { e.printStackTrace(); }
     }
 
     public byte[] getBytes(InputStream input) throws IOException {

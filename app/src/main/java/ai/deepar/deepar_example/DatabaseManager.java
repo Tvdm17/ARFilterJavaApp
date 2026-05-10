@@ -43,7 +43,8 @@ public class DatabaseManager {
 
     public static final String EFFECTS_URL = "https://a25pt305.studev.groept.be/upload/assets/effects/";
 
-    public static final String TARGET_URL = "https://a25pt305.studev.groept.be/file_upload.php";
+    public static final String IMAGE_UPLOAD_URL = "https://a25pt305.studev.groept.be/upload_image.php";
+    public static final String DEEPAR_UPLOAD_URL = "https://a25pt305.studev.groept.be/upload_deepar.php";
 
     private static final OkHttpClient client = createUnsafeOkHttpClient();
     private static int userid = -1;
@@ -421,11 +422,22 @@ public class DatabaseManager {
 
     // Endpoint: POST create_makeover/{userId}/{name}
     // Returns the new makeoverID in response (backend should return [{makeoverID: X}])
-    public static void createMakeover(int userId, String name,String serverFileName, SimpleCallback callback) {
+
+    public interface CreateCallback {
+        void onSuccess(int newMakeoverId);
+        void onFailure(String message);
+    }
+
+    public static void createMakeover(int userId, String name, String previewImage, String deeparFile, SimpleCallback callback) {
+        // We use postToAPI because it handles the URL encoding and just returns onSuccess/onFailure
         postToAPI("create_makeover", callback,
                 String.valueOf(userId),
                 name,
-                serverFileName);
+                previewImage,
+                deeparFile);
+    }
+    public static void addImageToMakeover(String fileName, int makeoverId, SimpleCallback callback) {
+        postToAPI("add_makeover_image", callback, fileName, String.valueOf(makeoverId));
     }
 
     // Endpoint: POST update_makeover/{makeoverId}/{name}
@@ -442,7 +454,15 @@ public class DatabaseManager {
         void onFailure(String error);
     }
 
-    public static void uploadFile(byte[] fileBytes, String fileName, UploadCallback callback) {
+    public static void uploadPreviewImage(byte[] data, String name, UploadCallback cb) {
+        genericUpload(IMAGE_UPLOAD_URL, data, name, "image/jpeg", cb);
+    }
+
+    public static void uploadDeepArFile(byte[] data, String name, UploadCallback cb) {
+        genericUpload(DEEPAR_UPLOAD_URL, data, name, "application/octet-stream", cb);
+    }
+
+    public static void genericUpload(String url, byte[] data, String name, String mime, UploadCallback cb) {
         executor.execute(() -> {
             try {
                 okhttp3.RequestBody requestBody = new okhttp3.MultipartBody.Builder()
@@ -450,27 +470,27 @@ public class DatabaseManager {
                         // The file key must match $_FILES['file'] in php
                         .addFormDataPart(
                                 "file",
-                                fileName,
-                                okhttp3.RequestBody.create(okhttp3.MediaType.parse("application/octet-stream"), fileBytes))
+                                name,
+                                okhttp3.RequestBody.create(okhttp3.MediaType.parse(mime), data))
                         .build();
 
-                Request request = new Request.Builder().url(TARGET_URL).post(requestBody).build();
+                Request request = new Request.Builder().url(url).post(requestBody).build();
 
                 try (Response response = client.newCall(request).execute()) {
                     if (response.isSuccessful() && response.body() != null) {
                         JSONObject jsonResponse = new JSONObject(response.body().string());
                         if (jsonResponse.getString("status").equals("success")) {
                             String newName = jsonResponse.getString("filename");
-                            mainHandler.post(() -> callback.onSuccess(newName));
+                            mainHandler.post(() -> cb.onSuccess(newName));
                         } else {
-                            mainHandler.post(() -> callback.onFailure(jsonResponse.optString("message", "Upload failed")));
+                            mainHandler.post(() -> cb.onFailure(jsonResponse.optString("message", "Upload failed")));
                         }
                     } else {
-                        mainHandler.post(() -> callback.onFailure("Server Error: " + response.code()));
+                        mainHandler.post(() -> cb.onFailure("Server Error: " + response.code()));
                     }
                 }
             } catch (Exception e) {
-                mainHandler.post(() -> callback.onFailure(e.getMessage()));
+                mainHandler.post(() -> cb.onFailure(e.getMessage()));
             }
         });
     }
@@ -510,6 +530,28 @@ public class DatabaseManager {
                 }
 
 
+            }
+        });
+    }
+
+    public interface IdCallback {
+        void onSuccess(int id);
+        void onFailure(String message);
+    }
+
+    public static void getLatestMakeoverId(int userId, IdCallback callback) {
+        executor.execute(() -> {
+
+            JSONArray response = fetchFromAPI("get_latest_makeover_id/" + userId);
+            try {
+                if (response != null && response.length() > 0) {
+                    int latestId = response.getJSONObject(0).getInt("makeoverID");
+                    mainHandler.post(() -> callback.onSuccess(latestId));
+                } else {
+                    mainHandler.post(() -> callback.onFailure("Could not find the created makeover."));
+                }
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onFailure(e.getMessage()));
             }
         });
     }
