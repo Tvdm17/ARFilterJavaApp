@@ -1,5 +1,8 @@
 # VirtuGlow
 
+## Important
+Free DeepAR license supports sessions up to 3 minutes. After this time, the app needs to be restarted to be able to use the effects. Additionally, the readily available Galaxy filter often has visible latency. The latency is likewise noticeable on web, and has to do with poor effect optimisation, not with how we handled DeepAR connection.
+
 ## Sources and AI usage statement
 
 This project builds upon an example app demonstrating DeepAR SDK usage for Android development. The following functionality was taken:
