@@ -47,7 +47,7 @@ public class EditMaskActivity extends DrawerMenu {
     private EditText  etNewTag;
     private TextView  tvDeepArFileName;
     private TextView  tvTagSuggestions;
-    private Uri       deepArFileUri = null;
+    private Uri deepArFileUri = null;
 
     // thumbnail previews: index 0 = main, 1–4 = secondary slots
     private final ImageView[] thumbViews = new ImageView[5];
@@ -171,20 +171,28 @@ public class EditMaskActivity extends DrawerMenu {
             };
 
             if (isEditMode) {
-//                DatabaseManager.updateMakeover(makeoverId, name, serverImageNames[0], serverDeepArName, new DatabaseManager.SimpleCallback() {
-//                    @Override
-//                    public void onSuccess() {
-//                        Toast.makeText(EditMaskActivity.this, "Mask updated!", Toast.LENGTH_SHORT).show();
-//                        finish();
-//                    }
-//
-//                    @Override
-//                    public void onFailure(String message) {
-//                        btnSave.setEnabled(true);
-//                        Toast.makeText(EditMaskActivity.this, "Update failed: " + message, Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-                DatabaseManager.updateMakeover(makeoverId, name, serverFileName, onDone); // old method, new on top
+                DatabaseManager.updateMakeover(makeoverId, name, serverImageNames[0], serverDeepArName, new DatabaseManager.SimpleCallback() {
+                    @Override
+                    public void onSuccess() {
+
+                        DatabaseManager.clearAndLinkImages(makeoverId, serverImageNames, new DatabaseManager.SimpleCallback() {
+                                    @Override
+                                    public void onSuccess() {
+                                        Toast.makeText(EditMaskActivity.this, "Mask updated!", Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    }
+
+                                    @Override
+                                    public void onFailure(String message) {} // handle error
+                                });
+                    }
+
+                    @Override
+                    public void onFailure(String message) {
+                        btnSave.setEnabled(true);
+                        Toast.makeText(EditMaskActivity.this, "Update failed: " + message, Toast.LENGTH_SHORT).show();
+                    }
+                });
             } else {
                 DatabaseManager.createMakeover(DatabaseManager.getUserid(), name, serverImageNames[0], serverDeepArName, new DatabaseManager.SimpleCallback() {
                     @Override
@@ -330,6 +338,10 @@ public class EditMaskActivity extends DrawerMenu {
         if (item == null) return;
 
         etMaskName.setText(item.getName());
+        tvDeepArFileName.setText(item.getDeeparFileName());
+
+        serverImageNames[0] = item.getPreviewImage();
+        serverDeepArName = item.getDeeparFileName();
 
         if (item.isTagsLoaded()) {
             for (String tag : item.getTags()) {
@@ -340,6 +352,26 @@ public class EditMaskActivity extends DrawerMenu {
         Glide.with(this)
                 .load(DatabaseManager.PREVIEW_URL + item.getPreviewImage())
                 .into(thumbViews[0]);
+        DatabaseManager.fetchSecondaryImages(item.getId(), new DatabaseManager.APICallback() {
+            @Override
+            public void onSuccess(JSONArray response) {
+                try{
+                    for(int i = 1; i < response.length() + 1 && i < thumbViews.length; i++ ){
+                        String fileName = response.getJSONObject(i-1).getString("fileName");
+                        serverImageNames[i] = fileName;
+                        Glide.with(EditMaskActivity.this).load(DatabaseManager.PREVIEW_URL + fileName).into(thumbViews[i]);
+                    }
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(String message) {
+                // handle error opt.
+            }
+        });
     }
 
     private void openDeepArPicker() {

@@ -440,13 +440,37 @@ public class DatabaseManager {
         postToAPI("add_makeover_image", callback, fileName, String.valueOf(makeoverId));
     }
 
-    // Endpoint: POST update_makeover/{makeoverId}/{name}
-    public static void updateMakeover(int makeoverId, String name, String serverFileName , SimpleCallback callback) {
+    public static void updateMakeover(int makeoverId, String name, String serverFileName,String serverDeepArName , SimpleCallback callback) {
         postToAPI("update_makeover", callback,
-                String.valueOf(makeoverId),
                 name,
-                serverFileName);
-        // no endpoint yet !!
+                serverDeepArName,
+                serverFileName,
+                String.valueOf(makeoverId));
+    }
+    public static void clearAndLinkImages(int makeoverId, String[] serverImageNames, SimpleCallback simpleCallback) {
+        // clear images and add new ones
+        postToAPI("clear_makeover_images", new SimpleCallback() {
+            @Override
+            public void onSuccess() {
+                for(int i = 1; i < serverImageNames.length ; i++){
+                    if(serverImageNames[i] != null && !serverImageNames[i].isEmpty()){
+                        addImageToMakeover(serverImageNames[i], makeoverId, new SimpleCallback() {
+                            @Override
+                            public void onSuccess() {}
+
+                            @Override
+                            public void onFailure(String message) {}
+                        });
+                    }
+                }
+                simpleCallback.onSuccess();
+            }
+
+            @Override
+            public void onFailure(String message) {
+                simpleCallback.onFailure(message);
+            }
+        }, String.valueOf(makeoverId)); // parameter
     }
 
     public interface UploadCallback {
