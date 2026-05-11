@@ -105,8 +105,24 @@ public class ItemCardActivity extends DrawerMenu implements LeaveReviewDialogFra
             btnAddDelete.setText("Remove");
             btnAddDelete.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.error)));
             btnLeaveReview.setVisibility(View.VISIBLE);
-            btnAddDelete.setOnClickListener(v ->
-                    Toast.makeText(this, "Remove functionality coming soon", Toast.LENGTH_SHORT).show());
+            btnAddDelete.setOnClickListener(v -> {
+                btnAddDelete.setEnabled(false);
+                DatabaseManager.removePurchase(DatabaseManager.getUserid(), id, new DatabaseManager.SimpleCallback() {
+                    @Override
+                    public void onSuccess() {
+                        DatabaseManager.ownedMakeovers.remove(currentItem);
+                        DatabaseManager.shopItems.add((ShopItem) currentItem);
+                        Toast.makeText(ItemCardActivity.this, "Removed from your collection", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+
+                    @Override
+                    public void onFailure(String message) {
+                        btnAddDelete.setEnabled(true);
+                        Toast.makeText(ItemCardActivity.this, "Remove failed: " + message, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            });
         } else {
             btnAddDelete.setText("Add (" + currentItem.getPrice() + ")");
             btnAddDelete.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.buttonPrimary)));

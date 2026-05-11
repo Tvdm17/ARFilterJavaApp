@@ -270,7 +270,7 @@ public class DatabaseManager {
         executor.execute(() -> {
             try {
 
-                String endpoint = "get_makeovers/" + clientNumber;
+                String endpoint = "get_owned_makeovers/" + clientNumber;
                 JSONArray response = fetchFromAPI(endpoint);
 
                 if (response != null) {
@@ -287,7 +287,7 @@ public class DatabaseManager {
     public static void fetchShopItems(int clientNumber, APICallback callback) {
         executor.execute(() -> {
             try {
-                String endpoint = "get_show_items/" + clientNumber;
+                String endpoint = "get_shop_items/" + clientNumber;
                 JSONArray response = fetchFromAPI(endpoint);
 
                 if (response != null) {
@@ -346,6 +346,14 @@ public class DatabaseManager {
     public static void addPurchase(int clientId, int makeoverId, SimpleCallback callback) {
 
         postToAPI("add_purchase", callback,
+                String.valueOf(clientId),
+                String.valueOf(makeoverId)
+        );
+
+    }
+    public static void removePurchase(int clientId, int makeoverId, SimpleCallback callback) {
+
+        postToAPI("remove_purchase", callback,
                 String.valueOf(clientId),
                 String.valueOf(makeoverId)
         );
