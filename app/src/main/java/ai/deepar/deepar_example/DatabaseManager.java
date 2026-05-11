@@ -152,8 +152,6 @@ public class DatabaseManager {
                         setUserid(userId);
                         setEmail(userEmail);
 
-                        Log.d("LOGIN_ROLE", "check_user full obj: " + userObj);
-
                         JSONArray typeResponse = fetchFromAPI("check_usertype/" + userId);
                         if (typeResponse != null && typeResponse.length() > 0) {
                             JSONObject typeObj = typeResponse.optJSONObject(0);
@@ -289,7 +287,7 @@ public class DatabaseManager {
     public static void fetchShopItems(int clientNumber, APICallback callback) {
         executor.execute(() -> {
             try {
-                String endpoint = "get_shop_makeovers/" + clientNumber;
+                String endpoint = "get_show_items/" + clientNumber;
                 JSONArray response = fetchFromAPI(endpoint);
 
                 if (response != null) {

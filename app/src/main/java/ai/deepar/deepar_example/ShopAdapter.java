@@ -2,6 +2,7 @@ package ai.deepar.deepar_example;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,9 +49,11 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ShopItem item = items.get(position);
 
+        Log.d("ADAPTER_DATA", "Binding item: " + item.getName() + " with: " + item.getAverageRating());
+
         holder.tvItemName.setText(item.getName());
-        holder.rbRating.setRating((float) item.averageRating);
-        holder.tvRatingValue.setText(String.valueOf(item.averageRating));
+        holder.rbRating.setRating((float) item.getAverageRating());
+        holder.tvRatingValue.setText(String.valueOf(item.getAverageRating()));
 
         String fullImageurl = DatabaseManager.PREVIEW_URL + item.getPreviewImage();
 
@@ -76,7 +79,6 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ViewHolder> {
             context.startActivity(intent);
         });
 
-        // Tapping the stars toggles the numeric rating label
         holder.rbRating.setOnClickListener(v ->
             holder.tvRatingValue.setVisibility(
                 holder.tvRatingValue.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE

@@ -3,6 +3,7 @@ package ai.deepar.deepar_example;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -117,8 +118,9 @@ public class ShopActivity extends DrawerMenu implements FilterDialogFragment.OnF
                                 obj.getString("deeparFile"),
                                 obj.getString("imagePreview"),
                                 obj.optDouble("price", 0.0),
-                                obj.optDouble("averageRating", 0.0)
+                                parseRawRating(obj)
                         );
+                        Log.d("JSON_DATA", "API returned: " + obj.optDouble("averageRating"));
                         itemList.add(newItem);
                         DatabaseManager.shopItems.add(newItem);
                     }
@@ -134,6 +136,20 @@ public class ShopActivity extends DrawerMenu implements FilterDialogFragment.OnF
                 Toast.makeText(ShopActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private double parseRawRating(JSONObject obj) {
+
+        String rawrating = obj.optString("averageRating", "0.0");
+        double rating;
+        try{
+            rating = Double.parseDouble(rawrating);
+            if(Double.isNaN(rating)){rating = 0.0;}
+        }
+        catch (NullPointerException | NumberFormatException e){
+            rating = 0.0;
+        }
+        return rating;
     }
 
     private void applyFilters() {
