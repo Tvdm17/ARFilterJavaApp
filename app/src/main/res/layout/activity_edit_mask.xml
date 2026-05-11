@@ -89,6 +89,8 @@
     - @+id/etNewTag         — EditText to type a new tag
     - @+id/btnAddTag        — "+" button to confirm adding tag
     - @+id/btnSave          — Save button
+    - @+id/tvPriceLabel     — price
+    - @+id/etMaskPrice      — price EditText
 -->
 
 <androidx.drawerlayout.widget.DrawerLayout
@@ -616,6 +618,80 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardPrice"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/backgroundPrimary"
+            app:layout_constraintTop_toBottomOf="@id/cardDeepArFile"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="14dp">
+
+                <TextView
+                    android:id="@+id/tvPriceLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/price"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="13sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/btnEditPrice" />
+
+                <ImageView
+                    android:id="@+id/btnEditPrice"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/edit_icon"
+                    app:tint="@color/textSecondary"
+                    android:scaleType="centerInside"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:contentDescription="@string/edit_name"
+                    app:layout_constraintTop_toTopOf="@id/tvPriceLabel"
+                    app:layout_constraintBottom_toBottomOf="@id/tvPriceLabel"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <View
+                    android:id="@+id/dividerPrice"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:background="@color/dividerLight"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintTop_toBottomOf="@id/tvPriceLabel"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <EditText
+                    android:id="@+id/etMaskPrice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/enter_price"
+                    android:textColorHint="@color/textMuted"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:gravity="end"
+                    android:background="@null"
+                    android:paddingTop="10dp"
+                    android:inputType="text"
+                    app:layout_constraintTop_toBottomOf="@id/dividerPrice"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
         <!-- ══════════════════════════════════════
              TAGS CARD
              ══════════════════════════════════════ -->
@@ -630,7 +706,7 @@
             app:cardCornerRadius="12dp"
             app:cardElevation="2dp"
             app:cardBackgroundColor="@color/backgroundPrimary"
-            app:layout_constraintTop_toBottomOf="@id/cardDeepArFile"
+            app:layout_constraintTop_toBottomOf="@id/cardPrice"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
