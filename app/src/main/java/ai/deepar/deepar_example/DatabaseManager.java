@@ -654,10 +654,11 @@ public class DatabaseManager {
         executor.execute(() -> {
             try {
                 // Construct the full URL to your new PHP file
+                Log.d("PHP","try loop" );
                 String urlString = "https://a25pt305.studev.groept.be/filter_shop.php"
                         + "?clientnb=" + userId
                         + "&tags=" + java.net.URLEncoder.encode(tags, "UTF-8");
-
+                Log.d("PHP",urlString );
                 JSONArray response = fetchFromAPIByFullUrl(urlString); // Use a helper that takes a full URL
 
                 mainHandler.post(() -> callback.onSuccess(response));
@@ -675,7 +676,9 @@ public class DatabaseManager {
         java.util.Scanner scanner = new java.util.Scanner(conn.getInputStream());
         StringBuilder builder = new StringBuilder();
         while (scanner.hasNextLine()) {
-            builder.append(scanner.nextLine());
+            String a = scanner.nextLine();
+            builder.append(a);
+            Log.d("PHP",a );
         }
         scanner.close();
         return new JSONArray(builder.toString());
