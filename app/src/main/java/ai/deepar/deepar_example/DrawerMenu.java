@@ -4,6 +4,7 @@ package ai.deepar.deepar_example;
 import static ai.deepar.deepar_example.DatabaseManager.isIsCustomer;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -85,7 +86,10 @@ public class  DrawerMenu extends AppCompatActivity  {
         TextView tvSignOut = header.findViewById(R.id.tvSignOut);
         tvSignOut.setOnClickListener(v -> {
             DatabaseManager.setUserid(-1);
+            SharedPreferences prefs = getSharedPreferences("UserSession", MODE_PRIVATE); // wipe disk
+            prefs.edit().clear().apply();
             DatabaseManager.setUsername("");
+            DatabaseManager.setEmail("");
             Intent intent = new Intent(this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);

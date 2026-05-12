@@ -80,7 +80,45 @@ public class ShopActivity extends DrawerMenu implements FilterDialogFragment.OnF
     @Override
     public void onFiltersApplied(List<String> selectedCategories) {
         activeFilters = selectedCategories;
-        applyFilters();
+
+        if(selectedCategories.isEmpty()){
+            fetchItems(); // refresh shop
+            return;
+        }
+
+        String tagsParam = String.join(",", selectedCategories);
+        DatabaseManager.fetchShopItemsFiltered(DatabaseManager.getUserid(), tagsParam, new DatabaseManager.APICallback() {
+            @Override
+            public void onSuccess(JSONArray response) {
+                updateDisplayList(response);
+            }
+
+            @Override
+            public void onFailure(String message) {
+                displayList.clear();
+                myAdapter.notifyDataSetChanged();
+                Toast.makeText(ShopActivity.this, "No matching items", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateDisplayList(JSONArray response) {
+        displayList.clear();
+        try {
+            for (int i = 0; i < response.length(); i++) {
+                JSONObject obj = response.getJSONObject(i);
+                ShopItem item = new ShopItem(
+                        obj.getInt("makeoverID"),
+                        obj.getString("name"),
+                        obj.getString("deeparFile"),
+                        obj.getString("imagePreview"),
+                        obj.optDouble("price", 0.0),
+                        parseRawRating(obj)
+                );
+                displayList.add(item);
+            }
+            myAdapter.notifyDataSetChanged();
+        } catch (Exception e) { e.printStackTrace(); }
     }
 
     @Override
@@ -101,6 +139,10 @@ public class ShopActivity extends DrawerMenu implements FilterDialogFragment.OnF
             @Override
             public void onFailure(String message) {}
         });
+        fetchItems();
+    }
+
+    private void fetchItems(){
         DatabaseManager.fetchShopItems(DatabaseManager.getUserid(), new DatabaseManager.APICallback() {
             @Override
             public void onSuccess(JSONArray response) {
@@ -125,7 +167,6 @@ public class ShopActivity extends DrawerMenu implements FilterDialogFragment.OnF
                         DatabaseManager.shopItems.add(newItem);
                     }
                     applyFilters();
-                    fetchTagsForAll();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -177,35 +218,5 @@ public class ShopActivity extends DrawerMenu implements FilterDialogFragment.OnF
             }
         }
         return false;
-    }
-
-    private void fetchTagsForAll() {
-        if (itemList.isEmpty()) return;
-        int[] remaining = {itemList.size()};
-        for (ShopItem item : itemList) {
-            DatabaseManager.fetchTagsForMakeover(item.getId(), new DatabaseManager.APICallback() {
-                @Override
-                public void onSuccess(JSONArray response) {
-                    List<String> tags = new ArrayList<>();
-                    for (int i = 0; i < response.length(); i++) {
-                        JSONObject obj = response.optJSONObject(i);
-                        if (obj != null) {
-                            String tag = obj.optString("tagName", obj.optString("group", ""));
-                            if (!tag.isEmpty()) tags.add(tag);
-                        }
-                    }
-                    item.setTags(tags);
-                    remaining[0]--;
-                    if (remaining[0] == 0) applyFilters();
-                }
-
-                @Override
-                public void onFailure(String message) {
-                    item.setTags(new ArrayList<>());
-                    remaining[0]--;
-                    if (remaining[0] == 0) applyFilters();
-                }
-            });
-        }
     }
 }

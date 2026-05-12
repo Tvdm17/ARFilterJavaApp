@@ -22,6 +22,7 @@ import java.security.cert.X509Certificate;
 
 import android.content.Context;
 
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -192,6 +193,8 @@ public class DatabaseManager {
                 }
 
                 String fullPath = endpoint + params.toString();
+                // Inside your postToAPI or network method
+                Log.d("API_URL", "Final URL: " + fullPath);
                 JSONArray response = fetchFromAPI(fullPath);
 
                 // Studev returns [] for successful INSERTs
@@ -246,25 +249,50 @@ public class DatabaseManager {
         });
     }
 
-    public static void resetUsername(){userid = -1;}
-
     public static int getUserid() {
+        if (userid == -1) {
+            // Uses the global application context to reach storage
+            SharedPreferences prefs = App.getContext().getSharedPreferences("UserSession", Context.MODE_PRIVATE);
+            userid = prefs.getInt("saved_userid", -1);
+        }
         return userid;
     }
 
     public static String getUsername(){
+        if (username.isEmpty()) {
+            // Uses the global application context to reach storage
+            SharedPreferences prefs = App.getContext().getSharedPreferences("UserSession", Context.MODE_PRIVATE);
+            username = prefs.getString("saved_username", "");
+        }
         return username;
     }
 
-    public static String getEmail() { return email;}
+    public static String getEmail() {
+        if (email.isEmpty()) {
+            // Uses the global application context to reach storage
+            SharedPreferences prefs = App.getContext().getSharedPreferences("UserSession", Context.MODE_PRIVATE);
+            email = prefs.getString("saved_email", "");
+        }
+        return email;}
 
     public static void setUserid(int id){
         userid = id;
+        // CRITICAL: Save to disk so getUserid() can find it later
+        SharedPreferences prefs = App.getContext().getSharedPreferences("UserSession", Context.MODE_PRIVATE);
+        prefs.edit().putInt("saved_userid", id).apply();
     }
 
-    public static void setUsername(String name){username = name;}
+    public static void setUsername(String name){
+        username = name;
+        SharedPreferences prefs = App.getContext().getSharedPreferences("UserSession", Context.MODE_PRIVATE);
+        prefs.edit().putString("saved_username", name).apply();
+    }
 
-    public static void setEmail(String emailgot){ email = emailgot;}
+    public static void setEmail(String emailgot){
+        email = emailgot;
+        SharedPreferences prefs = App.getContext().getSharedPreferences("UserSession", Context.MODE_PRIVATE);
+        prefs.edit().putString("saved_email", emailgot).apply();
+    }
 
     public static void fetchOwnedMakeovers(int clientNumber, APICallback callback) {
         executor.execute(() -> {
@@ -344,7 +372,7 @@ public class DatabaseManager {
     }
 
     public static void addPurchase(int clientId, int makeoverId, SimpleCallback callback) {
-
+        Log.d("API_DEBUG", "Adding Purchase - User: " + clientId + " Item: " + makeoverId);
         postToAPI("add_purchase", callback,
                 String.valueOf(clientId),
                 String.valueOf(makeoverId)
@@ -620,13 +648,48 @@ public class DatabaseManager {
             }
         });
     }
+    public static void fetchShopItemsFiltered(int userId, String tags, APICallback callback) {
+        executor.execute(() -> {
+            try {
+                // Construct the full URL to your new PHP file
+                String urlString = "https://a25pt305.studev.groept.be/filter_shop.php"
+                        + "?clientnb=" + userId
+                        + "&tags=" + java.net.URLEncoder.encode(tags, "UTF-8");
+
+                JSONArray response = fetchFromAPIByFullUrl(urlString); // Use a helper that takes a full URL
+
+                mainHandler.post(() -> callback.onSuccess(response));
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onFailure(e.getMessage()));
+            }
+        });
+    }
+
+    private static JSONArray fetchFromAPIByFullUrl(String urlString) throws Exception {
+        java.net.URL url = new java.net.URL(urlString);
+        java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+
+        java.util.Scanner scanner = new java.util.Scanner(conn.getInputStream());
+        StringBuilder builder = new StringBuilder();
+        while (scanner.hasNextLine()) {
+            builder.append(scanner.nextLine());
+        }
+        scanner.close();
+        return new JSONArray(builder.toString());
+    }
 
     public static boolean isIsCustomer() {
+        SharedPreferences prefs = App.getContext().getSharedPreferences("UserSession", Context.MODE_PRIVATE);
+        isCustomer = prefs.getBoolean("saved_isCustomer", true);
+        // always get from disk
         return isCustomer;
     }
 
     public static void setIsCustomer(boolean var) {
         isCustomer = var;
+        SharedPreferences prefs = App.getContext().getSharedPreferences("UserSession", Context.MODE_PRIVATE);
+        prefs.edit().putBoolean("saved_isCustomer", var).apply();
     }
 
 }
