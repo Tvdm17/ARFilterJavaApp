@@ -464,11 +464,12 @@ public class DatabaseManager {
         void onFailure(String message);
     }
 
-    public static void createMakeover(int userId, String name, String previewImage, String deeparFile, SimpleCallback callback) {
+    public static void createMakeover(int userId, String name, String price,  String previewImage, String deeparFile, SimpleCallback callback) {
         // We use postToAPI because it handles the URL encoding and just returns onSuccess/onFailure
         postToAPI("create_makeover", callback,
                 String.valueOf(userId),
                 name,
+                price,
                 previewImage,
                 deeparFile);
     }
@@ -476,9 +477,10 @@ public class DatabaseManager {
         postToAPI("add_makeover_image", callback, fileName, String.valueOf(makeoverId));
     }
 
-    public static void updateMakeover(int makeoverId, String name, String serverFileName,String serverDeepArName , SimpleCallback callback) {
+    public static void updateMakeover(int makeoverId, String name, String price, String serverFileName,String serverDeepArName , SimpleCallback callback) {
         postToAPI("update_makeover", callback,
                 name,
+                price,
                 serverDeepArName,
                 serverFileName,
                 String.valueOf(makeoverId));

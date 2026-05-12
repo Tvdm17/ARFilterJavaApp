@@ -22,6 +22,7 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.WindowDecorActionBar;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -43,6 +44,7 @@ import java.util.List;
 public class EditMaskActivity extends DrawerMenu {
 
     private EditText  etMaskName;
+    private EditText etMaskPrice;
     private ChipGroup chipGroupTags;
     private EditText  etNewTag;
     private TextView  tvDeepArFileName;
@@ -100,6 +102,7 @@ public class EditMaskActivity extends DrawerMenu {
         tvUsername.setText(DatabaseManager.getUsername());
 
         etMaskName        = findViewById(R.id.etMaskName);
+        etMaskPrice       = findViewById(R.id.etMaskPrice);
         chipGroupTags     = findViewById(R.id.chipGroupTags);
         etNewTag          = findViewById(R.id.etNewTag);
         tvDeepArFileName  = findViewById(R.id.tvDeepArFileName);
@@ -123,6 +126,12 @@ public class EditMaskActivity extends DrawerMenu {
         findViewById(R.id.btnPick3).setOnClickListener(v -> openMediaPicker(3));
         findViewById(R.id.btnPick4).setOnClickListener(v -> openMediaPicker(4));
 
+
+        //Price
+        TextView tvPriceLabel = findViewById(R.id.tvPriceLabel);
+
+
+
         // ── Tag input ────────────────────────────────────────────────────────
         findViewById(R.id.btnAddTag).setOnClickListener(v ->
                 addTag(etNewTag.getText().toString().trim()));
@@ -144,8 +153,13 @@ public class EditMaskActivity extends DrawerMenu {
         Button btnSave = findViewById(R.id.btnSave);
         btnSave.setOnClickListener(v -> {
             String name = etMaskName.getText().toString().trim();
+            String price = etMaskPrice.getText().toString().trim();
             if (name.isEmpty()) {
                 Toast.makeText(this, "Please enter a mask name", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (price.isEmpty()) {
+                Toast.makeText(this, "Please enter a price", Toast.LENGTH_SHORT).show();
                 return;
             }
             if (serverImageNames[0] == null || serverDeepArName.isEmpty()) {
@@ -171,7 +185,7 @@ public class EditMaskActivity extends DrawerMenu {
             };
 
             if (isEditMode) {
-                DatabaseManager.updateMakeover(makeoverId, name, serverImageNames[0], serverDeepArName, new DatabaseManager.SimpleCallback() {
+                DatabaseManager.updateMakeover(makeoverId, name, price, serverImageNames[0], serverDeepArName, new DatabaseManager.SimpleCallback() {
                     @Override
                     public void onSuccess() {
 
@@ -194,7 +208,7 @@ public class EditMaskActivity extends DrawerMenu {
                     }
                 });
             } else {
-                DatabaseManager.createMakeover(DatabaseManager.getUserid(), name, serverImageNames[0], serverDeepArName, new DatabaseManager.SimpleCallback() {
+                DatabaseManager.createMakeover(DatabaseManager.getUserid(), name,  price, serverImageNames[0], serverDeepArName, new DatabaseManager.SimpleCallback() {
                     @Override
                     public void onSuccess() {
 
@@ -338,8 +352,8 @@ public class EditMaskActivity extends DrawerMenu {
         if (item == null) return;
 
         etMaskName.setText(item.getName());
+        etMaskPrice.setText(String.valueOf(item.getPrice()));
         tvDeepArFileName.setText(item.getDeeparFileName());
-
         serverImageNames[0] = item.getPreviewImage();
         serverDeepArName = item.getDeeparFileName();
 
