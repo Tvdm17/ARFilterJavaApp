@@ -72,9 +72,9 @@ android {
 
     // [ANDROID] namespace: the Java package prefix for generated R.java and BuildConfig classes.
     // NOTE: This differs from applicationId intentionally:
-    //   namespace (Java)   = ai.deepar.deepar_example  (internal code organization)
+    //   namespace (Java)   = tech.virtuglow.android  (internal code organization)
     //   applicationId (OS) = tech.virtuglow.demoandroid (device/Play Store identity)
-    namespace 'ai.deepar.deepar_example'
+    namespace 'tech.virtuglow.android'
 }
 
 dependencies {
