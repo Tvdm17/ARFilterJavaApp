@@ -16,5 +16,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = 'DeepAR_Example'
+rootProject.name = 'tech.virtuglow.android'
 include ':app'
