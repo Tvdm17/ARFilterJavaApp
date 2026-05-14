@@ -205,23 +205,7 @@ public class DatabaseManager {
         });
     }
 
-    public static void fetchFromAPI(String serviceName, final SimpleCallback callback) {
-        String url = "https://a25pt305.studev.groept.be/api/a25pt305/" + serviceName;
-        Request request = new Request.Builder().url(url).build();
-        executor.execute(() -> {
-            try (Response response = client.newCall(request).execute()){
 
-                if (response.isSuccessful() && response.body() != null) {
-                    mainHandler.post(() -> callback.onSuccess());
-                } else {
-                    mainHandler.post(() -> callback.onFailure("Action failed"));
-                }
-            } catch (Exception e) {
-                mainHandler.post(() -> callback.onFailure(e.getMessage()));
-            }
-        });
-
-    }
 
     public interface APICallback {
         void onSuccess(JSONArray response);
@@ -682,6 +666,24 @@ public class DatabaseManager {
         }
         scanner.close();
         return new JSONArray(builder.toString());
+    }
+
+    public static void fetchRemoves(String makeoverid, APICallback callback){
+        executor.execute(() -> {
+            try {
+                String endpoint = "count_purchase/" + makeoverid;
+                JSONArray response = fetchFromAPI(endpoint);
+
+                if (response != null) {
+                    mainHandler.post(() -> callback.onSuccess(response));
+                } else {
+                    mainHandler.post(() -> callback.onFailure("Shop is empty!"));
+                }
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onFailure("Network error: " + e.getMessage()));
+            }
+        });
+
     }
 
     public static boolean isIsCustomer() {

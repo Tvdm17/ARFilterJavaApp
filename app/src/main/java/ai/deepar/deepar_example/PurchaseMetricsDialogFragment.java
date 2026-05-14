@@ -9,6 +9,9 @@ import androidx.fragment.app.DialogFragment;
 
 import com.github.mikephil.charting.charts.LineChart;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.Locale;
 
 public class PurchaseMetricsDialogFragment extends DialogFragment {
@@ -16,7 +19,12 @@ public class PurchaseMetricsDialogFragment extends DialogFragment {
     private static final String ARG_MAKEOVER_ID  = "makeover_id";
     private static final String ARG_AVG_RATING   = "avg_rating";
 
+    private static int makeoverID = -1;
+
     public static PurchaseMetricsDialogFragment newInstance(int makeoverId, float avgRating) {
+
+        makeoverID = makeoverId;
+
         PurchaseMetricsDialogFragment f = new PurchaseMetricsDialogFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_MAKEOVER_ID, makeoverId);
@@ -49,9 +57,8 @@ public class PurchaseMetricsDialogFragment extends DialogFragment {
         android.widget.TextView tvAvgValue = view.findViewById(R.id.tvAvgRatingValue);
         tvAvgValue.setText(String.format(Locale.getDefault(), "%.1f / 5", avgRating));
 
-        // Charts: data endpoints not yet available — initialise as empty
-        initEmptyChart(view.findViewById(R.id.chartAdds));
-        initEmptyChart(view.findViewById(R.id.chartRemoves));
+        initDataAdds(view.findViewById(R.id.chartAdds));
+        initDataRemoves(view.findViewById(R.id.chartRemoves));
         initEmptyChart(view.findViewById(R.id.chartReviews));
 
         view.findViewById(R.id.btnCloseMetrics).setOnClickListener(v -> dismiss());
@@ -61,5 +68,41 @@ public class PurchaseMetricsDialogFragment extends DialogFragment {
         chart.setNoDataText("Data coming soon");
         chart.getDescription().setEnabled(false);
         chart.invalidate();
+    }
+    private void initDataAdds(LineChart chart){
+
+        DatabaseManager.fetchRemoves(String.valueOf(makeoverID) ,new DatabaseManager.APICallback() {
+
+            @Override
+            public void onSuccess(JSONArray response) {
+
+                //chart.setData();
+
+            }
+
+            @Override
+            public void onFailure(String message) {
+
+            }
+        });
+        //chart.setData("");
+    }
+    private void initDataRemoves(LineChart chart){
+
+        DatabaseManager.fetchRemoves(String.valueOf(makeoverID) ,new DatabaseManager.APICallback() {
+
+            @Override
+            public void onSuccess(JSONArray response) {
+
+
+
+            }
+
+            @Override
+            public void onFailure(String message) {
+
+            }
+        });
+        //chart.setData("");
     }
 }
