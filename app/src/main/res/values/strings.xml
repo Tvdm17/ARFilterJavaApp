@@ -2,7 +2,7 @@
 <resources>
 
     <!-- App -->
-    <string name="app_name">DeepAR_Example</string>
+    <string name="app_name">VirtuGlow</string>
     <string name="app_display_name">VirtuGlow</string>
 
     <!-- Sign-in screen -->
