@@ -574,6 +574,14 @@ public class DatabaseManager {
         });
     }
 
+    public static void addTagToMakeover(int makeoverId, String tag, SimpleCallback callback) {
+        postToAPI("add_makeover_tag", callback, String.valueOf(makeoverId), tag);
+    }
+
+    public static void removeTagFromMakeover(int makeoverId, String tag, SimpleCallback callback) {
+        postToAPI("remove_makeover_tag", callback, String.valueOf(makeoverId), tag);
+    }
+
     public static boolean isItemOwned(int id){
         for(Makeover m : ownedMakeovers){
             if(m.getId() == id){

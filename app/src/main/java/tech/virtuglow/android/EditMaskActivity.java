@@ -59,6 +59,9 @@ public class EditMaskActivity extends DrawerMenu {
 
     private String serverDeepArName ="";//name of deeparfile
 
+    private final List<String> originalTags = new ArrayList<>();
+    private final List<String> currentTags  = new ArrayList<>();
+
     private int activeSlot = 0;
 
     // single launcher for all 5 image/video slots
@@ -195,6 +198,7 @@ public class EditMaskActivity extends DrawerMenu {
                         DatabaseManager.clearAndLinkImages(makeoverId, serverImageNames, new DatabaseManager.SimpleCallback() {
                                     @Override
                                     public void onSuccess() {
+                                        syncTags(makeoverId);
                                         Toast.makeText(EditMaskActivity.this, "Mask updated!", Toast.LENGTH_SHORT).show();
                                         finish();
                                     }
@@ -231,6 +235,7 @@ public class EditMaskActivity extends DrawerMenu {
                                     }
                                 }
 
+                                syncTags(id);
                                 Toast.makeText(EditMaskActivity.this, "Makeover fully created.", Toast.LENGTH_SHORT).show();
                                 finish();
 
@@ -367,6 +372,7 @@ public class EditMaskActivity extends DrawerMenu {
         serverDeepArName = item.getDeeparFileName();
 
         if (item.isTagsLoaded()) {
+            originalTags.addAll(item.getTags());
             for (String tag : item.getTags()) {
                 addTag(tag);
             }
@@ -458,7 +464,12 @@ public class EditMaskActivity extends DrawerMenu {
 
     private void addTag(String tagText) {
         if (tagText.isEmpty()) return;
+        if (currentTags.contains(tagText)) {
+            Toast.makeText(this, "Tag already added", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        currentTags.add(tagText);
         Chip chip = new Chip(this);
         chip.setText(tagText);
         chip.setCloseIconVisible(true);
@@ -466,8 +477,32 @@ public class EditMaskActivity extends DrawerMenu {
         chip.setChipStrokeColorResource(R.color.colorPrimary);
         chip.setChipStrokeWidth(1f);
         chip.setTextColor(ContextCompat.getColor(this, R.color.textPrimary));
-        chip.setOnCloseIconClickListener(v -> chipGroupTags.removeView(chip));
+        chip.setOnCloseIconClickListener(v -> {
+            currentTags.remove(tagText);
+            chipGroupTags.removeView(chip);
+        });
         chipGroupTags.addView(chip);
         etNewTag.setText("");
+    }
+
+    private void syncTags(int makeoverId) {
+        List<String> toAdd = new ArrayList<>(currentTags);
+        toAdd.removeAll(originalTags);
+
+        List<String> toRemove = new ArrayList<>(originalTags);
+        toRemove.removeAll(currentTags);
+
+        for (String tag : toAdd) {
+            DatabaseManager.addTagToMakeover(makeoverId, tag, new DatabaseManager.SimpleCallback() {
+                @Override public void onSuccess() {}
+                @Override public void onFailure(String message) {}
+            });
+        }
+        for (String tag : toRemove) {
+            DatabaseManager.removeTagFromMakeover(makeoverId, tag, new DatabaseManager.SimpleCallback() {
+                @Override public void onSuccess() {}
+                @Override public void onFailure(String message) {}
+            });
+        }
     }
 }
