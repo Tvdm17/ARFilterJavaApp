@@ -307,16 +307,7 @@ public class EditMaskActivity extends DrawerMenu {
             byte[] bytes = getBytes(is);
             String name = getFileName(uri);
 
-            if (name == null || !(name.toLowerCase().endsWith(".jpg") ||
-                    name.toLowerCase().endsWith(".jpeg") ||
-                    name.toLowerCase().endsWith(".png"))) {
-
-                Toast.makeText(this, "Please select a valid image (JPG or PNG)", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-
-                DatabaseManager.uploadPreviewImage(bytes, name, new DatabaseManager.UploadCallback() {
+            DatabaseManager.uploadPreviewImage(bytes, name, new DatabaseManager.UploadCallback() {
                 @Override
                 public void onSuccess(String fileNameFromServer) {
                     serverImageNames[slot] = fileNameFromServer; // Store image name
@@ -337,11 +328,6 @@ public class EditMaskActivity extends DrawerMenu {
             InputStream is = getContentResolver().openInputStream(uri);
             byte[] bytes = getBytes(is);
             String name = getFileName(uri);
-
-            if (name == null || !name.toLowerCase().endsWith(".deepar")) {
-                Toast.makeText(this, "Please select a valid .deepar file", Toast.LENGTH_SHORT).show();
-                return;
-            }
 
             DatabaseManager.uploadDeepArFile(bytes, name, new DatabaseManager.UploadCallback() {
                 @Override
