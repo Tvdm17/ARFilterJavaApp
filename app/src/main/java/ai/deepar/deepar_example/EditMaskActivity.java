@@ -162,6 +162,10 @@ public class EditMaskActivity extends DrawerMenu {
                 Toast.makeText(this, "Please enter a price", Toast.LENGTH_SHORT).show();
                 return;
             }
+            if (!isvalidprice(price)) {
+                Toast.makeText(this, "Invalid price format, please enter a valid price.", Toast.LENGTH_SHORT).show();
+                return;
+            }
             if (serverImageNames[0] == null || serverDeepArName.isEmpty()) {
                 Toast.makeText(this, "Main image and DeepAR file are required", Toast.LENGTH_SHORT).show();
                 return;
@@ -259,8 +263,14 @@ public class EditMaskActivity extends DrawerMenu {
         });
     }
 
-
-
+    private boolean isvalidprice (String price) {
+        try {
+            double doubleprice = Double.parseDouble(price);
+            return doubleprice >= 0;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 
     private String getFileName(Uri uri){
 //  When you pick a file using a URI in Android,
