@@ -122,10 +122,6 @@
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
-            <!--
-                TODO: Fetch metrics data from DB and populate charts
-                tvAvgRatingValue.setText(String.format("%.1f / 5", avgRating));
-            -->
             <TextView
                 android:id="@+id/tvAvgRatingValue"
                 android:layout_width="wrap_content"
@@ -139,7 +135,7 @@
 
         <!-- ── Adds over time ── -->
         <TextView
-            android:id="@+id/tvAddsLabel"
+            android:id="@+id/tvMetrics"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/label_adds_over_time"
@@ -148,37 +144,12 @@
             android:textStyle="bold"
             android:layout_marginBottom="8dp" />
 
-        <!--
-            LineChart for adds.
-            TODO: Fetch metrics data from DB and populate charts
-            See setupChart() in JAVA CHART SETUP EXAMPLE above.
-        -->
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/chartAdds"
+        <com.github.mikephil.charting.charts.HorizontalBarChart
+            android:id="@+id/metrics"
             android:layout_width="match_parent"
-            android:layout_height="180dp"
+            android:layout_height="200dp"
             android:layout_marginBottom="24dp" />
 
-        <!-- ── Removes over time ── -->
-        <TextView
-            android:id="@+id/tvRemovesLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/label_removes_over_time"
-            android:textColor="@color/textPrimary"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
-
-        <!--
-            LineChart for removes.
-            TODO: Fetch metrics data from DB and populate charts
-        -->
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/chartRemoves"
-            android:layout_width="match_parent"
-            android:layout_height="180dp"
-            android:layout_marginBottom="24dp" />
 
         <!-- ── Reviews over time ── -->
         <TextView
@@ -191,10 +162,7 @@
             android:textStyle="bold"
             android:layout_marginBottom="8dp" />
 
-        <!--
-            LineChart for review count over time.
-            TODO: Fetch metrics data from DB and populate charts
-        -->
+
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/chartReviews"
             android:layout_width="match_parent"

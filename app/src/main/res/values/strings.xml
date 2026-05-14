@@ -81,7 +81,7 @@
     <!-- Purchase metrics dialog -->
     <string name="purchase_metrics_title">Purchase Metrics</string>
     <string name="label_average_rating">Average Rating</string>
-    <string name="label_adds_over_time">Adds over time</string>
+    <string name="label_adds_over_time">Adds and removes over time</string>
     <string name="label_removes_over_time">Removes over time</string>
     <string name="label_reviews_over_time">Reviews over time</string>
 
