@@ -103,7 +103,7 @@
 
             <EditText
                 android:id="@+id/etChangeEmail"
-                android:layout_width="236dp"
+                android:layout_width="0dp"
                 android:layout_height="35dp"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="8dp"
@@ -117,6 +117,7 @@
                 android:textColorHint="@color/textMuted"
                 android:textSize="15sp"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btnChangeEmail"
                 app:layout_constraintTop_toBottomOf="@id/tvEmailLabel" />
 
             <View
@@ -146,7 +147,7 @@
 
             <EditText
                 android:id="@+id/etChangeUsername"
-                android:layout_width="236dp"
+                android:layout_width="0dp"
                 android:layout_height="35dp"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="8dp"
@@ -160,6 +161,7 @@
                 android:textColorHint="@color/textMuted"
                 android:textSize="15sp"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btnChangeUsername"
                 app:layout_constraintTop_toBottomOf="@id/tvUsernameLabel" />
 
             <View
@@ -191,7 +193,7 @@
 
             <EditText
                 android:id="@+id/etChangePassword"
-                android:layout_width="236dp"
+                android:layout_width="0dp"
                 android:layout_height="35dp"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="8dp"
@@ -204,9 +206,8 @@
                 android:textColor="@color/textPrimary"
                 android:textColorHint="@color/textMuted"
                 android:textSize="15sp"
-                app:layout_constraintBottom_toTopOf="@+id/dividerPassword"
-
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btnChangePassword"
                 app:layout_constraintTop_toBottomOf="@id/tvPasswordLabel" />
 
             <ImageView
@@ -236,7 +237,7 @@
 
             <Button
                 android:id="@+id/btnChangeUsername"
-                android:layout_width="112dp"
+                android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_marginStart="5dp"
                 android:layout_marginBottom="7dp"
@@ -246,12 +247,14 @@
                 android:textColor="@color/textOnGold"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@+id/dividerUsername"
+                app:layout_constraintTop_toTopOf="@id/etChangeUsername"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/etChangeUsername"
                 app:layout_constraintStart_toEndOf="@+id/etChangeUsername" />
 
             <Button
                 android:id="@+id/btnChangeEmail"
-                android:layout_width="104dp"
+                android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_marginStart="5dp"
                 android:layout_marginBottom="7dp"
@@ -261,7 +264,9 @@
                 android:textColor="@color/textOnGold"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@+id/dividerEmail"
+                app:layout_constraintTop_toTopOf="@id/etChangeEmail"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/etChangeEmail"
                 app:layout_constraintStart_toEndOf="@+id/etChangeEmail" />
 
             <Button
@@ -276,7 +281,9 @@
                 android:textColor="@color/textOnGold"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@+id/dividerPassword"
+                app:layout_constraintTop_toTopOf="@+id/etChangePassword"
+                app:layout_constraintBottom_toBottomOf="@+id/etChangePassword"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/etChangePassword" />
 
 
