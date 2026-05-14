@@ -166,14 +166,15 @@ public class EditMaskActivity extends DrawerMenu {
                 Toast.makeText(this, "Invalid price format, please enter a valid price.", Toast.LENGTH_SHORT).show();
                 return;
             }
+            if (serverDeepArName.isEmpty() ||!serverDeepArName.toLowerCase().endsWith(".deepar")) {
+                Toast.makeText(this, "A valid .deepar file is required!", Toast.LENGTH_LONG).show();
+                return;
+            }
             if (serverImageNames[0] == null || serverDeepArName.isEmpty()) {
                 Toast.makeText(this, "Main image and DeepAR file are required", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (!serverDeepArName.toLowerCase().endsWith(".deepar")) {
-                Toast.makeText(this, "A valid .deepar file is required!", Toast.LENGTH_LONG).show();
-                return;
-            }
+
 
             btnSave.setEnabled(false);
 
@@ -344,6 +345,10 @@ public class EditMaskActivity extends DrawerMenu {
 
             if (name == null || !name.toLowerCase().endsWith(".deepar")) {
                 Toast.makeText(this, "Please select a valid .deepar file", Toast.LENGTH_SHORT).show();
+                // CRITICAL FIX FOR EDIT MODE:
+                // We must clear the old valid name so the user can't save
+                // the mask while a "bad" file is currently selected in the picker.
+                serverDeepArName = "";
                 return;
             }
 
