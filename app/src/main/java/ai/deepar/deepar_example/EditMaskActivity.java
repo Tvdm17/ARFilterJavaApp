@@ -170,6 +170,10 @@ public class EditMaskActivity extends DrawerMenu {
                 Toast.makeText(this, "Main image and DeepAR file are required", Toast.LENGTH_SHORT).show();
                 return;
             }
+            if (!serverDeepArName.toLowerCase().endsWith(".deepar")) {
+                Toast.makeText(this, "A valid .deepar file is required!", Toast.LENGTH_LONG).show();
+                return;
+            }
 
             btnSave.setEnabled(false);
 
@@ -307,6 +311,15 @@ public class EditMaskActivity extends DrawerMenu {
             byte[] bytes = getBytes(is);
             String name = getFileName(uri);
 
+            if (name == null || !(name.toLowerCase().endsWith(".jpg") ||
+                    name.toLowerCase().endsWith(".jpeg") ||
+                    name.toLowerCase().endsWith(".png"))) {
+
+                Toast.makeText(this, "Please select a valid image (JPG or PNG)", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+
             DatabaseManager.uploadPreviewImage(bytes, name, new DatabaseManager.UploadCallback() {
                 @Override
                 public void onSuccess(String fileNameFromServer) {
@@ -328,6 +341,12 @@ public class EditMaskActivity extends DrawerMenu {
             InputStream is = getContentResolver().openInputStream(uri);
             byte[] bytes = getBytes(is);
             String name = getFileName(uri);
+
+            if (name == null || !name.toLowerCase().endsWith(".deepar")) {
+                Toast.makeText(this, "Please select a valid .deepar file", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
 
             DatabaseManager.uploadDeepArFile(bytes, name, new DatabaseManager.UploadCallback() {
                 @Override
