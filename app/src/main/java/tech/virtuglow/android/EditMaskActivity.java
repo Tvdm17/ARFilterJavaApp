@@ -168,7 +168,7 @@ public class EditMaskActivity extends DrawerMenu {
                 Toast.makeText(this, "Invalid price format, please enter a valid price.", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (serverImageNames[0] == null || serverDeepArName.isEmpty()) {
+            if (serverImageNames[0] == null || serverDeepArName.isEmpty() || !serverDeepArName.toLowerCase().endsWith(".deepar")) {
                 Toast.makeText(this, "Main image and DeepAR file are required", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -311,6 +311,14 @@ public class EditMaskActivity extends DrawerMenu {
             byte[] bytes = getBytes(is);
             String name = getFileName(uri);
 
+            if (name == null || !(name.toLowerCase().endsWith(".jpg") ||
+                    name.toLowerCase().endsWith(".jpeg") ||
+                    name.toLowerCase().endsWith(".png"))) {
+
+                Toast.makeText(this, "Please select a valid image (JPG or PNG)", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             DatabaseManager.uploadPreviewImage(bytes, name, new DatabaseManager.UploadCallback() {
                 @Override
                 public void onSuccess(String fileNameFromServer) {
@@ -332,6 +340,21 @@ public class EditMaskActivity extends DrawerMenu {
             InputStream is = getContentResolver().openInputStream(uri);
             byte[] bytes = getBytes(is);
             String name = getFileName(uri);
+
+            if (name == null || !name.toLowerCase().endsWith(".deepar")) {
+                Toast.makeText(this, "Invalid format!", Toast.LENGTH_SHORT).show();
+
+                // CRITICAL FIX FOR EDIT MODE:
+                // We must clear the old valid name so the user can't save
+                // the mask while a "bad" file is currently selected in the picker.
+                serverDeepArName = "";
+
+                tvDeepArFileName.setText("INVALID FILE SELECTED");
+                return;
+            }
+
+
+
 
             DatabaseManager.uploadDeepArFile(bytes, name, new DatabaseManager.UploadCallback() {
                 @Override
