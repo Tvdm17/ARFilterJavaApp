@@ -26,7 +26,10 @@ Claude Code, Claude, and Gemini were used throughout development to assist mainl
 - explaining documentation
 - recommending best practices for app structure
 
+## Database Architecture (ERD)
+Below is the Entity-Relationship Diagram representing the relational database design, illustrating the constraints and mappings between Users, Creator Makeovers, Purchases, and dynamic Filter Tags.
 
+![VirtuGlow ERD](docs/finalversion.png)
 
 
 ## Requirements
